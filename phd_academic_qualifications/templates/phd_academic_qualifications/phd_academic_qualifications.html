@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhD Admission – Academic Qualifications</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #007bff;
+  --primary-dark: #0056b3;
+  --primary-light: #e8f2ff;
+  --primary-mid: #3395ff;
+  --white: #ffffff;
+  --bg: #f0f4f8;
+  --card: #ffffff;
+  --border: #cce0ff;
+  --border-light: #e4efff;
+  --text: #1a2340;
+  --muted: #6b7a99;
+  --red: #dc3545;
+  --red-light: #fff5f5;
+  --green: #198754;
+  --row-odd: #f5f9ff;
+  --row-even: #ffffff;
+  --shadow: 0 4px 28px rgba(0,123,255,.12);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+  min-height: 100vh;
+  padding: 36px 16px 70px;
+}
+
+/* top blue band */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 240px;
+  background: linear-gradient(130deg, #004fa3 0%, #007bff 55%, #3a9cff 100%);
+  z-index: 0;
+}
+
+.page-wrapper {
+  position: relative;
+  z-index: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ─── HEADER ─── */
+.header-card {
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 14px 14px 0 0;
+  padding: 24px 36px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.header-emblem {
+  width: 58px; height: 58px;
+  background: rgba(255,255,255,0.20);
+  border: 2px solid rgba(255,255,255,0.55);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+}
+
+.header-text h1 {
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+
+.header-text p {
+  color: rgba(255,255,255,0.72);
+  font-size: .78rem;
+  margin-top: 4px;
+}
+
+/* accent stripe */
+.accent-stripe {
+  height: 4px;
+  background: linear-gradient(90deg, #004fa3, #007bff, #62b8ff, #007bff, #004fa3);
+}
+
+/* ─── FORM CARD ─── */
+.form-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 14px 14px;
+  padding: 34px 34px 50px;
+  box-shadow: var(--shadow);
+}
+
+/* ─── SECTION TITLE ─── */
+.sec-title-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.sec-icon {
+  width: 42px; height: 42px;
+  background: var(--primary-light);
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.sec-label h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.25rem;
+  color: var(--primary-dark);
+  font-weight: 700;
+}
+
+.sec-line {
+  flex: 1;
+  height: 1.5px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+
+/* ─── TABLE SCROLL ─── */
+.table-scroll {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  box-shadow: 0 2px 12px rgba(0,123,255,.07);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1060px;
+}
+
+/* THEAD */
+thead tr {
+  background: linear-gradient(90deg, #004fa3 0%, #007bff 100%);
+}
+
+thead th {
+  padding: 14px 10px;
+  font-size: .72rem;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+  letter-spacing: .45px;
+  text-transform: uppercase;
+  border-right: 1px solid rgba(255,255,255,0.13);
+  white-space: nowrap;
+}
+
+thead th:first-child { text-align: left; padding-left: 16px; }
+thead th:last-child  { border-right: none; }
+
+.th-ast { color: #ffd5d5; margin-left: 1px; }
+.th-note { display: block; font-size: .63rem; font-weight: 400; color: rgba(255,255,255,.62); margin-top: 2px; text-transform: none; letter-spacing: 0; white-space: normal; }
+
+/* TBODY */
+tbody tr {
+  border-bottom: 1px solid var(--border-light);
+  transition: background .14s;
+}
+
+tbody tr:last-child { border-bottom: none; }
+tbody tr:nth-child(odd)  { background: var(--row-odd); }
+tbody tr:nth-child(even) { background: var(--row-even); }
+tbody tr:hover { background: #eaf3ff; }
+
+tbody td {
+  padding: 9px 8px;
+  vertical-align: middle;
+  border-right: 1px solid var(--border-light);
+}
+
+tbody td:last-child { border-right: none; text-align: center; }
+tbody td:first-child { padding-left: 14px; }
+
+/* exam label */
+.exam-label {
+  font-size: .84rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+  padding-left: 10px;
+  border-left: 3px solid var(--primary);
+  line-height: 1.4;
+}
+
+/* ─── INPUTS ─── */
+.tb-input {
+  width: 100%;
+  padding: 8px 9px;
+  border: 1.5px solid #c4d9f5;
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: .81rem;
+  color: var(--text);
+  background: #fff;
+  outline: none;
+  transition: border-color .18s, box-shadow .18s;
+  -moz-appearance: textfield;
+}
+
+.tb-input::-webkit-outer-spin-button,
+.tb-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+.tb-input::placeholder { color: #aab8cc; font-size: .77rem; }
+
+.tb-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0,123,255,.14);
+}
+
+.tb-input.error {
+  border-color: var(--red) !important;
+  background: #fff8f8;
+  box-shadow: 0 0 0 3px rgba(220,53,69,.10);
+}
+
+/* select */
+select.tb-input {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath fill='%236b7a99' d='M0 0l5.5 7L11 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+}
+
+/* computed */
+.tb-input.computed {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  font-weight: 700;
+  text-align: center;
+  cursor: default;
+  font-size: .83rem;
+}
+
+/* grade + marks group */
+.gm-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.gm-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.gm-lbl {
+  font-size: .67rem;
+  font-weight: 600;
+  color: var(--muted);
+  min-width: 44px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+}
+
+.gm-row .tb-input { flex: 1; }
+.marks-row .tb-input { width: 60px; text-align: center; }
+.slash { font-size: .9rem; color: #aab8cc; font-weight: 700; }
+
+/* ─── ERROR ─── */
+.err-msg {
+  font-size: .68rem;
+  color: var(--red);
+  margin-top: 3px;
+  display: none;
+  align-items: center;
+  gap: 3px;
+  line-height: 1.2;
+}
+.err-msg.show { display: flex; }
+
+/* ─── ACTIONS ─── */
+.action-cell { display: flex; align-items: center; justify-content: center; gap: 7px; }
+
+.btn-act {
+  width: 33px; height: 33px;
+  border: none; border-radius: 50%;
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: transform .16s, box-shadow .16s;
+  flex-shrink: 0;
+}
+
+.btn-plus {
+  background: linear-gradient(135deg, #198754, #20a06a);
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(25,135,84,.28);
+}
+
+.btn-trash {
+  background: linear-gradient(135deg, #dc3545, #c62333);
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(220,53,69,.26);
+}
+
+.btn-act:hover { transform: scale(1.18); }
+.btn-act:active { transform: scale(.90); }
+
+/* ─── FOOTER ─── */
+.footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 28px;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.btn-add-other {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border: 2px dashed var(--primary);
+  color: var(--primary);
+  font-family: 'Inter', sans-serif;
+  font-size: .87rem;
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .18s, transform .15s;
+}
+
+.btn-add-other:hover { background: var(--primary-light); transform: translateY(-1px); }
+
+.btn-save {
+  background: linear-gradient(90deg, #004fa3, #007bff);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: .92rem;
+  font-weight: 600;
+  padding: 12px 36px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  box-shadow: 0 4px 18px rgba(0,123,255,.35);
+  transition: transform .15s, box-shadow .15s;
+  letter-spacing: .3px;
+}
+
+.btn-save:hover { transform: translateY(-2px); box-shadow: 0 8px 26px rgba(0,123,255,.40); }
+.btn-save:active { transform: translateY(0); }
+
+/* ─── TOAST ─── */
+.toast {
+  position: fixed;
+  bottom: 28px; right: 28px;
+  background: #1a2340;
+  color: #fff;
+  padding: 13px 20px;
+  border-radius: 10px;
+  font-size: .87rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all .35s cubic-bezier(.34,1.56,.64,1);
+  z-index: 999;
+  max-width: 380px;
+  border-left: 4px solid transparent;
+}
+
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-left-color: #198754; }
+.toast.error   { border-left-color: var(--red); }
+
+/* row animation */
+@keyframes rowIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.row-in { animation: rowIn .20s ease; }
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <!-- HEADER -->
+  <div class="header-card">
+    <div class="header-emblem">🎓</div>
+    <div class="header-text">
+      <h1>Doctor of Philosophy (Ph.D.) Admission Form</h1>
+
+    </div>
+  </div>
+  <div class="accent-stripe"></div>
+
+  <!-- FORM CARD -->
+  <div class="form-card">
+
+    <!-- Section Title -->
+    <div class="sec-title-row">
+      <div class="sec-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#007bff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+        </svg>
+      </div>
+      <div class="sec-label">
+        <h2>Academic Qualifications</h2>
+      </div>
+      <div class="sec-line"></div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-scroll">
+      <table id="qualTable">
+        <thead>
+          <tr>
+            <th style="min-width:148px;">Examination Passed <span class="th-ast">*</span></th>
+            <th style="min-width:175px;">Name of University / Board <span class="th-ast">*</span></th>
+            <th style="min-width:110px;">Year of Passing <span class="th-ast">*</span></th>
+            <th style="min-width:100px;">Roll No. <span class="th-ast">*</span></th>
+            <th style="min-width:195px;">
+              Grade or Marks Obtained / Max Marks <span class="th-ast">*</span>
+              <span class="th-note">Enter Grade OR Obtained / Max Marks</span>
+            </th>
+            <th style="min-width:100px;">
+              %Age of Marks
+              <span class="th-note">Auto Calculated</span>
+            </th>
+            <th style="min-width:165px;">Subjects <span class="th-ast">*</span></th>
+            <th style="min-width:82px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="qualBody">
+        {% for qualification in qualifications %}
+        <tr data-id="qual{{ qualification.id }}" class="row-in">
+          <td>
+            <select class="tb-input" data-field="exam" data-id="qual{{ qualification.id }}" onchange="toggleCustom('qual{{ qualification.id }}')">
+              <option value="">-- Select --</option>
+              <option value="matric" {% if qualification.examination_passed == 'matric' %}selected{% endif %}>Matric</option>
+              <option value="10+2" {% if qualification.examination_passed == '10+2' %}selected{% endif %}>10+2</option>
+              <option value="bachelor" {% if qualification.examination_passed == 'bachelor' %}selected{% endif %}>Bachelor Degree</option>
+              <option value="master" {% if qualification.examination_passed == 'master' %}selected{% endif %}>Master Degree</option>
+              <option value="mphil" {% if qualification.examination_passed == 'mphil' %}selected{% endif %}>M.Phil.</option>
+              <option value="net_jrf_gate_gpat" {% if qualification.examination_passed == 'net_jrf_gate_gpat' %}selected{% endif %}>NET/JRF/GATE/GPAT</option>
+              <option value="fellowship" {% if qualification.examination_passed == 'fellowship' %}selected{% endif %}>Any Other Fellowship</option>
+              <option value="other" {% if qualification.examination_passed == 'other' %}selected{% endif %}>Any Other Qualification</option>
+            </select>
+            <div class="err-msg" id="e-exam-qual{{ qualification.id }}">${ERR_ICON} Required</div>
+            
+            <input class="tb-input custom-exam" type="text" placeholder="Enter custom exam name"
+              data-field="custom_exam" data-id="qual{{ qualification.id }}" 
+              value="{{ qualification.custom_examination|default:'' }}"
+              style="{% if qualification.examination_passed != 'other' %}display:none;{% endif %}" />
+          </td>
+
+          <td>
+            <input class="tb-input" type="text" placeholder="e.g. CBLU, Haryana"
+              data-field="board" data-id="qual{{ qualification.id }}" value="{{ qualification.university_board }}" />
+            <div class="err-msg" id="e-board-qual{{ qualification.id }}">${ERR_ICON} Required</div>
+          </td>
+
+          <td>
+            <input class="tb-input" type="number" min="1950" max="2050" placeholder="YYYY"
+              data-field="year" data-id="qual{{ qualification.id }}" value="{{ qualification.year_of_passing }}" />
+            <div class="err-msg" id="e-year-qual{{ qualification.id }}">${ERR_ICON} Required</div>
+          </td>
+
+          <td>
+            <input class="tb-input" type="text" placeholder="Roll No."
+              data-field="roll" data-id="qual{{ qualification.id }}" value="{{ qualification.roll_number }}" />
+            <div class="err-msg" id="e-roll-qual{{ qualification.id }}">${ERR_ICON} Required</div>
+          </td>
+
+          <td>
+            <input class="tb-input" type="text" placeholder="e.g. A / A+ / O / Distinction"
+              data-field="grade" data-id="qual{{ qualification.id }}" value="{{ qualification.grade|default:'' }}" />
+          </td>
+
+          <td>
+            <input class="tb-input" type="number" step="0.01" placeholder="Obtained"
+              data-field="obtained" data-id="qual{{ qualification.id }}" 
+              value="{{ qualification.marks_obtained|default:'' }}" 
+              onchange="calcPerc('qual{{ qualification.id }}')" />
+          </td>
+
+          <td>
+            <input class="tb-input" type="number" step="0.01" placeholder="Max"
+              data-field="max" data-id="qual{{ qualification.id }}" 
+              value="{{ qualification.max_marks|default:'' }}" 
+              onchange="calcPerc('qual{{ qualification.id }}')" />
+          </td>
+
+          <td>
+            <input class="tb-input computed" id="perc-qual{{ qualification.id }}" type="text" readonly 
+              value="{% if qualification.percentage %}{{ qualification.percentage|floatformat:2 }}%{% endif %}" />
+          </td>
+
+          <td>
+            <input class="tb-input" type="text" placeholder="e.g. Physics, Chemistry"
+              data-field="subjects" data-id="qual{{ qualification.id }}" value="{{ qualification.subjects }}" />
+            <div class="err-msg" id="e-subjects-qual{{ qualification.id }}">${ERR_ICON} Required</div>
+          </td>
+
+          <td>
+            <div class="action-cell">
+              <button class="btn-act btn-plus"  title="Add row below" onclick="addRowBelow('qual{{ qualification.id }}')">${PLUS_ICON}</button>
+              <button class="btn-act btn-trash" title="Remove row"    onclick="delRow('qual{{ qualification.id }}')">${TRASH_ICON}</button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-row">
+      <button class="btn-add-other" onclick="addCustomRow()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        Add Other Qualification
+      </button>
+      <button class="btn-save" onclick="submitForm()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Save &amp; Continue
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span id="toastIco" style="font-size:1.1rem;"></span>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+/* ─── FIXED EXAM LIST ─── */
+const EXAMS = [
+  'Matric',
+  '10+2',
+  'Bachelor Degree',
+  'Master Degree',
+  'M.Phil.',
+  'NET/JRF/GATE/GPAT',
+  'Any Other Fellowship',
+  'Any Other Qualification',
+];
+
+const CUR_YEAR = new Date().getFullYear();
+let customCount = 0;
+const MAX_CUSTOM = 10;
+
+/* ─── YEAR SELECT ─── */
+function yearOptions() {
+  let html = '<option value="">-- Select Year --</option>';
+  for (let y = CUR_YEAR; y >= 1950; y--) {
+    html += `<option value="${y}">${y}</option>`;
+  }
+  return html;
+}
+
+/* ─── SVG ICONS ─── */
+const PLUS_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+const TRASH_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>`;
+const ERR_ICON  = `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>`;
+
+/* ─── CREATE ROW ─── */
+function makeRow(examName, isDynamic) {
+  const id = 'r' + Date.now() + Math.floor(Math.random() * 9999);
+
+  const examCell = isDynamic
+    ? `<td>
+        <input class="tb-input" type="text" placeholder="Qualification name"
+          data-field="exam" data-id="${id}" />
+        <div class="err-msg" id="e-exam-${id}">${ERR_ICON} Required</div>
+       </td>`
+    : `<td><div class="exam-label">${examName}</div></td>`;
+
+  const actionBtn = `<button class="btn-act btn-plus"  title="Add row below" onclick="addBelow('${id}')">${PLUS_ICON}</button><button class="btn-act btn-trash" title="Remove row" onclick="delRow('${id}')">${TRASH_ICON}</button>`;
+
+  return `
+  <tr data-id="${id}" data-dyn="${isDynamic ? '1' : '0'}" class="row-in">
+    ${examCell}
+
+    <td>
+      <input class="tb-input" type="text" placeholder="e.g. CBLU, Haryana"
+        data-field="board" data-id="${id}" />
+      <div class="err-msg" id="e-board-${id}">${ERR_ICON} Required</div>
+    </td>
+
+    <td>
+      <select class="tb-input" data-field="year" data-id="${id}">
+        ${yearOptions()}
+      </select>
+      <div class="err-msg" id="e-year-${id}">${ERR_ICON} Select year</div>
+    </td>
+
+    <td>
+      <input class="tb-input" type="text" placeholder="Roll No."
+        data-field="roll" data-id="${id}" />
+      <div class="err-msg" id="e-roll-${id}">${ERR_ICON} Required</div>
+    </td>
+
+    <td>
+      <div class="gm-group">
+        <div class="gm-row">
+          <span class="gm-lbl">Grade</span>
+          <input class="tb-input" type="text" placeholder="A / A+ / O / Distinction"
+            data-field="grade" data-id="${id}" oninput="onGrade('${id}')" style="flex:1;" />
+        </div>
+        <div class="gm-row marks-row">
+          <span class="gm-lbl">Marks</span>
+          <input class="tb-input" type="text" inputmode="decimal" placeholder="Obtained"
+            data-field="obtained" data-id="${id}" oninput="calcPct('${id}')" />
+          <span class="slash">/</span>
+          <input class="tb-input" type="text" inputmode="decimal" placeholder="Max"
+            data-field="max" data-id="${id}" oninput="calcPct('${id}')" />
+        </div>
+      </div>
+      <div class="err-msg" id="e-marks-${id}">${ERR_ICON} Enter Grade OR Marks Obtained / Max</div>
+    </td>
+
+    <td>
+      <input class="tb-input computed" id="pct-${id}" type="text" readonly placeholder="—" />
+    </td>
+
+    <td>
+      <input class="tb-input" type="text" placeholder="e.g. Physics, Chemistry"
+        data-field="subjects" data-id="${id}" />
+      <div class="err-msg" id="e-subjects-${id}">${ERR_ICON} Required</div>
+    </td>
+
+    <td>
+      <div class="action-cell">${actionBtn}</div>
+    </td>
+  </tr>`;
+}
+
+/* ─── INIT ─── */
+function init() {
+  document.getElementById('qualBody').innerHTML =
+    EXAMS.map(name => makeRow(name, false)).join('');
+}
+
+/* ─── PERCENTAGE CALC ─── */
+function calcPct(id) {
+  const obtEl = document.querySelector(`[data-field="obtained"][data-id="${id}"]`);
+  const maxEl = document.querySelector(`[data-field="max"][data-id="${id}"]`);
+  const pctEl = document.getElementById('pct-' + id);
+  if (!pctEl) return;
+
+  const ov = parseFloat((obtEl?.value || '').replace(/,/g, ''));
+  const mv = parseFloat((maxEl?.value || '').replace(/,/g, ''));
+
+  if (!obtEl.value.trim() && !maxEl.value.trim()) {
+    pctEl.value = ''; pctEl.style.color = ''; return;
+  }
+
+  if (!isNaN(ov) && !isNaN(mv) && mv > 0) {
+    if (ov > mv) {
+      pctEl.value = 'Error!';
+      pctEl.style.color = 'var(--red)';
+    } else {
+      pctEl.value = ((ov / mv) * 100).toFixed(2) + ' %';
+      pctEl.style.color = 'var(--primary-dark)';
+    }
+  } else {
+    pctEl.value = '';
+    pctEl.style.color = '';
+  }
+}
+
+function onGrade(id) {
+  const gradeEl = document.querySelector(`[data-field="grade"][data-id="${id}"]`);
+  const obtEl   = document.querySelector(`[data-field="obtained"][data-id="${id}"]`);
+  const maxEl   = document.querySelector(`[data-field="max"][data-id="${id}"]`);
+  const pctEl   = document.getElementById('pct-' + id);
+  if (!pctEl) return;
+
+  const gradeVal = gradeEl?.value.trim();
+  const noMarks  = !obtEl?.value.trim() && !maxEl?.value.trim();
+
+  if (gradeVal && noMarks) {
+    pctEl.value = 'N/A (Grade)';
+    pctEl.style.color = 'var(--muted)';
+  } else if (!gradeVal) {
+    calcPct(id);
+  }
+}
+
+/* ─── ADD / DELETE ─── */
+function addCustomRow() {
+  if (customCount >= MAX_CUSTOM) { toast('error','⚠️','Max custom rows reached.'); return; }
+  customCount++;
+  document.getElementById('qualBody').insertAdjacentHTML('beforeend', makeRow('', true));
+}
+
+function addBelow(refId) {
+  if (customCount >= MAX_CUSTOM) { toast('error','⚠️','Max custom rows reached.'); return; }
+  customCount++;
+  const ref = document.querySelector(`#qualBody tr[data-id="${refId}"]`);
+  if (ref) ref.insertAdjacentHTML('afterend', makeRow('', true));
+}
+
+function delRow(id) {
+  const tr = document.querySelector(`#qualBody tr[data-id="${id}"]`);
+  if (!tr) return;
+  // prevent deleting if only 1 row left
+  if (document.querySelectorAll('#qualBody tr').length <= 1) {
+    toast('error','⚠️','At least one row must remain.');
+    return;
+  }
+  tr.style.transition = 'opacity .18s, transform .18s';
+  tr.style.opacity = '0'; tr.style.transform = 'translateX(18px)';
+  setTimeout(() => {
+    if (tr.dataset.dyn === '1') customCount = Math.max(0, customCount - 1);
+    tr.remove();
+  }, 200);
+}
+
+/* ─── ROW ACTIVE? ─── */
+function isActive(tr) {
+  const fields = tr.querySelectorAll('.tb-input:not(.computed)');
+  return Array.from(fields).some(f => f.value.trim() !== '' && f.value !== '-- Select Year --');
+}
+
+/* ─── VALIDATION HELPERS ─── */
+function showErr(id, field, inp) {
+  document.getElementById(`e-${field}-${id}`)?.classList.add('show');
+  inp?.classList.add('error');
+}
+
+function clrErr(id, field, inp) {
+  document.getElementById(`e-${field}-${id}`)?.classList.remove('show');
+  inp?.classList.remove('error');
+}
+
+/* ─── VALIDATE ALL ─── */
+function validate() {
+  let ok = true;
+
+  document.querySelectorAll('#qualBody tr').forEach(tr => {
+    const id   = tr.dataset.id;
+    const isDyn = tr.dataset.dyn === '1';
+
+    if (!isActive(tr)) return; // blank row – skip
+
+    // exam (dynamic only)
+    if (isDyn) {
+      const e = tr.querySelector('[data-field="exam"]');
+      e.value.trim() ? clrErr(id,'exam',e) : (showErr(id,'exam',e), ok=false);
+    }
+
+    // board
+    const b = tr.querySelector('[data-field="board"]');
+    b.value.trim() ? clrErr(id,'board',b) : (showErr(id,'board',b), ok=false);
+
+    // year
+    const y = tr.querySelector('[data-field="year"]');
+    y.value ? clrErr(id,'year',y) : (showErr(id,'year',y), ok=false);
+
+    // roll
+    const r = tr.querySelector('[data-field="roll"]');
+    r.value.trim() ? clrErr(id,'roll',r) : (showErr(id,'roll',r), ok=false);
+
+    // grade OR marks
+    const grade = tr.querySelector('[data-field="grade"]');
+    const obt   = tr.querySelector('[data-field="obtained"]');
+    const max   = tr.querySelector('[data-field="max"]');
+    const errEl = document.getElementById(`e-marks-${id}`);
+    const gradeOk = grade?.value.trim() !== '';
+    const ov = parseFloat((obt?.value||'').replace(/,/g,''));
+    const mv = parseFloat((max?.value||'').replace(/,/g,''));
+    const marksOk = !isNaN(ov) && !isNaN(mv) && mv > 0 && ov <= mv;
+
+    if (!gradeOk && !marksOk) {
+      errEl?.classList.add('show');
+      obt?.classList.add('error'); max?.classList.add('error');
+      ok = false;
+    } else {
+      errEl?.classList.remove('show');
+      obt?.classList.remove('error'); max?.classList.remove('error');
+    }
+
+    // subjects
+    const s = tr.querySelector('[data-field="subjects"]');
+    s.value.trim() ? clrErr(id,'subjects',s) : (showErr(id,'subjects',s), ok=false);
+  });
+
+  return ok;
+}
+
+/* live clear */
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (!t.classList.contains('tb-input') || t.readOnly) return;
+  t.classList.remove('error');
+  const id = t.dataset.id, f = t.dataset.field;
+  if (id && f) document.getElementById(`e-${f}-${id}`)?.classList.remove('show');
+});
+
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (!t.classList.contains('tb-input') || t.readOnly) return;
+  t.classList.remove('error');
+  const id = t.dataset.id, f = t.dataset.field;
+  if (id && f) document.getElementById(`e-${f}-${id}`)?.classList.remove('show');
+});
+
+/* ─── SUBMIT ─── */
+function submitForm() {
+  if (validate()) {
+    // Collect all active rows data
+    const rows = document.querySelectorAll('#qualBody tr');
+    const formData = new FormData();
+    
+    rows.forEach((row, index) => {
+      const isActive = row.querySelector('.tb-input:not(.computed)')?.value.trim() !== '';
+      
+      if (isActive) {
+        const id = row.dataset.id;
+        formData.append(`exam`, row.querySelector('[data-field="exam"]')?.value || '');
+        formData.append(`custom_exam`, row.querySelector('[data-field="custom_exam"]')?.value || '');
+        formData.append(`board`, row.querySelector('[data-field="board"]')?.value || '');
+        formData.append(`year`, row.querySelector('[data-field="year"]')?.value || '');
+        formData.append(`roll`, row.querySelector('[data-field="roll"]')?.value || '');
+        formData.append(`grade`, row.querySelector('[data-field="grade"]')?.value || '');
+        formData.append(`obtained`, row.querySelector('[data-field="obtained"]')?.value || '');
+        formData.append(`max`, row.querySelector('[data-field="max"]')?.value || '');
+        formData.append(`subjects`, row.querySelector('[data-field="subjects"]')?.value || '');
+      }
+    });
+    
+    // Submit to Django backend
+    fetch("{% url 'phd_academic_qualifications:submit_qualification_data' %}", {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken')
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        toast('success','✔', data.message);
+        // Optionally reload page to show saved data
+        setTimeout(() => location.reload(), 2000);
+      } else {
+        toast('error','✖', data.message);
+      }
+    })
+    .catch(error => {
+      toast('error','✖','An error occurred. Please try again.');
+    });
+  } else {
+    toast('error','✖','Please complete all required fields in started rows.');
+    setTimeout(() => {
+      const first = document.querySelector('#qualBody .tb-input.error');
+      if (first) first.scrollIntoView({ behavior:'smooth', block:'center' });
+    }, 80);
+  }
+}
+
+// Helper function to get CSRF token
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+/* ─── TOAST ─── */
+function toast(type, ico, msg) {
+  const el  = document.getElementById('toast');
+  document.getElementById('toastIco').textContent = ico;
+  document.getElementById('toastMsg').textContent = msg;
+  el.className = `toast ${type}`;
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
+  setTimeout(() => el.classList.remove('show'), 3800);
+}
+
+init();
+</script>
+</body>
+</html>
