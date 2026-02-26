@@ -95,7 +95,7 @@ class AcademicQualification(models.Model):
         ordering = ['-year_of_passing']
     
     def __str__(self):
-        exam_name = self.get_examination_display()
+        exam_name = self.get_examination_passed_display()
         if self.examination_passed == 'other' and self.custom_examination:
             exam_name = self.custom_examination
         return f"{exam_name} - {self.university_board} ({self.year_of_passing})"
@@ -118,7 +118,7 @@ class AcademicQualification(models.Model):
         """Get the actual examination name"""
         if self.examination_passed == 'other' and self.custom_examination:
             return self.custom_examination
-        return self.get_examination_display()
+        return self.get_examination_passed_display()
     
     @property
     def has_grade(self):

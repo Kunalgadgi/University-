@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Home - PhD Admission System{% endblock %}
+{% block title %}Home - Admission System{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
@@ -14,7 +14,7 @@
                         <span>Academic Excellence</span>
                     </div>
                     <h1 class="hero-title">
-                        PhD Admission<br>
+                        Admission<br>
                         <span class="text-highlight">Management System</span>
                     </h1>
                     <p class="hero-subtitle">
@@ -27,10 +27,6 @@
                                 <i class="fas fa-tachometer-alt"></i> 
                                 <span>Go to Dashboard</span>
                                 <i class="fas fa-arrow-right"></i>
-                            </a>
-                            <a href="{% url 'employment_details:employment_details' %}" class="btn btn-hero btn-outline-light">
-                                <i class="fas fa-briefcase"></i> 
-                                <span>Manage Profile</span>
                             </a>
                         </div>
                     {% else %}
@@ -85,14 +81,14 @@
             <div class="col-12 text-center mb-5">
                 <div class="section-badge">
                     <i class="fas fa-star"></i>
-                    <span>Your Academic Journey</span>
+                    <span>Admission</span>
                 </div>
-                <h2 class="section-title">Manage Your PhD Application</h2>
+                <h2 class="section-title">Manage Your Application</h2>
                 <p class="section-subtitle">Complete control over your academic and professional profile</p>
             </div>
         </div>
         <div class="row g-4">
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg-4">
                 <div class="feature-card">
                     <div class="feature-icon-wrapper">
                         <div class="feature-icon">
@@ -107,7 +103,7 @@
                     </a>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg-4">
                 <div class="feature-card">
                     <div class="feature-icon-wrapper">
                         <div class="feature-icon">
@@ -122,7 +118,7 @@
                     </a>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg-4">
                 <div class="feature-card">
                     <div class="feature-icon-wrapper">
                         <div class="feature-icon">
@@ -133,21 +129,6 @@
                     <p>Monitor your application status, completion progress, and upcoming deadlines</p>
                     <a href="{% url 'dashboard' %}" class="btn btn-feature">
                         <span>View Dashboard</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="feature-card">
-                    <div class="feature-icon-wrapper">
-                        <div class="feature-icon">
-                            <i class="fas fa-cog"></i>
-                        </div>
-                    </div>
-                    <h4>Admin Panel</h4>
-                    <p>Access administrative controls, system management, and advanced settings</p>
-                    <a href="/admin/" class="btn btn-feature">
-                        <span>Admin Access</span>
                         <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
@@ -169,8 +150,8 @@
                                     <i class="fas fa-sparkles"></i>
                                     <span>Join Our Community</span>
                                 </div>
-                                <h3>Start Your PhD Journey Today</h3>
-                                <p>Join thousands of successful students who have navigated their PhD admission process through our innovative platform.</p>
+                                <h3>Start Your Journey Today</h3>
+                                <p>Join thousands of successful students who have navigated their admission process through our innovative platform.</p>
                                 
                                 <div class="auth-features">
                                     <div class="feature-item">
