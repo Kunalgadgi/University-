@@ -1,0 +1,777 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - PhD Admission System{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container-fluid">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Academic Excellence</span>
+                    </div>
+                    <h1 class="hero-title">
+                        PhD Admission<br>
+                        <span class="text-highlight">Management System</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Transform your academic journey with our comprehensive digital platform. 
+                        Streamline applications, track progress, and achieve your research ambitions.
+                    </p>
+                    {% if user.is_authenticated %}
+                        <div class="hero-buttons">
+                            <a href="{% url 'dashboard' %}" class="btn btn-hero btn-primary">
+                                <i class="fas fa-tachometer-alt"></i> 
+                                <span>Go to Dashboard</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                            <a href="{% url 'employment_details:employment_details' %}" class="btn btn-hero btn-outline-light">
+                                <i class="fas fa-briefcase"></i> 
+                                <span>Manage Profile</span>
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="hero-buttons">
+                            <a href="{% url 'register' %}" class="btn btn-hero btn-primary">
+                                <i class="fas fa-rocket"></i> 
+                                <span>Get Started</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                            <a href="{% url 'login' %}" class="btn btn-hero btn-outline-light">
+                                <i class="fas fa-sign-in-alt"></i> 
+                                <span>Sign In</span>
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-visual">
+                    <div class="floating-elements">
+                        <div class="float-element float-1">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <div class="float-element float-2">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="float-element float-3">
+                            <i class="fas fa-award"></i>
+                        </div>
+                        <div class="main-circle">
+                            <div class="inner-circle">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="hero-wave">
+        <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0V120Z" fill="white"/>
+        </svg>
+    </div>
+</section>
+
+<!-- Features Section -->
+{% if user.is_authenticated %}
+<section class="features-section py-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <div class="section-badge">
+                    <i class="fas fa-star"></i>
+                    <span>Your Academic Journey</span>
+                </div>
+                <h2 class="section-title">Manage Your PhD Application</h2>
+                <p class="section-subtitle">Complete control over your academic and professional profile</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <div class="feature-icon">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                    </div>
+                    <h4>Employment Details</h4>
+                    <p>Document and manage your professional experience and work history with detailed tracking</p>
+                    <a href="{% url 'employment_details:employment_details' %}" class="btn btn-feature">
+                        <span>Manage Employment</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <div class="feature-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                    </div>
+                    <h4>Academic Qualifications</h4>
+                    <p>Track and update your educational achievements, certifications, and academic milestones</p>
+                    <a href="{% url 'phd_academic_qualifications:academic_qualifications' %}" class="btn btn-feature">
+                        <span>Manage Qualifications</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                    <h4>Progress Tracking</h4>
+                    <p>Monitor your application status, completion progress, and upcoming deadlines</p>
+                    <a href="{% url 'dashboard' %}" class="btn btn-feature">
+                        <span>View Dashboard</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <div class="feature-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                    </div>
+                    <h4>Admin Panel</h4>
+                    <p>Access administrative controls, system management, and advanced settings</p>
+                    <a href="/admin/" class="btn btn-feature">
+                        <span>Admin Access</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% else %}
+<!-- Auth Section for non-logged users -->
+<section class="auth-section py-5">
+    <div class="container-fluid">
+        <div class="row justify-content-center g-0">
+            <div class="col-12">
+                <div class="auth-card">
+                    <div class="row align-items-center g-0">
+                        <div class="col-md-6">
+                            <div class="auth-content">
+                                <div class="auth-badge">
+                                    <i class="fas fa-sparkles"></i>
+                                    <span>Join Our Community</span>
+                                </div>
+                                <h3>Start Your PhD Journey Today</h3>
+                                <p>Join thousands of successful students who have navigated their PhD admission process through our innovative platform.</p>
+                                
+                                <div class="auth-features">
+                                    <div class="feature-item">
+                                        <i class="fas fa-check-circle"></i>
+                                        <div>
+                                            <strong>Easy Application Management</strong>
+                                            <p>Streamlined process with step-by-step guidance</p>
+                                        </div>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="fas fa-check-circle"></i>
+                                        <div>
+                                            <strong>Real-time Progress Tracking</strong>
+                                            <p>Monitor your application status 24/7</p>
+                                        </div>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="fas fa-check-circle"></i>
+                                        <div>
+                                            <strong>Secure Document Storage</strong>
+                                            <p>Cloud-based storage with enterprise security</p>
+                                        </div>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="fas fa-check-circle"></i>
+                                        <div>
+                                            <strong>Expert Guidance Resources</strong>
+                                            <p>Access to comprehensive support materials</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="auth-forms">
+                                <div class="auth-header">
+                                    <h4>Get Started Now</h4>
+                                    <p>Choose your path to academic excellence</p>
+                                </div>
+                                
+                                <div class="auth-options">
+                                    <div class="auth-option">
+                                        <div class="auth-option-icon">
+                                            <i class="fas fa-user-plus"></i>
+                                        </div>
+                                        <div class="auth-option-content">
+                                            <h5>New Student</h5>
+                                            <p>Create your account and begin your application</p>
+                                            <a href="{% url 'register' %}" class="btn btn-auth btn-primary">
+                                                <i class="fas fa-rocket"></i> Register Now
+                                            </a>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="auth-divider">
+                                        <span>OR</span>
+                                    </div>
+                                    
+                                    <div class="auth-option">
+                                        <div class="auth-option-icon">
+                                            <i class="fas fa-sign-in-alt"></i>
+                                        </div>
+                                        <div class="auth-option-content">
+                                            <h5>Returning Student</h5>
+                                            <p>Sign in to continue your journey</p>
+                                            <a href="{% url 'login' %}" class="btn btn-auth btn-outline-primary">
+                                                <i class="fas fa-arrow-right"></i> Sign In
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<style>
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    position: relative;
+    overflow: hidden;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.hero-section .container-fluid {
+    width: 100%;
+    max-width: none;
+    padding: 0 3rem;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.hero-title {
+    font-size: 4rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+}
+
+.text-highlight {
+    background: linear-gradient(45deg, #fff, #e8f2ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-subtitle {
+    font-size: 1.3rem;
+    margin-bottom: 3rem;
+    opacity: 0.9;
+    line-height: 1.6;
+    max-width: 500px;
+}
+
+.btn-hero {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 50px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.btn-hero:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.hero-visual {
+    position: relative;
+    height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.floating-elements {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.float-element {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.float-1 {
+    top: 20%;
+    left: 10%;
+    animation: float 8s ease-in-out infinite;
+}
+
+.float-2 {
+    top: 60%;
+    right: 15%;
+    animation: float 10s ease-in-out infinite 2s;
+}
+
+.float-3 {
+    bottom: 20%;
+    left: 20%;
+    animation: float 12s ease-in-out infinite 4s;
+}
+
+.main-circle {
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: float 6s ease-in-out infinite;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+}
+
+.inner-circle {
+    width: 200px;
+    height: 200px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(5deg); }
+}
+
+.hero-wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+}
+
+/* Features Section */
+.features-section {
+    background: #f8f9fa;
+    padding: 80px 0;
+    width: 100%;
+    margin: 0;
+}
+
+.features-section .container-fluid {
+    width: 100%;
+    max-width: none;
+    padding: 0 3rem;
+}
+
+.section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.section-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+.section-subtitle {
+    font-size: 1.2rem;
+    color: #6c757d;
+    margin-bottom: 3rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.feature-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s ease;
+    height: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.feature-card:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+}
+
+.feature-icon-wrapper {
+    margin-bottom: 2rem;
+}
+
+.feature-icon {
+    width: 90px;
+    height: 90px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    font-size: 2.5rem;
+    color: white;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.feature-card h4 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+.feature-card p {
+    color: #6c757d;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.btn-feature {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-feature:hover {
+    transform: translateX(5px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+/* Auth Section */
+.auth-section {
+    background: white;
+    padding: 80px 0;
+    width: 100%;
+    margin: 0;
+}
+
+.auth-section .container-fluid {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+}
+
+.auth-card {
+    background: white;
+    border-radius: 30px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    width: 100%;
+    margin: 0;
+}
+
+.auth-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+}
+
+.auth-content {
+    padding: 4rem 3rem;
+}
+
+.auth-content h3 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+}
+
+.auth-content p {
+    font-size: 1.2rem;
+    color: #6c757d;
+    margin-bottom: 3rem;
+    line-height: 1.6;
+}
+
+.auth-features {
+    margin-bottom: 2rem;
+}
+
+.feature-item {
+    display: flex;
+    align-items: start;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.feature-item i {
+    color: #28a745;
+    font-size: 1.5rem;
+    margin-top: 0.25rem;
+    flex-shrink: 0;
+}
+
+.feature-item strong {
+    color: #2c3e50;
+    font-size: 1.1rem;
+}
+
+.feature-item p {
+    color: #6c757d;
+    margin: 0.5rem 0 0 0;
+}
+
+.auth-forms {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    padding: 4rem 3rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.auth-header h4 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+}
+
+.auth-header p {
+    color: #6c757d;
+}
+
+.auth-option {
+    background: white;
+    padding: 2rem;
+    border-radius: 20px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.auth-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.auth-option-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    margin-bottom: 1.5rem;
+}
+
+.auth-option h5 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+}
+
+.auth-option p {
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+}
+
+.btn-auth {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.auth-divider {
+    text-align: center;
+    margin: 2rem 0;
+    position: relative;
+}
+
+.auth-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #dee2e6;
+}
+
+.auth-divider span {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    padding: 0 1rem;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-buttons {
+        justify-content: center;
+    }
+    
+    .main-circle {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .inner-circle {
+        width: 150px;
+        height: 150px;
+        font-size: 3rem;
+    }
+    
+    .hero-visual {
+        height: 400px;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .auth-content {
+        padding: 2rem 1.5rem;
+    }
+    
+    .auth-forms {
+        padding: 2rem 1.5rem;
+    }
+    
+    .auth-content h3 {
+        font-size: 2rem;
+    }
+    
+    .hero-section .container-fluid,
+    .features-section .container-fluid {
+        padding: 0 1rem;
+    }
+}
+
+/* Additional full width fixes */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+.hero-section,
+.features-section,
+.auth-section {
+    position: relative;
+    width: 100vw;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+}
+</style>
+{% endblock %}

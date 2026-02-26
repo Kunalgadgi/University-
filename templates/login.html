@@ -1,0 +1,380 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - PhD Admission System{% endblock %}
+
+{% block content %}
+<section class="login-section">
+    <div class="container-fluid">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-lg-6">
+                <div class="login-card">
+                    <div class="login-header">
+                        <div class="login-logo">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </div>
+                        <h2>Welcome Back</h2>
+                        <p>Sign in to your PhD admission account</p>
+                    </div>
+                    
+                    <div class="login-body">
+                        <form method="post" class="login-form" id="loginForm" novalidate>
+                            {% csrf_token %}
+                            
+                            <div class="form-group">
+                                <label for="username" class="form-label">
+                                    <i class="fas fa-user"></i> Username or Email
+                                </label>
+                                <input type="text" class="form-control" id="username" name="username" placeholder="Enter username or email">
+                                <div class="error-message" id="usernameError"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="password" class="form-label">
+                                    <i class="fas fa-lock"></i> Password
+                                </label>
+                                <div class="password-input">
+                                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
+                                    <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                                        <i class="fas fa-eye" id="passwordToggle"></i>
+                                    </button>
+                                </div>
+                                <div class="error-message" id="passwordError"></div>
+                            </div>
+                            
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                                <label class="form-check-label" for="remember">
+                                    Remember me
+                                </label>
+                            </div>
+                            
+                            <button type="submit" class="btn-login">
+                                <i class="fas fa-sign-in-alt"></i> Sign In
+                            </button>
+                            
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert alert-danger mt-3" role="alert">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </form>
+                        
+                        <div class="login-footer">
+                            <p>Don't have an account? <a href="{% url 'register' %}" class="text-primary">Sign Up</a></p>
+                            <a href="{% url 'home' %}" class="back-link">
+                                <i class="fas fa-arrow-left"></i> Back to Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.login-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.login-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.login-header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.login-logo {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2rem;
+    backdrop-filter: blur(10px);
+}
+
+.login-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.login-header p {
+    opacity: 0.9;
+    margin: 0;
+}
+
+.login-body {
+    padding: 3rem 2rem;
+}
+
+.login-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.login-form .form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.login-form .form-label i {
+    color: #667eea;
+    width: 20px;
+}
+
+.login-form .form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.login-form .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    outline: none;
+}
+
+.login-form .form-control.error {
+    border-color: #dc3545;
+}
+
+.login-form .form-control.success {
+    border-color: #28a745;
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    min-height: 1.2rem;
+    display: none;
+}
+
+.error-message.show {
+    display: block;
+}
+
+.password-input {
+    position: relative;
+}
+
+.password-input .form-control {
+    padding-right: 3rem;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 0.25rem;
+    transition: color 0.3s ease;
+}
+
+.password-toggle:hover {
+    color: #667eea;
+}
+
+.form-check {
+    margin-bottom: 2rem;
+}
+
+.form-check-input {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #667eea;
+    cursor: pointer;
+}
+
+.form-check-input:checked {
+    background-color: #667eea;
+    border-color: #667eea;
+}
+
+.form-check-label {
+    margin-left: 0.5rem;
+    color: #6c757d;
+    cursor: pointer;
+}
+
+.btn-login {
+    width: 100%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.btn-login:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.login-footer p {
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+.back-link {
+    color: #6c757d;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.back-link:hover {
+    color: #667eea;
+}
+
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .login-section {
+        padding: 1rem 0;
+    }
+    
+    .login-header {
+        padding: 2rem 1.5rem;
+    }
+    
+    .login-body {
+        padding: 2rem 1.5rem;
+    }
+    
+    .login-header h2 {
+        font-size: 1.5rem;
+    }
+}
+</style>
+
+<script>
+function togglePassword(fieldId) {
+    const passwordInput = document.getElementById(fieldId);
+    const toggleId = fieldId + 'Toggle';
+    const passwordToggle = document.getElementById(toggleId);
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        passwordToggle.classList.remove('fa-eye');
+        passwordToggle.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        passwordToggle.classList.remove('fa-eye-slash');
+        passwordToggle.classList.add('fa-eye');
+    }
+}
+
+// Validation functions
+function validateUsername() {
+    const username = document.getElementById('username');
+    const usernameError = document.getElementById('usernameError');
+    
+    if (username.value.trim() === '') {
+        showError(username, usernameError, 'Username or email is required');
+        return false;
+    } else {
+        showSuccess(username, usernameError);
+        return true;
+    }
+}
+
+function validatePassword() {
+    const password = document.getElementById('password');
+    const passwordError = document.getElementById('passwordError');
+    
+    if (password.value === '') {
+        showError(password, passwordError, 'Password is required');
+        return false;
+    } else {
+        showSuccess(password, passwordError);
+        return true;
+    }
+}
+
+function showError(input, errorElement, message) {
+    input.classList.remove('success');
+    input.classList.add('error');
+    errorElement.textContent = message;
+    errorElement.classList.add('show');
+}
+
+function showSuccess(input, errorElement) {
+    input.classList.remove('error');
+    input.classList.add('success');
+    errorElement.classList.remove('show');
+}
+
+// Add event listeners for real-time validation
+document.getElementById('username').addEventListener('blur', validateUsername);
+document.getElementById('password').addEventListener('blur', validatePassword);
+
+// Form submission validation
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    const isUsernameValid = validateUsername();
+    const isPasswordValid = validatePassword();
+    
+    if (!isUsernameValid || !isPasswordValid) {
+        e.preventDefault();
+        // Scroll to the first error
+        const firstError = document.querySelector('.form-control.error');
+        if (firstError) {
+            firstError.focus();
+            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+});
+</script>
+{% endblock %}

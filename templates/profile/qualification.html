@@ -1,0 +1,542 @@
+{% extends 'base.html' %}
+
+{% block title %}Qualification - PhD Admission System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Progress Bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="progress-card">
+                <div class="progress-header">
+                    <h4>Profile Completion</h4>
+                    <span class="progress-text">Step 2 of 3</span>
+                </div>
+                <div class="progress-steps">
+                    <div class="step completed">
+                        <div class="step-number">✓</div>
+                        <div class="step-label">Personal Info</div>
+                    </div>
+                    <div class="step active">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Qualification</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Employment</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Qualification Form -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="form-card">
+                <div class="form-header">
+                    <h3>Academic Qualifications</h3>
+                    <p class="text-muted">Add your educational qualifications</p>
+                </div>
+                
+                <div class="form-body">
+                    <form method="post" id="qualificationForm" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Quick Add Section -->
+                        <div class="quick-add-section">
+                            <h5>Quick Add Your Qualifications</h5>
+                            <p class="text-muted">You can add multiple qualifications. Start with your most recent qualification.</p>
+                            
+                            <div class="qualification-item">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="examination" class="form-label">
+                                                <i class="fas fa-graduation-cap"></i> Examination
+                                            </label>
+                                            <select class="form-control" id="examination" name="examination" required>
+                                                <option value="">Select Examination</option>
+                                                <option value="matric">Matric</option>
+                                                <option value="10+2">10+2</option>
+                                                <option value="bachelor">Bachelor Degree</option>
+                                                <option value="master">Master Degree</option>
+                                                <option value="mphil">M.Phil.</option>
+                                                <option value="net_jrf_gate_gpat">NET/JRF/GATE/GPAT</option>
+                                                <option value="fellowship">Any Other Fellowship</option>
+                                                <option value="other">Any Other Qualification</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="university" class="form-label">
+                                                <i class="fas fa-university"></i> University/Board
+                                            </label>
+                                            <input type="text" class="form-control" id="university" name="university" 
+                                                   placeholder="Enter university/board name" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="passing_year" class="form-label">
+                                                <i class="fas fa-calendar"></i> Year of Passing
+                                            </label>
+                                            <input type="number" class="form-control" id="passing_year" name="passing_year" 
+                                                   placeholder="YYYY" min="1950" max="2030" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="roll_number" class="form-label">
+                                                <i class="fas fa-id-card"></i> Roll Number
+                                            </label>
+                                            <input type="text" class="form-control" id="roll_number" name="roll_number" 
+                                                   placeholder="Enter roll number" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="grade" class="form-label">
+                                                <i class="fas fa-star"></i> Grade (Optional)
+                                            </label>
+                                            <input type="text" class="form-control" id="grade" name="grade" 
+                                                   placeholder="Enter grade">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="marks_obtained" class="form-label">
+                                                <i class="fas fa-chart-line"></i> Marks Obtained
+                                            </label>
+                                            <input type="number" class="form-control" id="marks_obtained" name="marks_obtained" 
+                                                   placeholder="Marks obtained" step="0.01">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="max_marks" class="form-label">
+                                                <i class="fas fa-chart-bar"></i> Maximum Marks
+                                            </label>
+                                            <input type="number" class="form-control" id="max_marks" name="max_marks" 
+                                                   placeholder="Maximum marks" step="0.01">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="subjects" class="form-label">
+                                                <i class="fas fa-book"></i> Subjects
+                                            </label>
+                                            <input type="text" class="form-control" id="subjects" name="subjects" 
+                                                   placeholder="Enter subjects studied" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="qualification-actions">
+                                    <button type="button" class="btn btn-outline-primary" onclick="addQualification()">
+                                        <i class="fas fa-plus"></i> Add Another Qualification
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger" onclick="removeQualification(this)">
+                                        <i class="fas fa-trash"></i> Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Added Qualifications List -->
+                        <div class="qualifications-list" id="qualificationsList">
+                            <!-- Existing qualifications will be listed here -->
+                        </div>
+                        
+                        <div class="form-actions">
+                            <a href="{% url 'profile_personal_info' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Previous
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Qualifications
+                            </button>
+                            <button type="submit" class="btn btn-success" name="next" value="true">
+                                <i class="fas fa-arrow-right"></i> Next
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include the existing qualifications template -->
+{% include 'phd_academic_qualifications/qualification_list.html' %}
+
+<style>
+.progress-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.progress-header h4 {
+    margin: 0;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.progress-text {
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+}
+
+.progress-steps::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e9ecef;
+    z-index: 1;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.step.active .step-number {
+    background: #667eea;
+    color: white;
+}
+
+.step.completed .step-number {
+    background: #28a745;
+    color: white;
+}
+
+.step-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.step.active .step-label {
+    color: #667eea;
+    font-weight: 600;
+}
+
+.form-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+}
+
+.form-header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.form-header h3 {
+    margin: 0 0 0.5rem 0;
+    font-weight: 600;
+}
+
+.form-header p {
+    margin: 0;
+    opacity: 0.9;
+}
+
+.form-body {
+    padding: 2rem;
+}
+
+.quick-add-section {
+    margin-bottom: 2rem;
+}
+
+.quick-add-section h5 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.qualification-item {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #e9ecef;
+}
+
+.qualification-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.form-label i {
+    color: #667eea;
+    width: 20px;
+}
+
+.form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    outline: none;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.btn {
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5a6fd8;
+    transform: translateY(-2px);
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #218838;
+    transform: translateY(-2px);
+}
+
+.btn-outline-secondary {
+    background: transparent;
+    color: #6c757d;
+    border: 2px solid #6c757d;
+}
+
+.btn-outline-secondary:hover {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-outline-primary {
+    background: transparent;
+    color: #667eea;
+    border: 2px solid #667eea;
+}
+
+.btn-outline-primary:hover {
+    background: #667eea;
+    color: white;
+}
+
+.btn-outline-danger {
+    background: transparent;
+    color: #dc3545;
+    border: 2px solid #dc3545;
+}
+
+.btn-outline-danger:hover {
+    background: #dc3545;
+    color: white;
+}
+
+.qualifications-list {
+    margin-bottom: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .progress-steps {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .progress-steps::before {
+        display: none;
+    }
+    
+    .step {
+        flex-direction: row;
+        width: 100%;
+        justify-content: flex-start;
+        margin-bottom: 1rem;
+    }
+    
+    .step-number {
+        margin-bottom: 0;
+        margin-right: 1rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .qualification-actions {
+        flex-direction: column;
+    }
+}
+</style>
+
+<script>
+let qualificationCount = 1;
+
+function addQualification() {
+    qualificationCount++;
+    const container = document.querySelector('.quick-add-section');
+    const newQualification = document.querySelector('.qualification-item').cloneNode(true);
+    
+    // Clear form values in the cloned element
+    const inputs = newQualification.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        input.value = '';
+        input.id = input.id.replace(/\d+$/, '') + qualificationCount;
+        input.name = input.name.replace(/\d+$/, '') + qualificationCount;
+    });
+    
+    container.appendChild(newQualification);
+}
+
+function removeQualification(button) {
+    const qualificationItem = button.closest('.qualification-item');
+    qualificationItem.remove();
+}
+
+// Form validation
+document.getElementById('qualificationForm').addEventListener('submit', function(e) {
+    const qualifications = document.querySelectorAll('.qualification-item');
+    let isValid = true;
+    
+    qualifications.forEach((item, index) => {
+        const examination = item.querySelector('[name*="examination"]');
+        const university = item.querySelector('[name*="university"]');
+        const passingYear = item.querySelector('[name*="passing_year"]');
+        const rollNumber = item.querySelector('[name*="roll_number"]');
+        const subjects = item.querySelector('[name*="subjects"]');
+        
+        if (examination && examination.value === '') {
+            isValid = false;
+            examination.classList.add('error');
+        }
+        
+        if (university && university.value.trim() === '') {
+            isValid = false;
+            university.classList.add('error');
+        }
+        
+        if (passingYear && passingYear.value === '') {
+            isValid = false;
+            passingYear.classList.add('error');
+        }
+        
+        if (rollNumber && rollNumber.value.trim() === '') {
+            isValid = false;
+            rollNumber.classList.add('error');
+        }
+        
+        if (subjects && subjects.value.trim() === '') {
+            isValid = false;
+            subjects.classList.add('error');
+        }
+    });
+    
+    if (!isValid) {
+        e.preventDefault();
+        alert('Please fill in all required fields for at least one qualification.');
+    }
+});
+</script>
+{% endblock %}

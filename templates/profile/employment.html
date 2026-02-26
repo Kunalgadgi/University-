@@ -1,0 +1,582 @@
+{% extends 'base.html' %}
+
+{% block title %}Employment Details - PhD Admission System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Progress Bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="progress-card">
+                <div class="progress-header">
+                    <h4>Profile Completion</h4>
+                    <span class="progress-text">Step 3 of 3</span>
+                </div>
+                <div class="progress-steps">
+                    <div class="step completed">
+                        <div class="step-number">✓</div>
+                        <div class="step-label">Personal Info</div>
+                    </div>
+                    <div class="step completed">
+                        <div class="step-number">✓</div>
+                        <div class="step-label">Qualification</div>
+                    </div>
+                    <div class="step active">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Employment</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employment Form -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="form-card">
+                <div class="form-header">
+                    <h3>Employment Details</h3>
+                    <p class="text-muted">Add your work experience and employment history</p>
+                </div>
+                
+                <div class="form-body">
+                    <form method="post" id="employmentForm" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Quick Add Section -->
+                        <div class="quick-add-section">
+                            <h5>Add Employment Experience</h5>
+                            <p class="text-muted">You can add multiple employment experiences. Start with your most recent job.</p>
+                            
+                            <div class="employment-item">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="post_held" class="form-label">
+                                                <i class="fas fa-briefcase"></i> Post Held
+                                            </label>
+                                            <input type="text" class="form-control" id="post_held" name="post_held" 
+                                                   placeholder="Enter your position/title" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="organization" class="form-label">
+                                                <i class="fas fa-building"></i> Organization
+                                            </label>
+                                            <input type="text" class="form-control" id="organization" name="organization" 
+                                                   placeholder="Enter organization name" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="from_date" class="form-label">
+                                                <i class="fas fa-calendar-alt"></i> From Date
+                                            </label>
+                                            <input type="date" class="form-control" id="from_date" name="from_date" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="to_date" class="form-label">
+                                                <i class="fas fa-calendar-alt"></i> To Date
+                                            </label>
+                                            <input type="date" class="form-control" id="to_date" name="to_date" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="job_type" class="form-label">
+                                                <i class="fas fa-tag"></i> Job Type
+                                            </label>
+                                            <input type="text" class="form-control" id="job_type" name="job_type" 
+                                                   placeholder="Full-time/Part-time/Contract" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="experience_years" class="form-label">
+                                                <i class="fas fa-clock"></i> Experience
+                                            </label>
+                                            <div class="experience-inputs">
+                                                <input type="number" class="form-control" id="experience_years" name="experience_years" 
+                                                       placeholder="Years" min="0" max="50" value="0">
+                                                <input type="number" class="form-control" id="experience_months" name="experience_months" 
+                                                       placeholder="Months" min="0" max="11" value="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="remarks" class="form-label">
+                                                <i class="fas fa-comment"></i> Remarks (Optional)
+                                            </label>
+                                            <textarea class="form-control" id="remarks" name="remarks" rows="3" 
+                                                      placeholder="Add any additional information about this job"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="employment-actions">
+                                    <button type="button" class="btn btn-outline-primary" onclick="addEmployment()">
+                                        <i class="fas fa-plus"></i> Add Another Employment
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger" onclick="removeEmployment(this)">
+                                        <i class="fas fa-trash"></i> Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Added Employment List -->
+                        <div class="employment-list" id="employmentList">
+                            <!-- Existing employment records will be listed here -->
+                        </div>
+                        
+                        <div class="form-actions">
+                            <a href="{% url 'profile_qualification' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Previous
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Employment
+                            </button>
+                            <button type="submit" class="btn btn-success" name="complete" value="true">
+                                <i class="fas fa-check"></i> Complete Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include the existing employment records template -->
+{% include 'employment_details/employment_list.html' %}
+
+<style>
+.progress-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.progress-header h4 {
+    margin: 0;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.progress-text {
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+}
+
+.progress-steps::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e9ecef;
+    z-index: 1;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.step.active .step-number {
+    background: #667eea;
+    color: white;
+}
+
+.step.completed .step-number {
+    background: #28a745;
+    color: white;
+}
+
+.step-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.step.active .step-label {
+    color: #667eea;
+    font-weight: 600;
+}
+
+.form-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+}
+
+.form-header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.form-header h3 {
+    margin: 0 0 0.5rem 0;
+    font-weight: 600;
+}
+
+.form-header p {
+    margin: 0;
+    opacity: 0.9;
+}
+
+.form-body {
+    padding: 2rem;
+}
+
+.quick-add-section {
+    margin-bottom: 2rem;
+}
+
+.quick-add-section h5 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.employment-item {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #e9ecef;
+}
+
+.employment-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.form-label i {
+    color: #667eea;
+    width: 20px;
+}
+
+.form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    outline: none;
+}
+
+.experience-inputs {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.experience-inputs .form-control {
+    flex: 1;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.btn {
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5a6fd8;
+    transform: translateY(-2px);
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #218838;
+    transform: translateY(-2px);
+}
+
+.btn-outline-secondary {
+    background: transparent;
+    color: #6c757d;
+    border: 2px solid #6c757d;
+}
+
+.btn-outline-secondary:hover {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-outline-primary {
+    background: transparent;
+    color: #667eea;
+    border: 2px solid #667eea;
+}
+
+.btn-outline-primary:hover {
+    background: #667eea;
+    color: white;
+}
+
+.btn-outline-danger {
+    background: transparent;
+    color: #dc3545;
+    border: 2px solid #dc3545;
+}
+
+.btn-outline-danger:hover {
+    background: #dc3545;
+    color: white;
+}
+
+.employment-list {
+    margin-bottom: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .progress-steps {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .progress-steps::before {
+        display: none;
+    }
+    
+    .step {
+        flex-direction: row;
+        width: 100%;
+        justify-content: flex-start;
+        margin-bottom: 1rem;
+    }
+    
+    .step-number {
+        margin-bottom: 0;
+        margin-right: 1rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .employment-actions {
+        flex-direction: column;
+    }
+    
+    .experience-inputs {
+        flex-direction: column;
+    }
+}
+</style>
+
+<script>
+let employmentCount = 1;
+
+function addEmployment() {
+    employmentCount++;
+    const container = document.querySelector('.quick-add-section');
+    const newEmployment = document.querySelector('.employment-item').cloneNode(true);
+    
+    // Clear form values in the cloned element
+    const inputs = newEmployment.querySelectorAll('input, textarea, select');
+    inputs.forEach(input => {
+        input.value = '';
+        input.id = input.id.replace(/\d+$/, '') + employmentCount;
+        input.name = input.name.replace(/\d+$/, '') + employmentCount;
+    });
+    
+    container.appendChild(newEmployment);
+}
+
+function removeEmployment(button) {
+    const employmentItem = button.closest('.employment-item');
+    employmentItem.remove();
+}
+
+// Auto-calculate experience based on dates
+document.addEventListener('change', function(e) {
+    if (e.target.id && e.target.id.includes('from_date') || e.target.id && e.target.id.includes('to_date')) {
+        const employmentItem = e.target.closest('.employment-item');
+        const fromDate = employmentItem.querySelector('[id*="from_date"]');
+        const toDate = employmentItem.querySelector('[id*="to_date"]');
+        const yearsInput = employmentItem.querySelector('[id*="experience_years"]');
+        const monthsInput = employmentItem.querySelector('[id*="experience_months"]');
+        
+        if (fromDate.value && toDate.value) {
+            const from = new Date(fromDate.value);
+            const to = new Date(toDate.value);
+            
+            if (to >= from) {
+                let years = to.getFullYear() - from.getFullYear();
+                let months = to.getMonth() - from.getMonth();
+                
+                if (to.getDate() < from.getDate()) {
+                    months--;
+                }
+                
+                if (months < 0) {
+                    years--;
+                    months += 12;
+                }
+                
+                yearsInput.value = Math.max(0, years);
+                monthsInput.value = Math.max(0, months);
+            }
+        }
+    }
+});
+
+// Form validation
+document.getElementById('employmentForm').addEventListener('submit', function(e) {
+    const employments = document.querySelectorAll('.employment-item');
+    let isValid = true;
+    
+    employments.forEach((item, index) => {
+        const postHeld = item.querySelector('[name*="post_held"]');
+        const organization = item.querySelector('[name*="organization"]');
+        const fromDate = item.querySelector('[name*="from_date"]');
+        const toDate = item.querySelector('[name*="to_date"]');
+        const jobType = item.querySelector('[name*="job_type"]');
+        
+        if (postHeld && postHeld.value.trim() === '') {
+            isValid = false;
+            postHeld.classList.add('error');
+        }
+        
+        if (organization && organization.value.trim() === '') {
+            isValid = false;
+            organization.classList.add('error');
+        }
+        
+        if (fromDate && fromDate.value === '') {
+            isValid = false;
+            fromDate.classList.add('error');
+        }
+        
+        if (toDate && toDate.value === '') {
+            isValid = false;
+            toDate.classList.add('error');
+        }
+        
+        if (jobType && jobType.value.trim() === '') {
+            isValid = false;
+            jobType.classList.add('error');
+        }
+        
+        // Validate date logic
+        if (fromDate && toDate && fromDate.value && toDate.value) {
+            const from = new Date(fromDate.value);
+            const to = new Date(toDate.value);
+            if (to < from) {
+                isValid = false;
+                toDate.classList.add('error');
+                fromDate.classList.add('error');
+            }
+        }
+    });
+    
+    if (!isValid) {
+        e.preventDefault();
+        alert('Please fill in all required fields and ensure To Date is after From Date.');
+    }
+});
+</script>
+{% endblock %}

@@ -488,20 +488,83 @@ input[type="date"].tb-input::-webkit-calendar-picker-indicator {
           </td>
 
           <td>
-            <input class="tb-input" type="text" placeholder="e.g. Teaching / Permanent"
+            <input class="tb-input" type="text" placeholder="e.g. Full-time, Part-time"
               data-field="jobtype" data-id="emp{{ employment.id }}" value="{{ employment.job_type }}" />
             <div class="err-msg" id="e-jobtype-emp{{ employment.id }}">${ERR_ICON} Required</div>
           </td>
 
           <td>
-            <input class="tb-input" type="text" placeholder="Optional remarks"
-              data-field="remarks" data-id="emp{{ employment.id }}" value="{{ employment.remarks|default:'' }}" />
+            <textarea class="tb-input" rows="1" placeholder="Any additional remarks"
+              data-field="remarks" data-id="emp{{ employment.id }}">{{ employment.remarks|default:'' }}</textarea>
+          </td>
+
+          <td class="actions">
+            <div class="action-btns">
+              <button class="btn-act btn-plus"  title="Add row below" onclick="addRowBelow('emp{{ employment.id }}')">${PLUS_ICON}</button>
+              <button class="btn-act btn-trash" title="Remove row"    onclick="delRow('emp{{ employment.id }}')">${TRASH_ICON}</button>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <!-- No Experience Option -->
+        <tr data-id="no_exp" class="row-in">
+          <td><span class="sr-badge">1</span></td>
+          <td colspan="8" style="text-align: center; padding: 20px;">
+            <label style="display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 16px; cursor: pointer;">
+              <input type="checkbox" id="noExperienceCheckbox" onchange="toggleNoExperience()" style="width: 20px; height: 20px;">
+              <strong>I have no work experience</strong>
+            </label>
+            <div id="noExperienceMessage" style="display: none; margin-top: 10px; color: #28a745; font-weight: bold;">
+              ✓ No experience - Click "Complete Profile" to continue
+            </div>
+          </td>
+        </tr>
+        
+        <!-- Experience Row (hidden by default) -->
+        <tr data-id="new1" class="row-in" id="experienceRow" style="display: none;">
+          <td><span class="sr-badge">1</span></td>
+
+          <td>
+            <input class="tb-input" type="text" placeholder="e.g. Assistant Professor"
+              data-field="post" data-id="new1" />
+            <div class="err-msg" id="e-post-new1">${ERR_ICON} Required</div>
           </td>
 
           <td>
-            <div class="action-cell">
-              <button class="btn-act btn-plus"  title="Add row below" onclick="addRowBelow('emp{{ employment.id }}')">${PLUS_ICON}</button>
-              <button class="btn-act btn-trash" title="Remove row"    onclick="delRow('emp{{ employment.id }}')">${TRASH_ICON}</button>
+            <input class="tb-input" type="text" placeholder="e.g. CBLU, Bhiwani"
+              data-field="org" data-id="new1" />
+            <div class="err-msg" id="e-org-new1">${ERR_ICON} Required</div>
+          </td>
+
+          <td>
+            <input class="tb-input" type="date" data-field="from" data-id="new1" onchange="calcExp('new1')" />
+            <div class="err-msg" id="e-from-new1">${ERR_ICON} Select start date</div>
+          </td>
+
+          <td>
+            <input class="tb-input" type="date" id="to-new1" data-field="to" data-id="new1" onchange="calcExp('new1')" />
+            <div class="err-msg" id="e-to-new1">${ERR_ICON} Select end date</div>
+          </td>
+
+          <td>
+            <input class="tb-input computed" id="exp-new1" type="text" readonly value="0 Yrs 0 Mos" />
+          </td>
+
+          <td>
+            <input class="tb-input" type="text" placeholder="e.g. Full-time, Part-time"
+              data-field="jobtype" data-id="new1" />
+            <div class="err-msg" id="e-jobtype-new1">${ERR_ICON} Required</div>
+          </td>
+
+          <td>
+            <textarea class="tb-input" rows="1" placeholder="Any additional remarks"
+              data-field="remarks" data-id="new1"></textarea>
+          </td>
+
+          <td class="actions">
+            <div class="action-btns">
+              <button class="btn-act btn-plus"  title="Add row below" onclick="addRowBelow('new1')">${PLUS_ICON}</button>
+              <button class="btn-act btn-trash" title="Remove row"    onclick="delRow('new1')">${TRASH_ICON}</button>
             </div>
           </td>
         </tr>
@@ -556,6 +619,10 @@ input[type="date"].tb-input::-webkit-calendar-picker-indicator {
       <button class="btn-save" onclick="submitForm()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         Save &amp; Continue
+      </button>
+      <button class="btn-save" onclick="submitAndComplete()" style="background: #28a745; margin-left: 10px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Complete Profile ✓
       </button>
     </div>
 
@@ -766,37 +833,34 @@ function clrE(id, field, inp) {
 }
 
 function validate() {
-  let ok = true;
-
-  document.querySelectorAll('#empBody tr').forEach(tr => {
-    const id = tr.dataset.id;
-    if (!isActive(tr)) return;
-
-    const post = tr.querySelector('[data-field="post"]');
-    post.value.trim() ? clrE(id,'post',post) : (showE(id,'post',post), ok=false);
-
-    const org = tr.querySelector('[data-field="org"]');
-    org.value.trim() ? clrE(id,'org',org) : (showE(id,'org',org), ok=false);
-
-    const from = tr.querySelector('[data-field="from"]');
-    from.value ? clrE(id,'from',from) : (showE(id,'from',from), ok=false);
-
-    const toInp = document.getElementById('to-' + id);
-    toInp.value ? clrE(id,'to',toInp) : (showE(id,'to',toInp), ok=false);
-
-    // Date order
-    if (from.value && toInp.value && new Date(toInp.value) < new Date(from.value)) {
-      const errEl = document.getElementById(`e-to-${id}`);
-      if (errEl) { errEl.innerHTML = `${ERR_ICON} "To" must be after "From"`; errEl.classList.add('show'); }
-      toInp.classList.add('error');
-      ok = false;
+  // Check if at least one field has any data
+  const inputs = document.querySelectorAll('#empBody .tb-input');
+  let hasAnyData = false;
+  
+  inputs.forEach(inp => {
+    if (inp.value.trim()) {
+      hasAnyData = true;
     }
-
-    const jt = tr.querySelector('[data-field="jobtype"]');
-    jt.value.trim() ? clrE(id,'jobtype',jt) : (showE(id,'jobtype',jt), ok=false);
   });
-
-  return ok;
+  
+  if (!hasAnyData) {
+    toast('error','✖','Please fill at least one field');
+    return false;
+  }
+  
+  // Check date logic only if both dates are provided
+  const rows = document.querySelectorAll('#empBody tr');
+  rows.forEach(row => {
+    const from = row.querySelector('[data-field="from"]')?.value;
+    const to = row.querySelector('[data-field="to"]')?.value;
+    
+    if (from && to && new Date(to) < new Date(from)) {
+      toast('error','✖','From date cannot be after to date');
+      return false;
+    }
+  });
+  
+  return true; // Allow any single field submission
 }
 
 /* live-clear */
@@ -817,6 +881,172 @@ document.addEventListener('change', e => {
 });
 
 /* ─── SUBMIT ─── */
+function toggleNoExperience() {
+  const checkbox = document.getElementById('noExperienceCheckbox');
+  const experienceRow = document.getElementById('experienceRow');
+  const message = document.getElementById('noExperienceMessage');
+  
+  if (checkbox.checked) {
+    experienceRow.style.display = 'none';
+    message.style.display = 'block';
+  } else {
+    experienceRow.style.display = 'table-row';
+    message.style.display = 'none';
+  }
+}
+
+function submitAndComplete() {
+  const checkbox = document.getElementById('noExperienceCheckbox');
+  
+  if (checkbox.checked) {
+    // No experience option selected - submit directly
+    const formData = new FormData();
+    formData.append('no_experience', 'true');
+    
+    fetch("{% url 'employment_details:submit_employment_data' %}", {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken')
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        toast('success','✔', data.message);
+        setTimeout(() => {
+          window.location.href = '/dashboard/';
+        }, 1500);
+      } else {
+        toast('error','✖', data.message);
+      }
+    })
+    .catch(error => {
+      toast('error','✖','An error occurred. Please try again.');
+    });
+  } else {
+    // Regular experience submission
+    if (validate()) {
+      const rows = document.querySelectorAll('#empBody tr');
+      const formData = new FormData();
+      
+      rows.forEach((row, index) => {
+        const isActive = row.querySelector('.tb-input:not(.computed)')?.value.trim() !== '';
+        
+        if (isActive) {
+          const id = row.dataset.id;
+          formData.append(`sr_no`, index + 1);
+          formData.append(`post`, row.querySelector('[data-field="post"]')?.value || '');
+          formData.append(`org`, row.querySelector('[data-field="org"]')?.value || '');
+          formData.append(`from`, row.querySelector('[data-field="from"]')?.value || '');
+          formData.append(`to`, row.querySelector('[data-field="to"]')?.value || '');
+          formData.append(`jobtype`, row.querySelector('[data-field="jobtype"]')?.value || '');
+          formData.append(`remarks`, row.querySelector('[data-field="remarks"]')?.value || '');
+        }
+      });
+      
+      fetch("{% url 'employment_details:submit_employment_data' %}", {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken')
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          toast('success','✔', data.message);
+          setTimeout(() => {
+            window.location.href = '/dashboard/';
+          }, 1500);
+        } else {
+          toast('error','✖', data.message);
+        }
+      })
+      .catch(error => {
+        toast('error','✖','An error occurred. Please try again.');
+      });
+    } else {
+      toast('error','✖','Please complete all required fields in active rows.');
+      setTimeout(() => {
+        const first = document.querySelector('#empBody .tb-input.error');
+        if (first) first.scrollIntoView({ behavior:'smooth', block:'center' });
+      }, 80);
+    }
+  }
+}
+
+function calcExp(id) {
+  const fromInput = document.querySelector(`[data-field="from"][data-id="${id}"]`);
+  const toInput = document.querySelector(`[data-field="to"][data-id="${id}"]`);
+  const expInput = document.getElementById(`exp-${id}`);
+  
+  if (fromInput.value && toInput.value) {
+    const from = new Date(fromInput.value);
+    const to = new Date(toInput.value);
+    
+    if (to >= from) {
+      const months = (to.getFullYear() - from.getFullYear()) * 12 + (to.getMonth() - from.getMonth());
+      const years = Math.floor(months / 12);
+      const remainingMonths = months % 12;
+      
+      expInput.value = `${years} Yrs ${remainingMonths} Mos`;
+    }
+  }
+}
+function submitAndComplete() {
+  if (validate()) {
+    // Collect all active rows data
+    const rows = document.querySelectorAll('#empBody tr');
+    const formData = new FormData();
+    
+    rows.forEach((row, index) => {
+      const isActive = row.querySelector('.tb-input:not(.computed)')?.value.trim() !== '';
+      
+      if (isActive) {
+        const id = row.dataset.id;
+        formData.append(`sr_no`, index + 1);
+        formData.append(`post`, row.querySelector('[data-field="post"]')?.value || '');
+        formData.append(`org`, row.querySelector('[data-field="org"]')?.value || '');
+        formData.append(`from`, row.querySelector('[data-field="from"]')?.value || '');
+        formData.append(`to`, row.querySelector('[data-field="to"]')?.value || '');
+        formData.append(`jobtype`, row.querySelector('[data-field="jobtype"]')?.value || '');
+        formData.append(`remarks`, row.querySelector('[data-field="remarks"]')?.value || '');
+      }
+    });
+    
+    // Submit to Django backend
+    fetch("{% url 'employment_details:submit_employment_data' %}", {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken')
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        toast('success','✔', data.message);
+        // Redirect to dashboard
+        setTimeout(() => {
+          window.location.href = '/dashboard/';
+        }, 1500);
+      } else {
+        toast('error','✖', data.message);
+      }
+    })
+    .catch(error => {
+      toast('error','✖','An error occurred. Please try again.');
+    });
+  } else {
+    toast('error','✖','Please complete all required fields in active rows.');
+    setTimeout(() => {
+      const first = document.querySelector('#empBody .tb-input.error');
+      if (first) first.scrollIntoView({ behavior:'smooth', block:'center' });
+    }, 80);
+  }
+}
+
 function submitForm() {
   if (validate()) {
     // Collect all active rows data
@@ -850,8 +1080,15 @@ function submitForm() {
     .then(data => {
       if (data.status === 'success') {
         toast('success','✔', data.message);
-        // Optionally reload page to show saved data
-        setTimeout(() => location.reload(), 2000);
+        // Always redirect if redirect_url is provided
+        if (data.redirect_url) {
+          setTimeout(() => {
+            window.location.href = data.redirect_url;
+          }, 1500);
+        } else {
+          // Reload page if no redirect
+          setTimeout(() => location.reload(), 2000);
+        }
       } else {
         toast('error','✖', data.message);
       }

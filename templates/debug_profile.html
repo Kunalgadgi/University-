@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}Debug Profile Status{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Profile Debug Information</h1>
+    
+    <div class="card">
+        <div class="card-header">
+            <h3>Profile Status</h3>
+        </div>
+        <div class="card-body">
+            <p><strong>User:</strong> {{ profile.user.username }}</p>
+            <p><strong>Profile Step:</strong> {{ profile.profile_step }}</p>
+            <p><strong>Personal Info Complete:</strong> {{ profile.is_personal_info_complete }}</p>
+            <p><strong>Qualification Complete:</strong> {{ profile.is_qualification_complete }}</p>
+            <p><strong>Employment Complete:</strong> {{ profile.is_employment_complete }}</p>
+            <p><strong>Completion Percentage:</strong> {{ completion_percentage }}%</p>
+            
+            <hr>
+            
+            <h4>Personal Information:</h4>
+            <p><strong>Name:</strong> {{ profile.user.first_name }}</p>
+            <p><strong>Email:</strong> {{ profile.user.email }}</p>
+            <p><strong>Mobile:</strong> {{ profile.mobile_number }}</p>
+            <p><strong>Date of Birth:</strong> {{ profile.date_of_birth }}</p>
+            <p><strong>Gender:</strong> {{ profile.get_gender_display }}</p>
+            <p><strong>Marital Status:</strong> {{ profile.get_marital_status_display }}</p>
+        </div>
+    </div>
+    
+    <div class="card mt-3">
+        <div class="card-header">
+            <h3>Academic Qualifications ({{ user_quals.count }})</h3>
+        </div>
+        <div class="card-body">
+            {% for qual in user_quals %}
+                <div class="border-bottom pb-2 mb-2">
+                    <p><strong>Examination:</strong> {{ qual.get_examination_passed_display }}</p>
+                    <p><strong>University:</strong> {{ qual.university_board }}</p>
+                    <p><strong>Year:</strong> {{ qual.year_of_passing }}</p>
+                    <p><strong>Roll No:</strong> {{ qual.roll_number }}</p>
+                </div>
+            {% empty %}
+                <p>No qualifications found</p>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="card mt-3">
+        <div class="card-header">
+            <h3>Employment Details ({{ user_emps.count }})</h3>
+        </div>
+        <div class="card-body">
+            {% for emp in user_emps %}
+                <div class="border-bottom pb-2 mb-2">
+                    <p><strong>Post:</strong> {{ emp.post_held }}</p>
+                    <p><strong>Organization:</strong> {{ emp.organization }}</p>
+                    <p><strong>From:</strong> {{ emp.from_date }}</p>
+                    <p><strong>To:</strong> {{ emp.to_date }}</p>
+                    <p><strong>Job Type:</strong> {{ emp.job_type }}</p>
+                </div>
+            {% empty %}
+                <p>No employment records found</p>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="card mt-3">
+        <div class="card-header">
+            <h3>Quick Actions</h3>
+        </div>
+        <div class="card-body">
+            <p><strong>Current Status:</strong> {{ completion_percentage }}% Complete</p>
+            <p><strong>Next Step:</strong> 
+                {% if profile.is_personal_info_complete and not profile.is_qualification_complete %}
+                    Fill Academic Qualifications
+                {% elif profile.is_qualification_complete and not profile.is_employment_complete %}
+                    Fill Employment Details  
+                {% elif profile.is_employment_complete %}
+                    Profile Complete! 🎉
+                {% else %}
+                    Fill Personal Information
+                {% endif %}
+            </p>
+            
+            <div class="mt-3">
+                <a href="{% url 'profile_personal_info' %}" class="btn btn-info">Personal Info</a>
+                <a href="{% url 'profile_qualification' %}" class="btn btn-warning">Qualifications</a>
+                <a href="/employment/" class="btn btn-secondary">Employment</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-3">
+        <a href="{% url 'dashboard' %}" class="btn btn-primary">Back to Dashboard</a>
+        <a href="{% url 'profile_personal_info' %}" class="btn btn-secondary">Edit Personal Info</a>
+        
+        <!-- Manual completion buttons for testing -->
+        <div class="mt-3">
+            <h4>Manual Completion (for testing):</h4>
+            <form method="post" action="{% url 'complete_qualification' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-warning">Mark Qualification Complete</button>
+            </form>
+            <form method="post" action="{% url 'complete_employment' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">Mark Employment Complete</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    margin-right: 10px;
+    text-decoration: none;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+</style>
+{% endblock %}

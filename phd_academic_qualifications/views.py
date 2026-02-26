@@ -4,9 +4,12 @@ from django.http import JsonResponse
 from .models import AcademicQualification
 from .forms import AcademicQualificationForm
 
-def academic_qualifications(request):
-    """Display academic qualifications form (original HTML)"""
-    qualifications = AcademicQualification.objects.all().order_by('-year_of_passing')
+def phd_academic_qualifications(request):
+    """Display academic qualifications form"""
+    if request.user.is_authenticated:
+        qualifications = AcademicQualification.objects.filter(user=request.user).order_by('-created_at')
+    else:
+        qualifications = AcademicQualification.objects.none()
     
     context = {
         'qualifications': qualifications,
@@ -28,34 +31,46 @@ def submit_qualification_data(request):
             max_marks = request.POST.get('max', '')
             subjects = request.POST.get('subjects')
             
-            # Validate required fields
-            if not all([examination, university_board, year_of_passing, roll_number, subjects]):
-                return JsonResponse({'status': 'error', 'message': 'Please fill all required fields'})
+            # Check if at least one field is filled
+            if not any([examination, university_board, year_of_passing, roll_number, subjects, grade, marks_obtained, max_marks]):
+                return JsonResponse({'status': 'error', 'message': 'Please fill at least one field'})
             
-            # Validate grade OR marks
-            has_grade = grade.strip()
-            has_marks = marks_obtained.strip() and max_marks.strip()
-            
-            if not has_grade and not has_marks:
-                return JsonResponse({'status': 'error', 'message': 'Enter Grade OR Marks Obtained / Max Marks'})
-            
-            # Create qualification
+            # Create qualification with available data
             qualification = AcademicQualification.objects.create(
-                examination_passed=examination,
-                custom_examination=custom_examination if examination == 'other' else '',
-                university_board=university_board,
-                year_of_passing=int(year_of_passing),
-                roll_number=roll_number,
-                grade=grade if has_grade else None,
-                marks_obtained=float(marks_obtained) if has_marks else None,
-                max_marks=float(max_marks) if has_marks else None,
-                subjects=subjects
+                user=request.user if request.user.is_authenticated else None,
+                examination_passed=examination or 'other',
+                custom_examination=custom_examination if examination == 'other' else custom_examination or '',
+                university_board=university_board or '',
+                year_of_passing=int(year_of_passing) if year_of_passing and year_of_passing.isdigit() else 2023,
+                roll_number=roll_number or '',
+                grade=grade if grade.strip() else None,
+                marks_obtained=float(marks_obtained) if marks_obtained.strip() else None,
+                max_marks=float(max_marks) if max_marks.strip() else None,
+                subjects=subjects or ''
             )
             
-            return JsonResponse({'status': 'success', 'message': 'Academic qualifications saved successfully!'})
+            # Mark profile qualification step as complete if user is logged in
+            if request.user.is_authenticated:
+                from phd_admission.models import UserProfile
+                profile, created = UserProfile.objects.get_or_create(user=request.user)
+                profile.is_qualification_complete = True
+                profile.profile_step = 3
+                profile.save()
+                
+                return JsonResponse({
+                    'status': 'success', 
+                    'message': 'Academic qualifications saved successfully!',
+                    'redirect_url': '/employment/'
+                })
+            else:
+                return JsonResponse({
+                    'status': 'success', 
+                    'message': 'Academic qualifications saved successfully!',
+                    'redirect_url': None
+                })
             
         except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)})
+            return JsonResponse({'status': 'error', 'message': f'Error: {str(e)}'})
     
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 

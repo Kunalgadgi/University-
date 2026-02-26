@@ -16,10 +16,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.home, name='home'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('login/', views.login_view, name='login'),
+    path('register/', views.register_view, name='register'),
+    path('logout/', views.logout_view, name='logout'),
+    path('profile/', views.profile_personal_info, name='profile_personal_info'),
+    path('profile/qualification/', views.profile_qualification, name='profile_qualification'),
+    path('profile/complete-qualification/', views.complete_qualification_step, name='complete_qualification'),
+    path('profile/complete-employment/', views.complete_employment_step, name='complete_employment'),
+    path('debug/', views.debug_profile, name='debug_profile'),
     path('employment/', include('employment_details.urls')),
     path('qualifications/', include('phd_academic_qualifications.urls')),
-    path('', include('employment_details.urls')),  # Default to employment details
 ]

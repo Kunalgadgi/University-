@@ -505,30 +505,95 @@ select.tb-input {
               data-field="obtained" data-id="qual{{ qualification.id }}" 
               value="{{ qualification.marks_obtained|default:'' }}" 
               onchange="calcPerc('qual{{ qualification.id }}')" />
+            <span class="perc" id="perc-qual{{ qualification.id }}">{% if qualification.percentage %}{{ qualification.percentage|floatformat:2 }}%{% endif %}</span>
           </td>
 
           <td>
-            <input class="tb-input" type="number" step="0.01" placeholder="Max"
+            <input class="tb-input" type="number" step="0.01" placeholder="Maximum"
               data-field="max" data-id="qual{{ qualification.id }}" 
               value="{{ qualification.max_marks|default:'' }}" 
               onchange="calcPerc('qual{{ qualification.id }}')" />
+            <div class="err-msg" id="e-marks-qual{{ qualification.id }}">${ERR_ICON} Grade OR Marks Required</div>
           </td>
 
           <td>
-            <input class="tb-input computed" id="perc-qual{{ qualification.id }}" type="text" readonly 
-              value="{% if qualification.percentage %}{{ qualification.percentage|floatformat:2 }}%{% endif %}" />
-          </td>
-
-          <td>
-            <input class="tb-input" type="text" placeholder="e.g. Physics, Chemistry"
+            <input class="tb-input" type="text" placeholder="Subjects"
               data-field="subjects" data-id="qual{{ qualification.id }}" value="{{ qualification.subjects }}" />
             <div class="err-msg" id="e-subjects-qual{{ qualification.id }}">${ERR_ICON} Required</div>
           </td>
 
-          <td>
-            <div class="action-cell">
+          <td class="actions">
+            <div class="action-btns">
               <button class="btn-act btn-plus"  title="Add row below" onclick="addRowBelow('qual{{ qualification.id }}')">${PLUS_ICON}</button>
               <button class="btn-act btn-trash" title="Remove row"    onclick="delRow('qual{{ qualification.id }}')">${TRASH_ICON}</button>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr data-id="new1" class="row-in">
+          <td>
+            <select class="tb-input" data-field="exam" data-id="new1" onchange="toggleCustom('new1')">
+              <option value="">-- Select --</option>
+              <option value="matric">Matric</option>
+              <option value="10+2">10+2</option>
+              <option value="bachelor">Bachelor Degree</option>
+              <option value="master">Master Degree</option>
+              <option value="mphil">M.Phil.</option>
+              <option value="net_jrf_gate_gpat">NET/JRF/GATE/GPAT</option>
+              <option value="fellowship">Any Other Fellowship</option>
+              <option value="other">Any Other Qualification</option>
+            </select>
+            <div class="err-msg" id="e-exam-new1">${ERR_ICON} Required</div>
+            
+            <input class="tb-input custom-exam" type="text" placeholder="Enter custom exam name"
+              data-field="custom_exam" data-id="new1" style="display:none;" />
+          </td>
+
+          <td>
+            <input class="tb-input" type="text" placeholder="e.g. CBLU, Haryana"
+              data-field="board" data-id="new1" />
+            <div class="err-msg" id="e-board-new1">${ERR_ICON} Required</div>
+          </td>
+
+          <td>
+            <input class="tb-input" type="number" min="1950" max="2050" placeholder="YYYY"
+              data-field="year" data-id="new1" />
+            <div class="err-msg" id="e-year-new1">${ERR_ICON} Required</div>
+          </td>
+
+          <td>
+            <input class="tb-input" type="text" placeholder="Roll No."
+              data-field="roll" data-id="new1" />
+            <div class="err-msg" id="e-roll-new1">${ERR_ICON} Required</div>
+          </td>
+
+          <td>
+            <input class="tb-input" type="text" placeholder="e.g. A / A+ / O / Distinction"
+              data-field="grade" data-id="new1" />
+          </td>
+
+          <td>
+            <input class="tb-input" type="number" step="0.01" placeholder="Obtained"
+              data-field="obtained" data-id="new1" onchange="calcPerc('new1')" />
+            <span class="perc" id="perc-new1"></span>
+          </td>
+
+          <td>
+            <input class="tb-input" type="number" step="0.01" placeholder="Maximum"
+              data-field="max" data-id="new1" onchange="calcPerc('new1')" />
+            <div class="err-msg" id="e-marks-new1">${ERR_ICON} Grade OR Marks Required</div>
+          </td>
+
+          <td>
+            <input class="tb-input" type="text" placeholder="Subjects"
+              data-field="subjects" data-id="new1" />
+            <div class="err-msg" id="e-subjects-new1">${ERR_ICON} Required</div>
+          </td>
+
+          <td class="actions">
+            <div class="action-btns">
+              <button class="btn-act btn-plus"  title="Add row below" onclick="addRowBelow('new1')">${PLUS_ICON}</button>
+              <button class="btn-act btn-trash" title="Remove row"    onclick="delRow('new1')">${TRASH_ICON}</button>
             </div>
           </td>
         </tr>
@@ -546,6 +611,10 @@ select.tb-input {
       <button class="btn-save" onclick="submitForm()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         Save &amp; Continue
+      </button>
+      <button class="btn-save" onclick="submitAndComplete()" style="background: #28a745; margin-left: 10px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Next Step →
       </button>
     </div>
   </div>
@@ -761,57 +830,62 @@ function clrErr(id, field, inp) {
 
 /* ─── VALIDATE ALL ─── */
 function validate() {
-  let ok = true;
-
-  document.querySelectorAll('#qualBody tr').forEach(tr => {
-    const id   = tr.dataset.id;
-    const isDyn = tr.dataset.dyn === '1';
-
-    if (!isActive(tr)) return; // blank row – skip
-
-    // exam (dynamic only)
-    if (isDyn) {
-      const e = tr.querySelector('[data-field="exam"]');
-      e.value.trim() ? clrErr(id,'exam',e) : (showErr(id,'exam',e), ok=false);
+  // Check if at least one field has any data
+  const inputs = document.querySelectorAll('#qualBody .tb-input');
+  let hasAnyData = false;
+  
+  inputs.forEach(inp => {
+    if (inp.value.trim()) {
+      hasAnyData = true;
     }
-
-    // board
-    const b = tr.querySelector('[data-field="board"]');
-    b.value.trim() ? clrErr(id,'board',b) : (showErr(id,'board',b), ok=false);
-
-    // year
-    const y = tr.querySelector('[data-field="year"]');
-    y.value ? clrErr(id,'year',y) : (showErr(id,'year',y), ok=false);
-
-    // roll
-    const r = tr.querySelector('[data-field="roll"]');
-    r.value.trim() ? clrErr(id,'roll',r) : (showErr(id,'roll',r), ok=false);
-
-    // grade OR marks
-    const grade = tr.querySelector('[data-field="grade"]');
-    const obt   = tr.querySelector('[data-field="obtained"]');
-    const max   = tr.querySelector('[data-field="max"]');
-    const errEl = document.getElementById(`e-marks-${id}`);
-    const gradeOk = grade?.value.trim() !== '';
-    const ov = parseFloat((obt?.value||'').replace(/,/g,''));
-    const mv = parseFloat((max?.value||'').replace(/,/g,''));
-    const marksOk = !isNaN(ov) && !isNaN(mv) && mv > 0 && ov <= mv;
-
-    if (!gradeOk && !marksOk) {
-      errEl?.classList.add('show');
-      obt?.classList.add('error'); max?.classList.add('error');
-      ok = false;
-    } else {
-      errEl?.classList.remove('show');
-      obt?.classList.remove('error'); max?.classList.remove('error');
-    }
-
-    // subjects
-    const s = tr.querySelector('[data-field="subjects"]');
-    s.value.trim() ? clrErr(id,'subjects',s) : (showErr(id,'subjects',s), ok=false);
   });
+  
+  if (!hasAnyData) {
+    toast('error','✖','Please fill at least one field');
+    return false;
+  }
+  
+  return true; // Allow any single field submission
+}
 
-  return ok;
+function isActive(tr) {
+  return tr.querySelector('.tb-input:not(.computed)')?.value.trim() !== '';
+}
+
+function clrErr(id, field, inp) {
+  const errEl = document.getElementById(`e-${field}-${id}`);
+  errEl?.classList.remove('show');
+  inp?.classList.remove('error');
+}
+
+function showErr(id, field, inp) {
+  const errEl = document.getElementById(`e-${field}-${id}`);
+  errEl?.classList.add('show');
+  inp?.classList.add('error');
+}
+
+function toggleCustom(id) {
+  const examSelect = document.querySelector(`[data-field="exam"][data-id="${id}"]`);
+  const customInput = document.querySelector(`[data-field="custom_exam"][data-id="${id}"]`);
+  
+  if (examSelect.value === 'other') {
+    customInput.style.display = 'block';
+  } else {
+    customInput.style.display = 'none';
+  }
+}
+
+function calcPerc(id) {
+  const obtained = document.querySelector(`[data-field="obtained"][data-id="${id}"]`);
+  const max = document.querySelector(`[data-field="max"][data-id="${id}"]`);
+  const perc = document.getElementById(`perc-${id}`);
+  
+  if (obtained.value && max.value) {
+    const percentage = (parseFloat(obtained.value) / parseFloat(max.value)) * 100;
+    perc.textContent = percentage.toFixed(2) + '%';
+  } else {
+    perc.textContent = '';
+  }
 }
 
 /* live clear */
@@ -832,6 +906,61 @@ document.addEventListener('change', e => {
 });
 
 /* ─── SUBMIT ─── */
+function submitAndComplete() {
+  if (validate()) {
+    // Collect all active rows data
+    const rows = document.querySelectorAll('#qualBody tr');
+    const formData = new FormData();
+    
+    rows.forEach((row, index) => {
+      const isActive = row.querySelector('.tb-input:not(.computed)')?.value.trim() !== '';
+      
+      if (isActive) {
+        const id = row.dataset.id;
+        formData.append(`exam`, row.querySelector('[data-field="exam"]')?.value || '');
+        formData.append(`custom_exam`, row.querySelector('[data-field="custom_exam"]')?.value || '');
+        formData.append(`board`, row.querySelector('[data-field="board"]')?.value || '');
+        formData.append(`year`, row.querySelector('[data-field="year"]')?.value || '');
+        formData.append(`roll`, row.querySelector('[data-field="roll"]')?.value || '');
+        formData.append(`grade`, row.querySelector('[data-field="grade"]')?.value || '');
+        formData.append(`obtained`, row.querySelector('[data-field="obtained"]')?.value || '');
+        formData.append(`max`, row.querySelector('[data-field="max"]')?.value || '');
+        formData.append(`subjects`, row.querySelector('[data-field="subjects"]')?.value || '');
+      }
+    });
+    
+    // Submit to Django backend
+    fetch("{% url 'phd_academic_qualifications:submit_qualification_data' %}", {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken')
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        toast('success','✔', data.message);
+        // Redirect to employment step
+        setTimeout(() => {
+          window.location.href = '/employment/';
+        }, 1500);
+      } else {
+        toast('error','✖', data.message);
+      }
+    })
+    .catch(error => {
+      toast('error','✖','An error occurred. Please try again.');
+    });
+  } else {
+    toast('error','✖','Please complete all required fields in started rows.');
+    setTimeout(() => {
+      const first = document.querySelector('#qualBody .tb-input.error');
+      if (first) first.scrollIntoView({ behavior:'smooth', block:'center' });
+    }, 80);
+  }
+}
+
 function submitForm() {
   if (validate()) {
     // Collect all active rows data
@@ -867,8 +996,15 @@ function submitForm() {
     .then(data => {
       if (data.status === 'success') {
         toast('success','✔', data.message);
-        // Optionally reload page to show saved data
-        setTimeout(() => location.reload(), 2000);
+        // Always redirect if redirect_url is provided
+        if (data.redirect_url) {
+          setTimeout(() => {
+            window.location.href = data.redirect_url;
+          }, 1500);
+        } else {
+          // Reload page if no redirect
+          setTimeout(() => location.reload(), 2000);
+        }
       } else {
         toast('error','✖', data.message);
       }

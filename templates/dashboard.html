@@ -1,0 +1,426 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - PhD Admission System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="welcome-card">
+                <div class="welcome-content">
+                    <h1>Welcome back, {{ user.first_name|default:user.username }}! 👋</h1>
+                    <p class="text-muted">Manage your PhD admission journey from your personal dashboard</p>
+                </div>
+                <div class="welcome-avatar">
+                    <div class="avatar-circle">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Personal Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stats-card personal">
+                <div class="stats-icon blue">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <div class="stats-number">{{ user_employment_count }}</div>
+                <div class="stats-label">Employment Records</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card personal">
+                <div class="stats-icon green">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="stats-number">{{ user_qualifications_count }}</div>
+                <div class="stats-label">Academic Qualifications</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card personal">
+                <div class="stats-icon orange">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stats-number">{{ user_applications_count }}</div>
+                <div class="stats-label">Applications</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card personal">
+                <div class="stats-icon purple">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stats-number">{{ profile_completion }}%</div>
+                <div class="stats-label">Profile Complete</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'employment_details:employment_details' %}" class="action-card">
+                                <div class="action-icon blue">
+                                    <i class="fas fa-briefcase"></i>
+                                </div>
+                                <div class="action-content">
+                                    <h6>Employment Details</h6>
+                                    <small>Add your work experience</small>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'phd_academic_qualifications:academic_qualifications' %}" class="action-card">
+                                <div class="action-icon green">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <div class="action-content">
+                                    <h6>Academic Qualifications</h6>
+                                    <small>Add your education history</small>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="#" class="action-card" onclick="alert('University Admission feature coming soon!')">
+                                <div class="action-icon orange">
+                                    <i class="fas fa-university"></i>
+                                </div>
+                                <div class="action-content">
+                                    <h6>University Admission</h6>
+                                    <small>Apply for programs</small>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'profile_personal_info' %}" class="action-card">
+                                <div class="action-icon blue">
+                                    <i class="fas fa-user-edit"></i>
+                                </div>
+                                <div class="action-content">
+                                    <h6>Complete Profile</h6>
+                                    <small>Fill in your information</small>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'debug_profile' %}" class="action-card">
+                                <div class="action-icon orange">
+                                    <i class="fas fa-bug"></i>
+                                </div>
+                                <div class="action-content">
+                                    <h6>Debug Status</h6>
+                                    <small>Check profile status</small>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Overview -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">System Overview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="overview-item">
+                                <div class="overview-icon">
+                                    <i class="fas fa-users text-primary"></i>
+                                </div>
+                                <div class="overview-content">
+                                    <h6>Total Users</h6>
+                                    <p class="mb-0">{{ total_users }} registered users</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="overview-item">
+                                <div class="overview-icon">
+                                    <i class="fas fa-briefcase text-success"></i>
+                                </div>
+                                <div class="overview-content">
+                                    <h6>Total Employment Records</h6>
+                                    <p class="mb-0">{{ total_employment }} records</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="overview-item">
+                                <div class="overview-icon">
+                                    <i class="fas fa-graduation-cap text-warning"></i>
+                                </div>
+                                <div class="overview-content">
+                                    <h6>Total Qualifications</h6>
+                                    <p class="mb-0">{{ total_qualifications }} qualifications</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="overview-item">
+                                <div class="overview-icon">
+                                    <i class="fas fa-file-alt text-info"></i>
+                                </div>
+                                <div class="overview-content">
+                                    <h6>Total Applications</h6>
+                                    <p class="mb-0">{{ total_applications }} applications</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Account Info</h5>
+                </div>
+                <div class="card-body">
+                    <div class="account-info">
+                        <div class="info-item">
+                            <strong>Name:</strong> {{ user.first_name|default:'Not set' }}
+                        </div>
+                        <div class="info-item">
+                            <strong>Email:</strong> {{ user.email }}
+                        </div>
+                        <div class="info-item">
+                            <strong>Username:</strong> {{ user.username }}
+                        </div>
+                        <div class="info-item">
+                            <strong>Member Since:</strong> {{ user.date_joined|date:"M d, Y" }}
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.welcome-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.welcome-content h1 {
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.welcome-content p {
+    margin: 0;
+    opacity: 0.9;
+}
+
+.avatar-circle {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    backdrop-filter: blur(10px);
+}
+
+.stats-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+    text-align: center;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.stats-card.personal {
+    border-left: 4px solid #667eea;
+}
+
+.stats-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.5rem;
+}
+
+.stats-icon.blue { background: rgba(102, 126, 234, 0.1); color: #667eea; }
+.stats-icon.green { background: rgba(40, 167, 69, 0.1); color: #28a745; }
+.stats-icon.orange { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
+.stats-icon.purple { background: rgba(111, 66, 193, 0.1); color: #6f42c1; }
+
+.stats-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+}
+
+.stats-label {
+    color: #6c757d;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.action-card {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.action-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    color: inherit;
+    text-decoration: none;
+}
+
+.action-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.action-content h6 {
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+
+.action-content small {
+    color: #6c757d;
+}
+
+.overview-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.overview-item:last-child {
+    border-bottom: none;
+}
+
+.overview-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.overview-content h6 {
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+
+.overview-content p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.account-info .info-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.account-info .info-item:last-child {
+    border-bottom: none;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+}
+
+.card-header {
+    background: white;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1.5rem;
+}
+
+.card-header h5 {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .welcome-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .welcome-content {
+        margin-bottom: 1.5rem;
+    }
+    
+    .stats-number {
+        font-size: 2rem;
+    }
+}
+</style>
+{% endblock %}

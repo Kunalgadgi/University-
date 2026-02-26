@@ -1,0 +1,528 @@
+{% extends 'base.html' %}
+
+{% block title %}Personal Information - PhD Admission System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Progress Bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="progress-card">
+                <div class="progress-header">
+                    <h4>Profile Completion</h4>
+                    <span class="progress-text">Step 1 of 3</span>
+                </div>
+                <div class="progress-steps">
+                    <div class="step active">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Personal Info</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Qualification</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Employment</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Personal Information Form -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="form-card">
+                <div class="form-header">
+                    <h3>Personal Information</h3>
+                    <p class="text-muted">Please provide your personal details</p>
+                </div>
+                
+                <div class="form-body">
+                    <form method="post" id="personalInfoForm" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="name" class="form-label">
+                                        <i class="fas fa-user"></i> Full Name
+                                    </label>
+                                    <input type="text" class="form-control" id="name" name="name" 
+                                           value="{{ user.first_name }}" required>
+                                    <div class="error-message" id="nameError"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="email" class="form-label">
+                                        <i class="fas fa-envelope"></i> Email Address
+                                    </label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           value="{{ user.email }}" required>
+                                    <div class="error-message" id="emailError"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="mobile_number" class="form-label">
+                                        <i class="fas fa-phone"></i> Mobile Number
+                                    </label>
+                                    <input type="tel" class="form-control" id="mobile_number" name="mobile_number" 
+                                           value="{{ profile.mobile_number }}" required>
+                                    <div class="error-message" id="mobileError"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="date_of_birth" class="form-label">
+                                        <i class="fas fa-calendar"></i> Date of Birth
+                                    </label>
+                                    <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" 
+                                           value="{{ profile.date_of_birth|date:'Y-m-d' }}" required>
+                                    <div class="error-message" id="dobError"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="gender" class="form-label">
+                                        <i class="fas fa-venus-mars"></i> Gender
+                                    </label>
+                                    <select class="form-control" id="gender" name="gender" required>
+                                        <option value="">Select Gender</option>
+                                        <option value="M" {% if profile.gender == 'M' %}selected{% endif %}>Male</option>
+                                        <option value="F" {% if profile.gender == 'F' %}selected{% endif %}>Female</option>
+                                        <option value="O" {% if profile.gender == 'O' %}selected{% endif %}>Other</option>
+                                    </select>
+                                    <div class="error-message" id="genderError"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="marital_status" class="form-label">
+                                        <i class="fas fa-heart"></i> Marital Status
+                                    </label>
+                                    <select class="form-control" id="marital_status" name="marital_status" required>
+                                        <option value="">Select Marital Status</option>
+                                        <option value="S" {% if profile.marital_status == 'S' %}selected{% endif %}>Single</option>
+                                        <option value="M" {% if profile.marital_status == 'M' %}selected{% endif %}>Married</option>
+                                        <option value="D" {% if profile.marital_status == 'D' %}selected{% endif %}>Divorced</option>
+                                        <option value="W" {% if profile.marital_status == 'W' %}selected{% endif %}>Widowed</option>
+                                    </select>
+                                    <div class="error-message" id="maritalError"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Update Profile
+                            </button>
+                            <button type="submit" class="btn btn-success" name="next" value="true">
+                                <i class="fas fa-arrow-right"></i> Next
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.progress-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.progress-header h4 {
+    margin: 0;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.progress-text {
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+}
+
+.progress-steps::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e9ecef;
+    z-index: 1;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.step.active .step-number {
+    background: #667eea;
+    color: white;
+}
+
+.step.completed .step-number {
+    background: #28a745;
+    color: white;
+}
+
+.step-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.step.active .step-label {
+    color: #667eea;
+    font-weight: 600;
+}
+
+.form-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+}
+
+.form-header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.form-header h3 {
+    margin: 0 0 0.5rem 0;
+    font-weight: 600;
+}
+
+.form-header p {
+    margin: 0;
+    opacity: 0.9;
+}
+
+.form-body {
+    padding: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.form-label i {
+    color: #667eea;
+    width: 20px;
+}
+
+.form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    outline: none;
+}
+
+.form-control.error {
+    border-color: #dc3545;
+}
+
+.form-control.success {
+    border-color: #28a745;
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    min-height: 1.2rem;
+    display: none;
+}
+
+.error-message.show {
+    display: block;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.btn {
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5a6fd8;
+    transform: translateY(-2px);
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #218838;
+    transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .progress-steps {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .progress-steps::before {
+        display: none;
+    }
+    
+    .step {
+        flex-direction: row;
+        width: 100%;
+        justify-content: flex-start;
+        margin-bottom: 1rem;
+    }
+    
+    .step-number {
+        margin-bottom: 0;
+        margin-right: 1rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+
+<script>
+// Validation functions
+function validateName() {
+    const name = document.getElementById('name');
+    const nameError = document.getElementById('nameError');
+    
+    if (name.value.trim() === '') {
+        showError(name, nameError, 'Full name is required');
+        return false;
+    } else if (name.value.trim().length < 3) {
+        showError(name, nameError, 'Name must be at least 3 characters long');
+        return false;
+    } else {
+        showSuccess(name, nameError);
+        return true;
+    }
+}
+
+function validateEmail() {
+    const email = document.getElementById('email');
+    const emailError = document.getElementById('emailError');
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (email.value.trim() === '') {
+        showError(email, emailError, 'Email address is required');
+        return false;
+    } else if (!emailPattern.test(email.value)) {
+        showError(email, emailError, 'Please enter a valid email address');
+        return false;
+    } else {
+        showSuccess(email, emailError);
+        return true;
+    }
+}
+
+function validateMobileNumber() {
+    const mobileNumber = document.getElementById('mobile_number');
+    const mobileError = document.getElementById('mobileError');
+    const mobilePattern = /^[0-9]{10}$/;
+    
+    if (mobileNumber.value.trim() === '') {
+        showError(mobileNumber, mobileError, 'Mobile number is required');
+        return false;
+    } else if (!mobilePattern.test(mobileNumber.value.replace(/\s/g, ''))) {
+        showError(mobileNumber, mobileError, 'Please enter a valid 10-digit mobile number');
+        return false;
+    } else {
+        showSuccess(mobileNumber, mobileError);
+        return true;
+    }
+}
+
+function validateDateOfBirth() {
+    const dateOfBirth = document.getElementById('date_of_birth');
+    const dobError = document.getElementById('dobError');
+    
+    if (dateOfBirth.value === '') {
+        showError(dateOfBirth, dobError, 'Date of birth is required');
+        return false;
+    } else {
+        const birthDate = new Date(dateOfBirth.value);
+        const today = new Date();
+        const age = today.getFullYear() - birthDate.getFullYear();
+        
+        if (age < 16) {
+            showError(dateOfBirth, dobError, 'You must be at least 16 years old');
+            return false;
+        } else if (age > 100) {
+            showError(dateOfBirth, dobError, 'Please enter a valid date of birth');
+            return false;
+        } else {
+            showSuccess(dateOfBirth, dobError);
+            return true;
+        }
+    }
+}
+
+function validateGender() {
+    const gender = document.getElementById('gender');
+    const genderError = document.getElementById('genderError');
+    
+    if (gender.value === '') {
+        showError(gender, genderError, 'Please select your gender');
+        return false;
+    } else {
+        showSuccess(gender, genderError);
+        return true;
+    }
+}
+
+function validateMaritalStatus() {
+    const maritalStatus = document.getElementById('marital_status');
+    const maritalError = document.getElementById('maritalError');
+    
+    if (maritalStatus.value === '') {
+        showError(maritalStatus, maritalError, 'Please select your marital status');
+        return false;
+    } else {
+        showSuccess(maritalStatus, maritalError);
+        return true;
+    }
+}
+
+function showError(input, errorElement, message) {
+    input.classList.remove('success');
+    input.classList.add('error');
+    errorElement.textContent = message;
+    errorElement.classList.add('show');
+}
+
+function showSuccess(input, errorElement) {
+    input.classList.remove('error');
+    input.classList.add('success');
+    errorElement.classList.remove('show');
+}
+
+// Add event listeners for real-time validation
+document.getElementById('name').addEventListener('blur', validateName);
+document.getElementById('email').addEventListener('blur', validateEmail);
+document.getElementById('mobile_number').addEventListener('blur', validateMobileNumber);
+document.getElementById('date_of_birth').addEventListener('blur', validateDateOfBirth);
+document.getElementById('gender').addEventListener('change', validateGender);
+document.getElementById('marital_status').addEventListener('change', validateMaritalStatus);
+
+// Form submission validation
+document.getElementById('personalInfoForm').addEventListener('submit', function(e) {
+    const isNameValid = validateName();
+    const isEmailValid = validateEmail();
+    const isMobileValid = validateMobileNumber();
+    const isDobValid = validateDateOfBirth();
+    const isGenderValid = validateGender();
+    const isMaritalValid = validateMaritalStatus();
+    
+    if (!isNameValid || !isEmailValid || !isMobileValid || !isDobValid || !isGenderValid || !isMaritalValid) {
+        e.preventDefault();
+        // Scroll to the first error
+        const firstError = document.querySelector('.form-control.error');
+        if (firstError) {
+            firstError.focus();
+            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+});
+</script>
+{% endblock %}

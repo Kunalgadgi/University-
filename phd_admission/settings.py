@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'phd_admission',
     'employment_details',
     'phd_academic_qualifications',
 ]

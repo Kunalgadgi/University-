@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 
@@ -7,6 +8,8 @@ class AcademicQualification(models.Model):
     Model to store academic qualifications for PhD admission
     Based on the phd_academic_qualifications.html form structure
     """
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='academic_qualifications')
     
     # Fixed examination types from the HTML form
     EXAM_TYPES = [
