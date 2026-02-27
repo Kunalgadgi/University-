@@ -1,0 +1,360 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | University Master Control{% endblock %}
+
+{% block extrastyle %}
+<style>
+    :root {
+        --primary: #0d1f3c;
+        --primary-light: #1e3d6f;
+        --gold: #c9a84c;
+        --gold-light: #e8c96a;
+        --success: #16a34a;
+        --warning: #d97706;
+        --danger: #dc2626;
+        --info: #0284c7;
+        --bg: #f1f4f9;
+        --card-bg: #ffffff;
+        --text: #0f1c30;
+        --text-secondary: #4a5a72;
+        --border: #dde3ee;
+        --shadow: 0 4px 20px rgba(15, 28, 48, 0.08);
+        --radius: 12px;
+    }
+    
+    .health-container {
+        padding: 24px;
+        background: var(--bg);
+        min-height: 100vh;
+    }
+    
+    .health-header {
+        margin-bottom: 28px;
+    }
+    
+    .health-title {
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        font-size: 26px;
+        font-weight: 800;
+        color: var(--primary);
+        margin: 0 0 8px 0;
+    }
+    
+    .health-subtitle {
+        color: var(--text-secondary);
+        font-size: 14px;
+    }
+    
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--primary-light);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 16px;
+    }
+    
+    .back-link:hover {
+        color: var(--primary);
+    }
+    
+    .health-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    
+    .health-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 24px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+    }
+    
+    .health-card-title {
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 0 0 16px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .health-card-title i {
+        font-size: 20px;
+    }
+    
+    .check-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .check-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .check-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+    
+    .check-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        flex-shrink: 0;
+    }
+    
+    .check-icon.success {
+        background: #dcfce7;
+        color: var(--success);
+    }
+    
+    .check-icon.error {
+        background: #fee2e2;
+        color: var(--danger);
+    }
+    
+    .check-icon.warning {
+        background: #fef3c7;
+        color: var(--warning);
+    }
+    
+    .check-content {
+        flex: 1;
+    }
+    
+    .check-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text);
+    }
+    
+    .check-status {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 2px;
+    }
+    
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    
+    .status-badge.success {
+        background: #dcfce7;
+        color: var(--success);
+    }
+    
+    .status-badge.error {
+        background: #fee2e2;
+        color: var(--danger);
+    }
+    
+    .status-badge.warning {
+        background: #fef3c7;
+        color: var(--warning);
+    }
+    
+    .info-table {
+        width: 100%;
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-size: 13px;
+        color: var(--text-secondary);
+    }
+    
+    .info-value {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="health-container">
+    <a href="{% url 'master_control:dashboard' %}" class="back-link">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+    
+    <div class="health-header">
+        <h1 class="health-title">System Health</h1>
+        <p class="health-subtitle">Check portal configuration and system status</p>
+    </div>
+    
+    <div class="health-grid">
+        <!-- Portal Configuration -->
+        <div class="health-card">
+            <h2 class="health-card-title">
+                <i class="fas fa-gear" style="color: var(--primary);"></i>
+                Portal Configuration
+            </h2>
+            <ul class="check-list">
+                <li class="check-item">
+                    <div class="check-icon {% if health_checks.portal_configured %}success{% else %}error{% endif %}">
+                        <i class="fas {% if health_checks.portal_configured %}fa-check{% else %}fa-xmark{% endif %}"></i>
+                    </div>
+                    <div class="check-content">
+                        <div class="check-label">Portal Settings</div>
+                        <div class="check-status">
+                            {% if health_checks.portal_configured %}Configured{% else %}Not configured{% endif %}
+                        </div>
+                    </div>
+                </li>
+                <li class="check-item">
+                    <div class="check-icon {% if health_checks.portal_active %}success{% else %}warning{% endif %}">
+                        <i class="fas {% if health_checks.portal_active %}fa-check{% else %}fa-exclamation{% endif %}"></i>
+                    </div>
+                    <div class="check-content">
+                        <div class="check-label">Portal Active</div>
+                        <div class="check-status">
+                            {% if health_checks.portal_active %}Running{% else %}Inactive{% endif %}
+                        </div>
+                    </div>
+                </li>
+                <li class="check-item">
+                    <div class="check-icon {% if health_checks.maintenance_mode %}warning{% else %}success{% endif %}">
+                        <i class="fas {% if health_checks.maintenance_mode %}fa-wrench{% else %}fa-check{% endif %}"></i>
+                    </div>
+                    <div class="check-content">
+                        <div class="check-label">Maintenance Mode</div>
+                        <div class="check-status">
+                            {% if health_checks.maintenance_mode %}Enabled{% else %}Disabled{% endif %}
+                        </div>
+                    </div>
+                </li>
+                <li class="check-item">
+                    <div class="check-icon {% if health_checks.application_period_active %}success{% else %}warning{% endif %}">
+                        <i class="fas {% if health_checks.application_period_active %}fa-check{% else %}fa-clock{% endif %}"></i>
+                    </div>
+                    <div class="check-content">
+                        <div class="check-label">Application Period</div>
+                        <div class="check-status">
+                            {% if health_checks.application_period_active %}Active{% else %}Not in application period{% endif %}
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Content Status -->
+        <div class="health-card">
+            <h2 class="health-card-title">
+                <i class="fas fa-folder-open" style="color: var(--info);"></i>
+                Content Status
+            </h2>
+            <ul class="check-list">
+                <li class="check-item">
+                    <div class="check-icon {% if health_checks.courses_configured %}success{% else %}warning{% endif %}">
+                        <i class="fas {% if health_checks.courses_configured %}fa-check{% else %}fa-exclamation{% endif %}"></i>
+                    </div>
+                    <div class="check-content">
+                        <div class="check-label">Courses</div>
+                        <div class="check-status">
+                            {% if health_checks.courses_configured %}Active courses available{% else %}No active courses{% endif %}
+                        </div>
+                    </div>
+                </li>
+                <li class="check-item">
+                    <div class="check-icon {% if health_checks.forms_configured %}success{% else %}warning{% endif %}">
+                        <i class="fas {% if health_checks.forms_configured %}fa-check{% else %}fa-exclamation{% endif %}"></i>
+                    </div>
+                    <div class="check-content">
+                        <div class="check-label">Form Configurations</div>
+                        <div class="check-status">
+                            {% if health_checks.forms_configured %}Forms configured{% else %}No active forms{% endif %}
+                        </div>
+                    </div>
+                </li>
+                <li class="check-item">
+                    <div class="check-icon {% if health_checks.ads_configured %}success{% else %}warning{% endif %}">
+                        <i class="fas {% if health_checks.ads_configured %}fa-check{% else %}fa-exclamation{% endif %}"></i>
+                    </div>
+                    <div class="check-content">
+                        <div class="check-label">Advertisements</div>
+                        <div class="check-status">
+                            {% if health_checks.ads_configured %}Active ads running{% else %}No active ads{% endif %}
+                        </div>
+                    </div>
+                </li>
+                <li class="check-item">
+                    <div class="check-icon {% if health_checks.notices_active %}success{% else %}warning{% endif %}">
+                        <i class="fas {% if health_checks.notices_active %}fa-check{% else %}fa-exclamation{% endif %}"></i>
+                    </div>
+                    <div class="check-content">
+                        <div class="check-label">Notices</div>
+                        <div class="check-status">
+                            {% if health_checks.notices_active %}Active notices{% else %}No active notices{% endif %}
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Portal Settings Summary -->
+        {% if settings %}
+        <div class="health-card">
+            <h2 class="health-card-title">
+                <i class="fas fa-info-circle" style="color: var(--gold);"></i>
+                Current Settings
+            </h2>
+            <div class="info-table">
+                <div class="info-row">
+                    <span class="info-label">Portal Name</span>
+                    <span class="info-value">{{ settings.portal_name }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Academic Year</span>
+                    <span class="info-value">{{ settings.current_academic_year }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Application Start</span>
+                    <span class="info-value">{{ settings.application_start_date|date:"d M Y" }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Application End</span>
+                    <span class="info-value">{{ settings.application_end_date|date:"d M Y" }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Contact Email</span>
+                    <span class="info-value">{{ settings.contact_email }}</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

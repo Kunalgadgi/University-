@@ -1,0 +1,110 @@
+{% extends "master_control/base.html" %}
+{% block title %}Courses{% endblock %}
+{% block breadcrumb %}Courses{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ptitle">Course Management</div>
+      <div class="psub">Manage academic courses — active courses are visible on the portal frontend</div>
+    </div>
+    <a href="/admin/courses/add" class="btn btn-primary"><i class="fas fa-plus"></i> Add Course</a>
+  </div>
+
+  <div class="card">
+    <!-- Search & Filters -->
+    <form method="GET" action="/admin/courses">
+      <div class="fbar">
+        <div class="srch">
+          <i class="fas fa-search srch-ico"></i>
+          <input type="text" name="search" value="{{ search }}" placeholder="Search by course or department name…">
+        </div>
+        <select name="is_active" class="fsel" onchange="this.form.submit()">
+          <option value="">All Status</option>
+          <option value="1" {% if filter_active=='1' %}selected{% endif %}>Active</option>
+          <option value="0" {% if filter_active=='0' %}selected{% endif %}>Inactive</option>
+        </select>
+        <button type="submit" class="btn btn-outline btn-sm"><i class="fas fa-filter"></i> Filter</button>
+        {% if search or filter_active %}
+        <a href="/admin/courses" class="btn btn-outline btn-sm"><i class="fas fa-xmark"></i> Clear</a>
+        {% endif %}
+      </div>
+    </form>
+
+    <!-- Bulk Actions -->
+    <form id="bulkForm" method="POST" action="/admin/courses/bulk">
+      <div class="bbar">
+        <label><i class="fas fa-layer-group" style="margin-right:5px"></i>Bulk Action:</label>
+        <select name="action">
+          <option value="">Select action</option>
+          <option value="activate">✅ Activate Selected</option>
+          <option value="deactivate">❌ Deactivate Selected</option>
+        </select>
+        <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-play"></i> Apply</button>
+      </div>
+
+      <!-- Table -->
+      {% if courses %}
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:38px"><input type="checkbox" onchange="toggleAll(this)"></th>
+              <th>Course Name</th>
+              <th>Department</th>
+              <th>Degree</th>
+              <th>Duration</th>
+              <th>Seats</th>
+              <th>Priority</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in courses %}
+            <tr>
+              <td><input type="checkbox" name="ids" value="{{ c.id }}" class="rc"></td>
+              <td>
+                <div class="td-main">{{ c.course_name }}</div>
+                <div class="td-sub">ID: {{ c.id }}</div>
+              </td>
+              <td style="color:#4a5a72;font-weight:500">{{ c.department_name }}</td>
+              <td><span class="badge badge-open">{{ c.degree_type }}</span></td>
+              <td style="color:#4a5a72">{{ c.duration_years }} yr{{ 's' if c.duration_years != 1 else '' }}</td>
+              <td style="font-weight:600">{{ c.total_seats }}</td>
+              <td><span class="pri">{{ c.display_priority }}</span></td>
+              <td>
+                {% if c.is_active %}
+                <span class="badge badge-on"><span class="badge-dot"></span>Active</span>
+                {% else %}
+                <span class="badge badge-off"><span class="badge-dot"></span>Inactive</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="acts">
+                  <a href="/admin/courses/edit/{{ c.id }}" class="ab ab-edit" title="Edit">
+                    <i class="fas fa-pen"></i>
+                  </a>
+                  <button type="button" class="ab ab-del" title="Delete"
+                          onclick="openDel('/admin/courses/delete/{{ c.id }}')">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty">
+        <div class="empty-ico"><i class="fas fa-graduation-cap"></i></div>
+        <h4>No courses found</h4>
+        <p>{% if search or filter_active %}Try adjusting your search or filters.{% else %}Add your first course to get started.{% endif %}</p>
+        <a href="/admin/courses/add" class="btn btn-primary" style="margin-top:14px"><i class="fas fa-plus"></i> Add Course</a>
+      </div>
+      {% endif %}
+    </form>
+  </div>
+</div>
+{% endblock %}

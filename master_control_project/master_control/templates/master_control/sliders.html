@@ -1,0 +1,83 @@
+{% extends "master_control/base.html" %}
+{% block title %}Homepage Sliders{% endblock %}
+{% block breadcrumb %}Homepage Sliders{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ptitle">Homepage Sliders</div>
+      <div class="psub">Manage hero banner slides displayed on the homepage, ordered by priority</div>
+    </div>
+    <a href="/admin/sliders/add" class="btn btn-primary"><i class="fas fa-plus"></i> Add Slider</a>
+  </div>
+
+  <div class="card">
+    <form id="bulkForm" method="POST" action="/admin/sliders/bulk">
+      <div class="bbar">
+        <label><i class="fas fa-layer-group" style="margin-right:5px"></i>Bulk Action:</label>
+        <select name="action">
+          <option value="">Select action</option>
+          <option value="activate">✅ Activate Selected</option>
+          <option value="deactivate">❌ Deactivate Selected</option>
+        </select>
+        <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-play"></i> Apply</button>
+      </div>
+
+      {% if sliders %}
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:38px"><input type="checkbox" onchange="toggleAll(this)"></th>
+              <th>Slider</th>
+              <th>Subtitle</th>
+              <th>Image</th>
+              <th>Priority</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in sliders %}
+            <tr>
+              <td><input type="checkbox" name="ids" value="{{ s.id }}" class="rc"></td>
+              <td><div class="td-main">{{ s.title }}</div></td>
+              <td style="color:#4a5a72;font-size:12.5px">{{ s.subtitle or '—' }}</td>
+              <td>
+                {% if s.image %}
+                <span class="badge badge-open"><i class="fas fa-image" style="font-size:9px"></i>Uploaded</span>
+                {% else %}
+                <span style="color:#8a97aa;font-size:12px">—</span>
+                {% endif %}
+              </td>
+              <td><span class="pri">{{ s.priority }}</span></td>
+              <td>
+                {% if s.is_active %}
+                <span class="badge badge-on"><span class="badge-dot"></span>Active</span>
+                {% else %}
+                <span class="badge badge-off"><span class="badge-dot"></span>Inactive</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="acts">
+                  <a href="/admin/sliders/edit/{{ s.id }}" class="ab ab-edit"><i class="fas fa-pen"></i></a>
+                  <button type="button" class="ab ab-del" onclick="openDel('/admin/sliders/delete/{{ s.id }}')"><i class="fas fa-trash"></i></button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty">
+        <div class="empty-ico"><i class="fas fa-images"></i></div>
+        <h4>No sliders found</h4>
+        <p>Add homepage slider banners to showcase important content.</p>
+        <a href="/admin/sliders/add" class="btn btn-primary" style="margin-top:14px"><i class="fas fa-plus"></i> Add Slider</a>
+      </div>
+      {% endif %}
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -142,12 +142,14 @@ body::before {
   border-radius: 10px;
   border: 1.5px solid var(--border);
   box-shadow: 0 2px 12px rgba(0,123,255,.07);
+  padding-right: 12px;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
   min-width: 1060px;
+  margin-right: 12px;
 }
 
 /* THEAD */
@@ -574,7 +576,7 @@ select.tb-input {
 
           <td class="actions">
             <div class="action-btns">
-              <button class="btn-act btn-trash" title="Remove row" onclick="delRow('qual{{ qualification.id }}')">${TRASH_ICON}</button>
+              <button class="btn-act btn-trash" title="Remove row" onclick="delRow('qual{{ qualification.id }}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
             </div>
           </td>
         </tr>
@@ -641,7 +643,7 @@ select.tb-input {
 
           <td class="actions">
             <div class="action-btns">
-              <button class="btn-act btn-trash" title="Remove row" onclick="delRow('new1')">${TRASH_ICON}</button>
+              <button class="btn-act btn-trash" title="Remove row" onclick="delRow('new1')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
             </div>
           </td>
         </tr>
@@ -1191,7 +1193,10 @@ function submitAndContinue() {
   }
 }
 
-init();
+const HAS_EXISTING_QUALIFICATIONS = {% if qualifications %}true{% else %}false{% endif %};
+if (!HAS_EXISTING_QUALIFICATIONS) {
+  init();
+}
 </script>
 </body>
 </html>

@@ -1,0 +1,112 @@
+{% extends "master_control/base.html" %}
+{% block title %}Advertisements{% endblock %}
+{% block breadcrumb %}Advertisements{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ptitle">Advertisement Management</div>
+      <div class="psub">Manage banners, sidebars and notice ads — shown when active and within date range</div>
+    </div>
+    <a href="/admin/advertisements/add" class="btn btn-primary"><i class="fas fa-plus"></i> Add Advertisement</a>
+  </div>
+
+  <div class="card">
+    <form method="GET" action="/admin/advertisements">
+      <div class="fbar">
+        <div class="srch">
+          <i class="fas fa-search srch-ico"></i>
+          <input type="text" name="search" value="{{ search }}" placeholder="Search advertisements by title…">
+        </div>
+        <select name="display_type" class="fsel" onchange="this.form.submit()">
+          <option value="">All Types</option>
+          <option value="banner"  {% if filter_type=='banner' %}selected{% endif %}>Banner</option>
+          <option value="sidebar" {% if filter_type=='sidebar' %}selected{% endif %}>Sidebar</option>
+          <option value="notice"  {% if filter_type=='notice' %}selected{% endif %}>Notice</option>
+        </select>
+        <select name="is_active" class="fsel" onchange="this.form.submit()">
+          <option value="">All Status</option>
+          <option value="1" {% if filter_active=='1' %}selected{% endif %}>Active</option>
+          <option value="0" {% if filter_active=='0' %}selected{% endif %}>Inactive</option>
+        </select>
+        <button type="submit" class="btn btn-outline btn-sm"><i class="fas fa-filter"></i> Filter</button>
+        {% if search or filter_active or filter_type %}
+        <a href="/admin/advertisements" class="btn btn-outline btn-sm"><i class="fas fa-xmark"></i> Clear</a>
+        {% endif %}
+      </div>
+    </form>
+
+    <form id="bulkForm" method="POST" action="/admin/advertisements/bulk">
+      <div class="bbar">
+        <label><i class="fas fa-layer-group" style="margin-right:5px"></i>Bulk Action:</label>
+        <select name="action">
+          <option value="">Select action</option>
+          <option value="activate">✅ Activate Selected</option>
+          <option value="deactivate">❌ Deactivate Selected</option>
+        </select>
+        <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-play"></i> Apply</button>
+      </div>
+
+      {% if ads %}
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:38px"><input type="checkbox" onchange="toggleAll(this)"></th>
+              <th>Title</th>
+              <th>Type</th>
+              <th>Priority</th>
+              <th>Date Range</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ad in ads %}
+            <tr>
+              <td><input type="checkbox" name="ids" value="{{ ad.id }}" class="rc"></td>
+              <td>
+                <div class="td-main">{{ ad.title }}</div>
+                {% if ad.description %}
+                <div class="td-sub">{{ ad.description[:55] }}{% if ad.description|length > 55 %}…{% endif %}</div>
+                {% endif %}
+              </td>
+              <td>
+                {% if ad.display_type=='banner' %}<span class="badge badge-open">Banner</span>
+                {% elif ad.display_type=='sidebar' %}<span class="badge badge-sidebar">Sidebar</span>
+                {% else %}<span class="badge badge-notice">Notice</span>{% endif %}
+              </td>
+              <td><span class="pri">{{ ad.priority }}</span></td>
+              <td style="font-size:11.5px;color:#4a5a72">
+                {{ ad.start_date }}<br>→ {{ ad.end_date }}
+              </td>
+              <td>
+                {% if ad.is_active %}
+                <span class="badge badge-on"><span class="badge-dot"></span>Active</span>
+                {% else %}
+                <span class="badge badge-off"><span class="badge-dot"></span>Inactive</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="acts">
+                  <a href="/admin/advertisements/edit/{{ ad.id }}" class="ab ab-edit"><i class="fas fa-pen"></i></a>
+                  <button type="button" class="ab ab-del" onclick="openDel('/admin/advertisements/delete/{{ ad.id }}')"><i class="fas fa-trash"></i></button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty">
+        <div class="empty-ico"><i class="fas fa-rectangle-ad"></i></div>
+        <h4>No advertisements found</h4>
+        <p>{% if search or filter_active or filter_type %}Adjust your filters.{% else %}Create your first advertisement campaign.{% endif %}</p>
+        <a href="/admin/advertisements/add" class="btn btn-primary" style="margin-top:14px"><i class="fas fa-plus"></i> Add Advertisement</a>
+      </div>
+      {% endif %}
+    </form>
+  </div>
+</div>
+{% endblock %}

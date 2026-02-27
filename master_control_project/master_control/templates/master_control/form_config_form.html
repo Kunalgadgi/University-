@@ -1,0 +1,99 @@
+{% extends "master_control/base.html" %}
+{% block title %}{{ action }} Form Configuration{% endblock %}
+{% block breadcrumb %}Form Configurations / {{ action }}{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ptitle">{{ action }} Form Configuration</div>
+      <div class="psub">{% if action=='Edit' %}Update form settings for a course{% else %}Configure application form availability for a course{% endif %}</div>
+    </div>
+    <a href="/admin/form-configs" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back</a>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 300px;gap:18px">
+    <form method="POST" action="{{ '/admin/form-configs/edit/'+config.id|string if config else '/admin/form-configs/add' }}">
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-ttl"><div class="card-ico"><i class="fas fa-file-lines"></i></div>Form Configuration</div>
+        </div>
+        <div class="card-bd">
+          <div class="fg-grid fg-2">
+            <div class="fg" style="grid-column:1/-1">
+              <label class="fl">Course <span class="req">*</span></label>
+              <select name="course_id" class="fc" required>
+                <option value="">Select a course</option>
+                {% for c in courses %}
+                <option value="{{ c.id }}" {% if config and config.course_id==c.id %}selected{% endif %}>
+                  {{ c.course_name }} ({{ c.department_name }})
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="fg">
+              <label class="fl">Maximum Applications Allowed</label>
+              <input type="number" name="max_applications_allowed" class="fc"
+                     value="{{ config.max_applications_allowed if config else 100 }}" min="1">
+            </div>
+            <div class="fg">
+              <label class="fl">Application Fee (₹)</label>
+              <input type="number" name="application_fee" class="fc" step="0.01"
+                     value="{{ config.application_fee if config else 0 }}" min="0">
+            </div>
+            <div class="fg">
+              <label class="fl">Form Start Date</label>
+              <input type="date" name="form_start_date" class="fc"
+                     value="{{ config.form_start_date or '' }}">
+            </div>
+            <div class="fg">
+              <label class="fl">Form End Date</label>
+              <input type="date" name="form_end_date" class="fc"
+                     value="{{ config.form_end_date or '' }}">
+            </div>
+          </div>
+
+          <div style="margin-top:20px;padding-top:18px;border-top:1px solid #f1f4f9;display:flex;flex-direction:column;gap:16px">
+            <div>
+              <label class="fl" style="margin-bottom:9px">Form Status</label>
+              <div class="tg-wrap">
+                <label class="tg">
+                  <input type="checkbox" name="is_form_open" value="1" {% if config and config.is_form_open %}checked{% endif %}>
+                  <span class="tg-sl"></span>
+                </label>
+                <span class="tg-lbl">Form is open for submissions</span>
+              </div>
+            </div>
+            <div>
+              <label class="fl" style="margin-bottom:9px">Payment</label>
+              <div class="tg-wrap">
+                <label class="tg">
+                  <input type="checkbox" name="is_payment_required" value="1" {% if not config or config.is_payment_required %}checked{% endif %}>
+                  <span class="tg-sl"></span>
+                </label>
+                <span class="tg-lbl">Application fee payment required</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-floppy-disk"></i> {{ action }} Configuration</button>
+        <a href="/admin/form-configs" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-ttl"><div class="card-ico"><i class="fas fa-circle-info"></i></div>How It Works</div>
+      </div>
+      <div class="card-bd" style="font-size:12.5px;color:#4a5a72;line-height:1.8;display:flex;flex-direction:column;gap:10px">
+        <div><i class="fas fa-arrow-right" style="color:#c9a84c;margin-right:6px"></i>Each course can have one form configuration.</div>
+        <div><i class="fas fa-arrow-right" style="color:#c9a84c;margin-right:6px"></i>Toggle <strong>Form Open</strong> to allow applications.</div>
+        <div><i class="fas fa-arrow-right" style="color:#c9a84c;margin-right:6px"></i>Set start and end dates for availability window.</div>
+        <div><i class="fas fa-arrow-right" style="color:#c9a84c;margin-right:6px"></i>Fee is only charged if <strong>Payment Required</strong> is on.</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

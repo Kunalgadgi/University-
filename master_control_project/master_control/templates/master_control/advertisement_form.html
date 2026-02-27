@@ -1,0 +1,455 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% load form_filters %}
+
+{% block title %}{{ title }} | University Master Control{% endblock %}
+
+{% block extrastyle %}
+<style>
+    :root {
+        --primary: #0d1f3c;
+        --primary-light: #1e3d6f;
+        --gold: #c9a84c;
+        --gold-light: #e8c96a;
+        --success: #16a34a;
+        --warning: #d97706;
+        --danger: #dc2626;
+        --info: #0284c7;
+        --bg: #f1f4f9;
+        --card-bg: #ffffff;
+        --text: #0f1c30;
+        --text-secondary: #4a5a72;
+        --border: #dde3ee;
+        --shadow: 0 4px 20px rgba(15, 28, 48, 0.08);
+        --radius: 12px;
+    }
+    
+    .form-container {
+        padding: 24px;
+        background: var(--bg);
+        min-height: 100vh;
+    }
+    
+    .form-header {
+        margin-bottom: 28px;
+    }
+    
+    .form-title {
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        font-size: 26px;
+        font-weight: 800;
+        color: var(--primary);
+        margin: 0 0 8px 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .form-subtitle {
+        color: var(--text-secondary);
+        font-size: 14px;
+    }
+    
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--primary-light);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 16px;
+    }
+    
+    .back-link:hover {
+        color: var(--primary);
+    }
+    
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+    
+    .form-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 24px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+    }
+    
+    .form-card-title {
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 0 0 20px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group:last-child {
+        margin-bottom: 0;
+    }
+    
+    .form-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 6px;
+    }
+    
+    .form-input,
+    .form-select,
+    .form-textarea {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        background: var(--card-bg);
+        color: var(--text);
+    }
+    
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(13, 31, 60, 0.1);
+    }
+    
+    .form-textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+    
+    .form-checkbox {
+        width: 18px;
+        height: 18px;
+        margin-right: 8px;
+        accent-color: var(--primary);
+    }
+    
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        color: var(--text);
+        cursor: pointer;
+    }
+    
+    .form-file {
+        width: 100%;
+        padding: 10px 14px;
+        border: 2px dashed var(--border);
+        border-radius: 8px;
+        font-size: 14px;
+        background: var(--card-bg);
+        color: var(--text);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+    
+    .form-file:hover {
+        border-color: var(--primary);
+        background: rgba(13, 31, 60, 0.02);
+    }
+    
+    .form-file::before {
+        content: "📄 Choose PDF";
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary);
+        font-weight: 600;
+        pointer-events: none;
+    }
+    
+    .form-file::-webkit-file-upload-button {
+        visibility: hidden;
+    }
+    
+    .form-file::-moz-file-upload-button {
+        visibility: hidden;
+    }
+    
+    .form-actions {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 24px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+    
+    .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: var(--primary-light);
+    }
+    
+    .btn-secondary {
+        background: var(--border);
+        color: var(--text);
+    }
+    
+    .btn-secondary:hover {
+        background: #c8d2e0;
+    }
+    
+    .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 8px 0 0 0;
+    }
+    
+    .errorlist li {
+        color: var(--danger);
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+    
+    .help-text {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 4px;
+    }
+    
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <a href="{% url 'master_control:dashboard' %}" class="back-link">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+    
+    <div class="form-header">
+        <h1 class="form-title">
+            <i class="fas fa-ad" style="color: var(--gold);"></i>
+            {{ title }}
+        </h1>
+        <p class="form-subtitle">Create a new advertisement campaign</p>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-grid">
+            <!-- Advertisement Details -->
+            <div class="form-card">
+                <h2 class="form-card-title">
+                    <i class="fas fa-info-circle" style="color: var(--info);"></i>
+                    Advertisement Details
+                </h2>
+                
+                <div class="form-group">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">
+                        Title <span style="color: var(--danger);">*</span>
+                    </label>
+                    {{ form.title.errors }}
+                    {{ form.title|add_class:"form-input" }}
+                    {% if form.title.help_text %}
+                        <div class="help-text">{{ form.title.help_text }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.display_type.id_for_label }}" class="form-label">
+                        Display Type <span style="color: var(--danger);">*</span>
+                    </label>
+                    {{ form.display_type.errors }}
+                    {{ form.display_type|add_class:"form-select" }}
+                    {% if form.display_type.help_text %}
+                        <div class="help-text">{{ form.display_type.help_text }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.redirect_url.id_for_label }}" class="form-label">
+                        Redirect URL
+                    </label>
+                    {{ form.redirect_url.errors }}
+                    {{ form.redirect_url|add_class:"form-input" }}
+                    {% if form.redirect_url.help_text %}
+                        <div class="help-text">{{ form.redirect_url.help_text }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.priority.id_for_label }}" class="form-label">
+                        Priority
+                    </label>
+                    {{ form.priority.errors }}
+                    {{ form.priority|add_class:"form-input" }}
+                    {% if form.priority.help_text %}
+                        <div class="help-text">{{ form.priority.help_text }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Schedule & Status -->
+            <div class="form-card">
+                <h2 class="form-card-title">
+                    <i class="fas fa-calendar" style="color: var(--success);"></i>
+                    Schedule & Status
+                </h2>
+                
+                <div class="form-group">
+                    <label for="{{ form.start_date.id_for_label }}" class="form-label">
+                        Start Date <span style="color: var(--danger);">*</span>
+                    </label>
+                    {{ form.start_date.errors }}
+                    {{ form.start_date|add_class:"form-input" }}
+                    {% if form.start_date.help_text %}
+                        <div class="help-text">{{ form.start_date.help_text }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.end_date.id_for_label }}" class="form-label">
+                        End Date <span style="color: var(--danger);">*</span>
+                    </label>
+                    {{ form.end_date.errors }}
+                    {{ form.end_date|add_class:"form-input" }}
+                    {% if form.end_date.help_text %}
+                        <div class="help-text">{{ form.end_date.help_text }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.file.id_for_label }}" class="form-label">
+                        Advertisement PDF
+                    </label>
+                    {{ form.file.errors }}
+                    <div style="position: relative;">
+                        {{ form.file|add_class:"form-file" }}
+                        <div id="file-name-display" style="margin-top: 8px; font-size: 12px; color: var(--text-secondary);"></div>
+                    </div>
+                    {% if form.file.help_text %}
+                        <div class="help-text">{{ form.file.help_text }}</div>
+                    {% endif %}
+                    <div class="help-text">
+                        <i class="fas fa-info-circle"></i>
+                        Please upload a PDF file for the advertisement (Recommended size: A4 format)
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.is_active.id_for_label }}" class="checkbox-label">
+                        {{ form.is_active|add_class:"form-checkbox" }}
+                        Active Advertisement
+                    </label>
+                    {{ form.is_active.errors }}
+                    {% if form.is_active.help_text %}
+                        <div class="help-text">{{ form.is_active.help_text }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Description -->
+        <div class="form-card" style="margin-bottom: 24px;">
+            <h2 class="form-card-title">
+                <i class="fas fa-align-left" style="color: var(--gold);"></i>
+                Advertisement Description
+            </h2>
+            
+            <div class="form-group">
+                <label for="{{ form.description.id_for_label }}" class="form-label">
+                    Description
+                </label>
+                {{ form.description.errors }}
+                {{ form.description|add_class:"form-textarea" }}
+                {% if form.description.help_text %}
+                    <div class="help-text">{{ form.description.help_text }}</div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <a href="{% url 'master_control:dashboard' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i>
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i>
+                Save Advertisement
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('{{ form.file.id_for_label }}');
+    const fileNameDisplay = document.getElementById('file-name-display');
+    
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const fileName = file.name;
+                const fileSize = (file.size / 1024 / 1024).toFixed(2);
+                
+                if (fileName.toLowerCase().endsWith('.pdf')) {
+                    fileNameDisplay.innerHTML = `<i class="fas fa-file-pdf" style="color: var(--danger);"></i> ${fileName} (${fileSize} MB)`;
+                    fileNameDisplay.style.color = 'var(--success)';
+                } else {
+                    fileNameDisplay.innerHTML = `<i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i> ${fileName} (${fileSize} MB) - Not a PDF file`;
+                    fileNameDisplay.style.color = 'var(--warning)';
+                }
+            } else {
+                fileNameDisplay.innerHTML = '';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

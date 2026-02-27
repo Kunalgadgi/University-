@@ -337,6 +337,96 @@ def profile_employment(request):
     # Redirect to employment details form
     return redirect('employment_details:employment_add')
 
+def create_application_snapshots(user):
+    """Create snapshots for all draft applications when user completes profile"""
+    from master_control.models import (
+        AdmissionApplication, ApplicationProfileSnapshot, 
+        ApplicationEducationSnapshot, ApplicationExperienceSnapshot
+    )
+    from personal_details.models import PersonalDetail
+    from phd_academic_qualifications.models import AcademicQualification
+    from employment_details.models import EmploymentDetail
+    from django.utils import timezone
+    
+    # Get all draft applications for this user
+    draft_applications = AdmissionApplication.objects.filter(
+        student=user,
+        status='draft',
+        is_data_locked=False
+    )
+    
+    for application in draft_applications:
+        try:
+            # Get personal details
+            personal_detail = PersonalDetail.objects.filter(user=user).first()
+            if personal_detail:
+                # Create profile snapshot
+                ApplicationProfileSnapshot.objects.create(
+                    application=application,
+                    first_name=personal_detail.first_name,
+                    last_name=personal_detail.last_name,
+                    father_name=personal_detail.father_name,
+                    mother_name=personal_detail.mother_name,
+                    date_of_birth=personal_detail.date_of_birth,
+                    gender=personal_detail.gender,
+                    marital_status=personal_detail.marital_status,
+                    nationality=personal_detail.nationality,
+                    category=personal_detail.category,
+                    aadhar_number=personal_detail.aadhar_number,
+                    mobile_number=personal_detail.mobile_number,
+                    alternate_phone=personal_detail.alternate_phone,
+                    email=personal_detail.email,
+                    permanent_address=personal_detail.permanent_address,
+                    city=personal_detail.city,
+                    state=personal_detail.state,
+                    pincode=personal_detail.pincode,
+                    photo=personal_detail.photo,
+                    snapshot_created_at=timezone.now()
+                )
+            
+            # Get education details
+            education_records = AcademicQualification.objects.filter(user=user)
+            for education in education_records:
+                ApplicationEducationSnapshot.objects.create(
+                    application=application,
+                    examination_passed=education.examination_passed,
+                    university_board=education.university_board,
+                    year_of_passing=education.year_of_passing,
+                    roll_number=education.roll_number,
+                    marks_obtained=education.marks_obtained,
+                    total_marks=education.total_marks,
+                    percentage=education.percentage,
+                    grade=education.grade,
+                    subjects=education.subjects,
+                    snapshot_created_at=timezone.now()
+                )
+            
+            # Get employment details
+            employment_records = EmploymentDetail.objects.filter(user=user)
+            for employment in employment_records:
+                ApplicationExperienceSnapshot.objects.create(
+                    application=application,
+                    post_held=employment.post_held,
+                    organization=employment.organization,
+                    date_of_joining=employment.date_of_joining,
+                    date_of_leaving=employment.date_of_leaving,
+                    experience_years=employment.experience_years,
+                    experience_months=employment.experience_months,
+                    total_experience=employment.total_experience,
+                    snapshot_created_at=timezone.now()
+                )
+            
+            # Update application status and lock it
+            application.status = 'submitted'
+            application.is_data_locked = True
+            application.submitted_at = timezone.now()
+            application.save()
+            
+        except Exception as e:
+            # Log error but continue with other applications
+            print(f"Error creating snapshots for application {application.id}: {str(e)}")
+            continue
+
 @login_required
 def complete_employment_step(request):
     """Mark employment step as complete and redirect to dashboard"""
@@ -345,7 +435,10 @@ def complete_employment_step(request):
     profile.profile_step = 4
     profile.save()
     
-    messages.success(request, 'Employment details completed successfully!')
+    # Create application snapshots if there's a draft application
+    create_application_snapshots(request.user)
+    
+    messages.success(request, 'Application completed successfully!')
     return redirect('dashboard')
 
 @login_required
@@ -442,3 +535,136 @@ def personal_details_view(request):
     }
     
     return render(request, 'personal_details.html', context)
+
+@login_required
+def apply_now(request):
+    """Display active advertisements and available courses for application"""
+    from master_control.models import Advertisement, AdvertisementCourse, Course
+    from django.utils import timezone
+    
+    # Get active advertisements
+    active_advertisements = Advertisement.objects.filter(
+        is_active=True,
+        start_date__lte=timezone.now().date(),
+        end_date__gte=timezone.now().date()
+    ).order_by('-priority', '-created_at')
+    
+    # Prepare advertisement data with courses
+    advertisements_with_courses = []
+    for ad in active_advertisements:
+        ad_courses = AdvertisementCourse.objects.filter(advertisement=ad).select_related('course')
+        courses_data = []
+        for ad_course in ad_courses:
+            courses_data.append({
+                'course': ad_course.course,
+                'available_seats': ad_course.available_seats,
+                'application_fee': ad_course.application_fee,
+                'total_seats': ad_course.total_seats,
+            })
+        
+        advertisements_with_courses.append({
+            'advertisement': ad,
+            'courses': courses_data,
+        })
+    
+    context = {
+        'advertisements_with_courses': advertisements_with_courses,
+    }
+    
+    return render(request, 'apply/apply_now.html', context)
+
+@login_required
+def create_application(request):
+    """Create a draft application when student applies for a course"""
+    from master_control.models import AdmissionApplication, AdvertisementCourse
+    from django.shortcuts import get_object_or_404
+    
+    if request.method != 'POST':
+        messages.error(request, 'Invalid request method.')
+        return redirect('apply_now')
+    
+    advertisement_id = request.POST.get('advertisement_id')
+    course_id = request.POST.get('course_id')
+    
+    if not advertisement_id or not course_id:
+        messages.error(request, 'Advertisement and course are required.')
+        return redirect('apply_now')
+    
+    try:
+        # Get the advertisement course
+        ad_course = get_object_or_404(AdvertisementCourse, 
+                                     advertisement_id=advertisement_id, 
+                                     course_id=course_id)
+        
+        # Check if seats are available
+        if ad_course.available_seats <= 0:
+            messages.error(request, 'No seats available for this course.')
+            return redirect('apply_now')
+        
+        # Check if student already has an application for this advertisement and course
+        existing_application = AdmissionApplication.objects.filter(
+            student=request.user,
+            advertisement_id=advertisement_id,
+            course_id=course_id
+        ).first()
+        
+        if existing_application:
+            if existing_application.is_data_locked:
+                messages.error(request, 'You have already submitted an application for this course.')
+                return redirect('apply_now')
+            else:
+                messages.info(request, 'You already have a draft application for this course. Please complete it.')
+                return redirect('profile_personal_info')
+        
+        # Create new draft application
+        application = AdmissionApplication.objects.create(
+            student=request.user,
+            advertisement=ad_course.advertisement,
+            course=ad_course.course,
+            status='draft',
+            application_fee=ad_course.application_fee
+        )
+        
+        messages.success(request, f'Application started for {ad_course.course.name}. Please complete your profile.')
+        
+        # Redirect to profile personal info to start the application process
+        return redirect('profile_personal_info')
+        
+    except Exception as e:
+        messages.error(request, f'Error creating application: {str(e)}')
+        return redirect('apply_now')
+
+
+@login_required
+def application_preview(request):
+    from personal_details.models import PersonalDetail
+    from phd_academic_qualifications.models import AcademicQualification
+    from employment_details.models import EmploymentDetail
+
+    profile = request.user.profile
+
+    # 🔒 Step validation
+    if not (
+        profile.is_personal_info_complete and
+        profile.is_qualification_complete and
+        profile.is_employment_complete
+    ):
+        messages.warning(request, "Please complete all steps first.")
+        return redirect('dashboard')
+
+    # ✅ Fetch SINGLE data
+    personal = PersonalDetail.objects.filter(user=request.user).select_related().first()
+
+    # ✅ Fetch MULTIPLE data (FK related)
+    qualifications = AcademicQualification.objects.filter(user=request.user).select_related()
+
+    employments = EmploymentDetail.objects.filter(user=request.user).select_related()
+
+    context = {
+        "profile": profile,
+        "personal": personal,
+        "qualifications": qualifications,
+        "employments": employments,
+    }
+
+    return render(request, "application_preview.html", context)

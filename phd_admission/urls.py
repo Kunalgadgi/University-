@@ -21,6 +21,8 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('admin/login/', views.admin_login_view, name='admin_login'),
+    path('master-control/', include('master_control.urls')),
+    path('master/', include('master_control.urls')),
     path('', views.home, name='home'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('login/', views.login_view, name='login'),
@@ -36,4 +38,7 @@ urlpatterns = [
     path('employment/', include('employment_details.urls')),
     path('qualifications/', include('phd_academic_qualifications.urls')),
     path('personal/', include(('personal_details.urls', 'personal_details'), namespace='personal_details_legacy')),
+    path('apply/', views.apply_now, name='apply_now'),
+    path('apply/create/', views.create_application, name='create_application'),
+    path('application_preview/', views.application_preview, name='application_preview'),
 ]

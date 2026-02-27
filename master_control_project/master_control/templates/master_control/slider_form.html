@@ -1,0 +1,90 @@
+{% extends "master_control/base.html" %}
+{% block title %}{{ action }} Slider{% endblock %}
+{% block breadcrumb %}Sliders / {{ action }}{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ptitle">{{ action }} Slider</div>
+      <div class="psub">{% if action=='Edit' %}Update slider details{% else %}Add a new homepage slider banner{% endif %}</div>
+    </div>
+    <a href="/admin/sliders" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back</a>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 300px;gap:18px">
+    <form method="POST" enctype="multipart/form-data"
+          action="{{ '/admin/sliders/edit/'+slider.id|string if slider else '/admin/sliders/add' }}">
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-ttl"><div class="card-ico"><i class="fas fa-images"></i></div>Slider Details</div>
+        </div>
+        <div class="card-bd">
+          <div class="fg-grid fg-2">
+            <div class="fg" style="grid-column:1/-1">
+              <label class="fl">Title <span class="req">*</span></label>
+              <input type="text" name="title" class="fc" value="{{ slider.title if slider else '' }}"
+                     placeholder="Slider headline text" required>
+            </div>
+            <div class="fg" style="grid-column:1/-1">
+              <label class="fl">Subtitle</label>
+              <input type="text" name="subtitle" class="fc" value="{{ slider.subtitle if slider else '' }}"
+                     placeholder="Supporting subtitle text">
+            </div>
+            <div class="fg">
+              <label class="fl">Priority</label>
+              <input type="number" name="priority" class="fc" value="{{ slider.priority if slider else 0 }}" min="0">
+              <span class="fhint">Lower = displayed first</span>
+            </div>
+            <div class="fg">
+              <label class="fl">Image</label>
+              <input type="file" name="image" class="fc" accept=".png,.jpg,.jpeg,.gif,.webp">
+              {% if slider and slider.image %}
+              <span class="fhint"><i class="fas fa-image"></i> Current: {{ slider.image }}</span>
+              {% endif %}
+            </div>
+          </div>
+          <div style="margin-top:18px;padding-top:16px;border-top:1px solid #f1f4f9">
+            <label class="fl" style="margin-bottom:9px">Status</label>
+            <div class="tg-wrap">
+              <label class="tg">
+                <input type="checkbox" name="is_active" value="1" {% if not slider or slider.is_active %}checked{% endif %}>
+                <span class="tg-sl"></span>
+              </label>
+              <span class="tg-lbl">Show this slider on the homepage</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-floppy-disk"></i> {{ action }} Slider</button>
+        <a href="/admin/sliders" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-ttl"><div class="card-ico"><i class="fas fa-circle-info"></i></div>Slider Info</div>
+        </div>
+        <div class="card-bd" style="font-size:12.5px;color:#4a5a72;line-height:1.8;display:flex;flex-direction:column;gap:9px">
+          <div><i class="fas fa-check" style="color:#16a34a;margin-right:6px"></i>Only <strong>active</strong> sliders display on homepage.</div>
+          <div><i class="fas fa-check" style="color:#16a34a;margin-right:6px"></i>Ordered by <strong>priority</strong> (ascending).</div>
+          <div><i class="fas fa-check" style="color:#16a34a;margin-right:6px"></i>Recommended image size: <strong>1920×600px</strong>.</div>
+          <div><i class="fas fa-check" style="color:#16a34a;margin-right:6px"></i>Max file size: <strong>5 MB</strong>.</div>
+        </div>
+      </div>
+      {% if slider %}
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-ttl"><div class="card-ico"><i class="fas fa-clock"></i></div>Timestamps</div>
+        </div>
+        <div class="card-bd" style="font-size:12px;color:#4a5a72;display:flex;flex-direction:column;gap:8px">
+          <div><span style="color:#8a97aa">Created:</span><br>{{ slider.created_at[:16] if slider.created_at else '—' }}</div>
+          <div><span style="color:#8a97aa">Updated:</span><br>{{ slider.updated_at[:16] if slider.updated_at else '—' }}</div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -11,9 +11,13 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Allow importing the admin-only master_control app vendored under master_control_project/
+sys.path.insert(0, str(BASE_DIR / 'master_control_project'))
 
 
 # Quick-start development settings - unsuitable for production
@@ -41,6 +45,7 @@ INSTALLED_APPS = [
     'employment_details',
     'phd_academic_qualifications',
     'personal_details',
+    'master_control',
 ]
 
 MIDDLEWARE = [

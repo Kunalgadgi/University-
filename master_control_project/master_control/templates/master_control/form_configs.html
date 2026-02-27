@@ -1,0 +1,81 @@
+{% extends "master_control/base.html" %}
+{% block title %}Form Configurations{% endblock %}
+{% block breadcrumb %}Form Configurations{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ptitle">Form Configurations</div>
+      <div class="psub">Dynamically control application form availability per course</div>
+    </div>
+    <a href="/admin/form-configs/add" class="btn btn-primary"><i class="fas fa-plus"></i> Add Configuration</a>
+  </div>
+
+  <div class="card">
+    {% if configs %}
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Course</th>
+            <th>Form Open</th>
+            <th>Payment Required</th>
+            <th>Application Fee</th>
+            <th>Max Applications</th>
+            <th>Form Period</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in configs %}
+          <tr>
+            <td>
+              <div class="td-main">{{ c.course_name or '— (deleted)' }}</div>
+              <div class="td-sub">Config ID: {{ c.id }}</div>
+            </td>
+            <td>
+              {% if c.is_form_open %}
+              <span class="badge badge-on"><span class="badge-dot"></span>Open</span>
+              {% else %}
+              <span class="badge badge-off"><span class="badge-dot"></span>Closed</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if c.is_payment_required %}
+              <span class="badge" style="background:#fef3c7;color:#92400e"><i class="fas fa-check" style="font-size:9px"></i>Required</span>
+              {% else %}
+              <span class="badge badge-closed">Free</span>
+              {% endif %}
+            </td>
+            <td style="font-weight:700;font-size:13.5px">
+              {% if c.is_payment_required %}₹ {{ "%.2f"|format(c.application_fee) }}{% else %}—{% endif %}
+            </td>
+            <td style="font-weight:600">{{ c.max_applications_allowed }}</td>
+            <td style="font-size:12px;color:#4a5a72">
+              {{ c.form_start_date or '—' }}<br>→ {{ c.form_end_date or '—' }}
+            </td>
+            <td>
+              <div class="acts">
+                <a href="/admin/form-configs/edit/{{ c.id }}" class="ab ab-edit" title="Edit"><i class="fas fa-pen"></i></a>
+                <button type="button" class="ab ab-del" title="Delete"
+                        onclick="openDel('/admin/form-configs/delete/{{ c.id }}')">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty">
+      <div class="empty-ico"><i class="fas fa-file-lines"></i></div>
+      <h4>No Form Configurations</h4>
+      <p>Create a configuration to control application form availability for each course.</p>
+      <a href="/admin/form-configs/add" class="btn btn-primary" style="margin-top:14px"><i class="fas fa-plus"></i> Add Configuration</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

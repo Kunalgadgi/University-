@@ -721,6 +721,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
                     <option>Prof.</option>
                   </select>
                   <input class="f-input uppercase-field" type="text" id="fullName" name="fullName"
+                    value="{{ personal_detail.first_name|default:'' }}"
                     placeholder="FULL NAME AS IN CERTIFICATE" maxlength="80" required />
                 </div>
                 <div class="err-msg" id="e-fullName">
@@ -733,6 +734,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
               <div class="field">
                 <label>Father's Name (In Block Letters) <span class="req-star">*</span></label>
                 <input class="f-input uppercase-field" type="text" id="fatherName" name="fatherName"
+                  value="{{ personal_detail.father_name|default:'' }}"
                   placeholder="FATHER'S NAME" maxlength="80" required />
                 <div class="err-msg" id="e-fatherName">
                   <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
@@ -744,6 +746,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
               <div class="field">
                 <label>Mother's Name <span class="req-star">*</span></label>
                 <input class="f-input uppercase-field" type="text" id="motherName" name="motherName"
+                  value="{{ personal_detail.mother_name|default:'' }}"
                   placeholder="MOTHER'S NAME" maxlength="80" required />
                 <div class="err-msg" id="e-motherName">
                   <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
@@ -769,7 +772,8 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
           <!-- Date of Birth -->
           <div class="field col-span-2">
             <label>Date of Birth <span class="req-star">*</span></label>
-            <input class="f-input" type="date" id="dob" name="date_of_birth" required onchange="calcAge()" />
+            <input class="f-input" type="date" id="dob" name="date_of_birth" required onchange="calcAge()"
+              value="{{ personal_detail.date_of_birth|date:'Y-m-d' }}" />
             <span class="hint">As given in Matriculation Certificate</span>
             <div class="err-msg" id="e-dob">
               <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
@@ -789,13 +793,13 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
             <div class="radio-wrap" id="genderWrap">
               <div class="radio-group">
                 <label class="radio-opt">
-                  <input type="radio" name="gender" value="Male" onchange="clearRadioErr('genderWrap','e-gender')" /> <span>Male (M)</span>
+                  <input type="radio" name="gender" value="Male" onchange="clearRadioErr('genderWrap','e-gender')" {% if personal_detail.gender == 'Male' %}checked{% endif %} /> <span>Male (M)</span>
                 </label>
                 <label class="radio-opt">
-                  <input type="radio" name="gender" value="Female" onchange="clearRadioErr('genderWrap','e-gender')" /> <span>Female (F)</span>
+                  <input type="radio" name="gender" value="Female" onchange="clearRadioErr('genderWrap','e-gender')" {% if personal_detail.gender == 'Female' %}checked{% endif %} /> <span>Female (F)</span>
                 </label>
                 <label class="radio-opt">
-                  <input type="radio" name="gender" value="Transgender" onchange="clearRadioErr('genderWrap','e-gender')" /> <span>Transgender (T)</span>
+                  <input type="radio" name="gender" value="Transgender" onchange="clearRadioErr('genderWrap','e-gender')" {% if personal_detail.gender == 'Transgender' %}checked{% endif %} /> <span>Transgender (T)</span>
                 </label>
               </div>
             </div>
@@ -811,16 +815,16 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
             <div class="radio-wrap" id="maritalWrap">
               <div class="radio-group">
                 <label class="radio-opt">
-                  <input type="radio" name="marital" value="Single" onchange="clearRadioErr('maritalWrap','e-marital')" /> <span>Single</span>
+                  <input type="radio" name="marital" value="Single" onchange="clearRadioErr('maritalWrap','e-marital')" {% if personal_detail.marital_status == 'Single' %}checked{% endif %} /> <span>Single</span>
                 </label>
                 <label class="radio-opt">
-                  <input type="radio" name="marital" value="Married" onchange="clearRadioErr('maritalWrap','e-marital')" /> <span>Married</span>
+                  <input type="radio" name="marital" value="Married" onchange="clearRadioErr('maritalWrap','e-marital')" {% if personal_detail.marital_status == 'Married' %}checked{% endif %} /> <span>Married</span>
                 </label>
                 <label class="radio-opt">
-                  <input type="radio" name="marital" value="Divorced" onchange="clearRadioErr('maritalWrap','e-marital')" /> <span>Divorced</span>
+                  <input type="radio" name="marital" value="Divorced" onchange="clearRadioErr('maritalWrap','e-marital')" {% if personal_detail.marital_status == 'Divorced' %}checked{% endif %} /> <span>Divorced</span>
                 </label>
                 <label class="radio-opt">
-                  <input type="radio" name="marital" value="Widowed" onchange="clearRadioErr('maritalWrap','e-marital')" /> <span>Widowed</span>
+                  <input type="radio" name="marital" value="Widowed" onchange="clearRadioErr('maritalWrap','e-marital')" {% if personal_detail.marital_status == 'Widowed' %}checked{% endif %} /> <span>Widowed</span>
                 </label>
               </div>
             </div>
@@ -835,7 +839,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
             <label>Nationality <span class="req-star">*</span></label>
             <select class="f-select" id="nationality" name="nationality" required>
               <option value="">-- Select --</option>
-              <option value="Indian" selected>Indian</option>
+              <option value="Indian" {% if personal_detail.nationality == 'Indian' or not personal_detail.nationality %}selected{% endif %}>Indian</option>
               <option value="NRI">NRI (Non-Resident Indian)</option>
               <option value="OCI">OCI (Overseas Citizen)</option>
               <option value="Foreign National">Foreign National</option>
@@ -850,12 +854,12 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
             <label>Category <span class="req-star">*</span></label>
             <select class="f-select" id="category" name="category" required>
               <option value="">-- Select Category --</option>
-              <option>General / UR</option>
-              <option>OBC (Non-Creamy Layer)</option>
-              <option>SC</option>
-              <option>ST</option>
-              <option>EWS</option>
-              <option>PwD (Divyangjan)</option>
+              <option {% if personal_detail.category == 'General / UR' %}selected{% endif %}>General / UR</option>
+              <option {% if personal_detail.category == 'OBC (Non-Creamy Layer)' %}selected{% endif %}>OBC (Non-Creamy Layer)</option>
+              <option {% if personal_detail.category == 'SC' %}selected{% endif %}>SC</option>
+              <option {% if personal_detail.category == 'ST' %}selected{% endif %}>ST</option>
+              <option {% if personal_detail.category == 'EWS' %}selected{% endif %}>EWS</option>
+              <option {% if personal_detail.category == 'PwD (Divyangjan)' %}selected{% endif %}>PwD (Divyangjan)</option>
             </select>
             <div class="err-msg" id="e-category">
               <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
@@ -881,12 +885,15 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
             <label>Aadhar Card Number <span class="req-star">*</span></label>
             <div class="aadhar-group">
               <input class="f-input" type="text" id="aadhar1" name="aadhar1" maxlength="4" placeholder="XXXX"
+                value="{{ personal_detail.aadhar_number|default:''|slice:':4' }}"
                 oninput="aadharJump(this,'aadhar2')" inputmode="numeric" pattern="\d*" />
               <span class="aadhar-sep">–</span>
               <input class="f-input" type="text" id="aadhar2" name="aadhar2" maxlength="4" placeholder="XXXX"
+                value="{{ personal_detail.aadhar_number|default:''|slice:'4:8' }}"
                 oninput="aadharJump(this,'aadhar3')" inputmode="numeric" pattern="\d*" />
               <span class="aadhar-sep">–</span>
               <input class="f-input" type="text" id="aadhar3" name="aadhar3" maxlength="4" placeholder="XXXX"
+                value="{{ personal_detail.aadhar_number|default:''|slice:'8:12' }}"
                 inputmode="numeric" pattern="\d*" oninput="updateProgress()" />
             </div>
             <div class="err-msg" id="e-aadhar">
@@ -966,6 +973,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
             <div class="field col-span-2">
               <label>Address Line 1 <span class="req-star">*</span></label>
               <input class="f-input" type="text" id="permAddr1" name="permanent_address"
+                value="{{ personal_detail.permanent_address|default:'' }}"
                 placeholder="House No., Street / Mohalla / Colony" maxlength="100" required />
               <div class="err-msg" id="e-permAddr1">
                 <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
@@ -982,6 +990,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
             <div class="field">
               <label>City / Town <span class="req-star">*</span></label>
               <input class="f-input" type="text" id="permCity" name="city"
+                value="{{ personal_detail.city|default:'' }}"
                 placeholder="City" maxlength="50" required />
               <div class="err-msg" id="e-permCity">
                 <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
@@ -999,23 +1008,23 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
               <label>State / UT <span class="req-star">*</span></label>
               <select class="f-select" id="permState" name="state" required>
                 <option value="">-- Select State --</option>
-                <option>Andhra Pradesh</option><option>Arunachal Pradesh</option>
-                <option>Assam</option><option>Bihar</option><option>Chhattisgarh</option>
-                <option>Goa</option><option>Gujarat</option><option>Haryana</option>
-                <option>Himachal Pradesh</option><option>Jharkhand</option>
-                <option>Karnataka</option><option>Kerala</option>
-                <option>Madhya Pradesh</option><option>Maharashtra</option>
-                <option>Manipur</option><option>Meghalaya</option>
-                <option>Mizoram</option><option>Nagaland</option><option>Odisha</option>
-                <option>Punjab</option><option>Rajasthan</option><option>Sikkim</option>
-                <option>Tamil Nadu</option><option>Telangana</option>
-                <option>Tripura</option><option>Uttar Pradesh</option>
-                <option>Uttarakhand</option><option>West Bengal</option>
-                <option>Andaman & Nicobar Islands</option>
-                <option>Chandigarh</option><option>Dadra & Nagar Haveli</option>
-                <option>Daman & Diu</option><option>Delhi (NCT)</option>
-                <option>Jammu & Kashmir</option><option>Ladakh</option>
-                <option>Lakshadweep</option><option>Puducherry</option>
+                <option {% if personal_detail.state == 'Andhra Pradesh' %}selected{% endif %}>Andhra Pradesh</option><option {% if personal_detail.state == 'Arunachal Pradesh' %}selected{% endif %}>Arunachal Pradesh</option>
+                <option {% if personal_detail.state == 'Assam' %}selected{% endif %}>Assam</option><option {% if personal_detail.state == 'Bihar' %}selected{% endif %}>Bihar</option><option {% if personal_detail.state == 'Chhattisgarh' %}selected{% endif %}>Chhattisgarh</option>
+                <option {% if personal_detail.state == 'Goa' %}selected{% endif %}>Goa</option><option {% if personal_detail.state == 'Gujarat' %}selected{% endif %}>Gujarat</option><option {% if personal_detail.state == 'Haryana' %}selected{% endif %}>Haryana</option>
+                <option {% if personal_detail.state == 'Himachal Pradesh' %}selected{% endif %}>Himachal Pradesh</option><option {% if personal_detail.state == 'Jharkhand' %}selected{% endif %}>Jharkhand</option>
+                <option {% if personal_detail.state == 'Karnataka' %}selected{% endif %}>Karnataka</option><option {% if personal_detail.state == 'Kerala' %}selected{% endif %}>Kerala</option>
+                <option {% if personal_detail.state == 'Madhya Pradesh' %}selected{% endif %}>Madhya Pradesh</option><option {% if personal_detail.state == 'Maharashtra' %}selected{% endif %}>Maharashtra</option>
+                <option {% if personal_detail.state == 'Manipur' %}selected{% endif %}>Manipur</option><option {% if personal_detail.state == 'Meghalaya' %}selected{% endif %}>Meghalaya</option>
+                <option {% if personal_detail.state == 'Mizoram' %}selected{% endif %}>Mizoram</option><option {% if personal_detail.state == 'Nagaland' %}selected{% endif %}>Nagaland</option><option {% if personal_detail.state == 'Odisha' %}selected{% endif %}>Odisha</option>
+                <option {% if personal_detail.state == 'Punjab' %}selected{% endif %}>Punjab</option><option {% if personal_detail.state == 'Rajasthan' %}selected{% endif %}>Rajasthan</option><option {% if personal_detail.state == 'Sikkim' %}selected{% endif %}>Sikkim</option>
+                <option {% if personal_detail.state == 'Tamil Nadu' %}selected{% endif %}>Tamil Nadu</option><option {% if personal_detail.state == 'Telangana' %}selected{% endif %}>Telangana</option>
+                <option {% if personal_detail.state == 'Tripura' %}selected{% endif %}>Tripura</option><option {% if personal_detail.state == 'Uttar Pradesh' %}selected{% endif %}>Uttar Pradesh</option>
+                <option {% if personal_detail.state == 'Uttarakhand' %}selected{% endif %}>Uttarakhand</option><option {% if personal_detail.state == 'West Bengal' %}selected{% endif %}>West Bengal</option>
+                <option {% if personal_detail.state == 'Andaman & Nicobar Islands' %}selected{% endif %}>Andaman & Nicobar Islands</option>
+                <option {% if personal_detail.state == 'Chandigarh' %}selected{% endif %}>Chandigarh</option><option {% if personal_detail.state == 'Dadra & Nagar Haveli' %}selected{% endif %}>Dadra & Nagar Haveli</option>
+                <option {% if personal_detail.state == 'Daman & Diu' %}selected{% endif %}>Daman & Diu</option><option {% if personal_detail.state == 'Delhi (NCT)' %}selected{% endif %}>Delhi (NCT)</option>
+                <option {% if personal_detail.state == 'Jammu & Kashmir' %}selected{% endif %}>Jammu & Kashmir</option><option {% if personal_detail.state == 'Ladakh' %}selected{% endif %}>Ladakh</option>
+                <option {% if personal_detail.state == 'Lakshadweep' %}selected{% endif %}>Lakshadweep</option><option {% if personal_detail.state == 'Puducherry' %}selected{% endif %}>Puducherry</option>
               </select>
               <div class="err-msg" id="e-permState">
                 <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
@@ -1026,6 +1035,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
             <div class="field">
               <label>PIN Code <span class="req-star">*</span></label>
               <input class="f-input" type="text" id="permPin" name="pincode"
+                value="{{ personal_detail.pincode|default:'' }}"
                 placeholder="123456" maxlength="6" inputmode="numeric" required />
               <div class="err-msg" id="e-permPin">
                 <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
