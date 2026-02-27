@@ -9,10 +9,32 @@ from django.core.validators import validate_email
 import re
 from datetime import datetime
 from .models import UserProfile
+from personal_details.models import PersonalDetail
+from personal_details.forms import PersonalDetailForm
 
 def home(request):
     """Home page view"""
     return render(request, 'home.html')
+
+def admin_login_view(request):
+    """Admin login view - only for staff users"""
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            if user.is_staff:
+                login(request, user)
+                messages.success(request, 'Admin login successful!')
+                return redirect('/admin/')
+            else:
+                messages.error(request, 'Access denied. This login is for admin users only.')
+        else:
+            messages.error(request, 'Invalid username or password.')
+    
+    return render(request, 'admin_login.html')
 
 def dashboard(request):
     """Dashboard page view"""
@@ -94,11 +116,9 @@ def register_view(request):
         # Get form data
         name = request.POST.get('name', '').strip()
         email = request.POST.get('email', '').strip()
-        date_of_birth = request.POST.get('date_of_birth', '').strip()
         mobile_number = request.POST.get('mobile_number', '').strip()
         password = request.POST.get('password', '').strip()
         confirm_password = request.POST.get('confirm_password', '').strip()
-        terms = request.POST.get('terms', '')
         
         # Validation
         error_found = False
@@ -120,24 +140,6 @@ def register_view(request):
                 messages.error(request, 'Please enter a valid email address')
                 error_found = True
         
-        if not date_of_birth:
-            messages.error(request, 'Date of birth is required')
-            error_found = True
-        else:
-            try:
-                birth_date = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
-                today = datetime.now().date()
-                age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
-                if age < 16:
-                    messages.error(request, 'You must be at least 16 years old')
-                    error_found = True
-                elif age > 100:
-                    messages.error(request, 'Please enter a valid date of birth')
-                    error_found = True
-            except ValueError:
-                messages.error(request, 'Please enter a valid date of birth')
-                error_found = True
-        
         if not mobile_number:
             messages.error(request, 'Mobile number is required')
             error_found = True
@@ -157,10 +159,6 @@ def register_view(request):
             error_found = True
         elif password != confirm_password:
             messages.error(request, 'Passwords do not match')
-            error_found = True
-        
-        if not terms:
-            messages.error(request, 'You must agree to the terms and conditions')
             error_found = True
         
         # Check if email already exists
@@ -188,11 +186,10 @@ def register_view(request):
                     first_name=name
                 )
                 
-                # Create user profile with registration data
+                # Create user profile with registration data (without date_of_birth)
                 UserProfile.objects.create(
                     user=user,
-                    mobile_number=mobile_number,
-                    date_of_birth=datetime.strptime(date_of_birth, '%Y-%m-%d').date() if date_of_birth else None
+                    mobile_number=mobile_number
                 )
                 
                 messages.success(request, f'Account created successfully! You can now login.')
@@ -215,40 +212,101 @@ def logout_view(request):
 @login_required
 def profile_personal_info(request):
     """Personal Information Step"""
+    from personal_details.models import PersonalDetail
+    
     profile, created = UserProfile.objects.get_or_create(user=request.user)
+    personal_detail, created = PersonalDetail.objects.get_or_create(
+        user=request.user,
+        defaults={
+            'first_name': request.user.first_name or '',
+            'last_name': request.user.last_name or '',
+            'email': request.user.email or '',  # From registration
+            'mobile_number': profile.mobile_number or '',  # From registration
+            'date_of_birth': profile.date_of_birth or datetime(1990, 1, 1).date(),  # From registration if available
+        }
+    )
     
     if request.method == 'POST':
+        # Handle photo upload
+        if 'photo' in request.FILES:
+            personal_detail.photo = request.FILES['photo']
+        
         # Update personal information
-        request.user.first_name = request.POST.get('name', '').strip()
-        request.user.email = request.POST.get('email', '').strip()
+        request.user.first_name = request.POST.get('first_name', '').strip()
+        request.user.last_name = request.POST.get('last_name', '').strip()
+        # Email comes from registration and should not be changed here
         request.user.save()
         
-        profile.mobile_number = request.POST.get('mobile_number', '').strip()
+        personal_detail.first_name = request.POST.get('first_name', '').strip()
+        personal_detail.last_name = request.POST.get('last_name', '').strip()
+        # Email and mobile number are fetched from registration - not editable here
+        personal_detail.email = request.user.email or profile.email or ''
+        personal_detail.mobile_number = profile.mobile_number or ''
+        personal_detail.alternate_email = request.POST.get('alternate_email', '').strip()
+        
         date_of_birth = request.POST.get('date_of_birth', '').strip()
         if date_of_birth:
-            profile.date_of_birth = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
-        profile.gender = request.POST.get('gender', '')
-        profile.marital_status = request.POST.get('marital_status', '')
+            personal_detail.date_of_birth = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
+        
+        personal_detail.gender = request.POST.get('gender', '')
+        personal_detail.blood_group = request.POST.get('blood_group', '')
+        personal_detail.marital_status = request.POST.get('marital_status', '')
+        personal_detail.nationality = request.POST.get('nationality', 'Indian')
+        
+        # Address fields
+        personal_detail.current_address = request.POST.get('current_address', '').strip()
+        personal_detail.permanent_address = request.POST.get('permanent_address', '').strip()
+        personal_detail.city = request.POST.get('city', '').strip()
+        personal_detail.state = request.POST.get('state', '').strip()
+        personal_detail.pincode = request.POST.get('pincode', '').strip()
+        personal_detail.country = request.POST.get('country', 'India')
+        
+        # Emergency contact
+        personal_detail.emergency_contact_name = request.POST.get('emergency_contact_name', '').strip()
+        personal_detail.emergency_contact_number = request.POST.get('emergency_contact_number', '').strip()
+        personal_detail.emergency_contact_relation = request.POST.get('emergency_contact_relation', '').strip()
+        
+        personal_detail.save()
         
         profile.is_personal_info_complete = True
         profile.profile_step = 2
         profile.save()
         
         messages.success(request, 'Personal information updated successfully!')
-        return redirect('profile_qualification')
+        
+        # Check if "Save & Continue" was clicked
+        if 'next' in request.POST:
+            return redirect('phd_academic_qualifications:academic_qualifications')
+        
+        return redirect('profile_personal_info')
     
     context = {
         'profile': profile,
         'user': request.user,
+        'personal_detail': personal_detail,
     }
     return render(request, 'profile/personal_info.html', context)
 
 @login_required
 def profile_qualification(request):
-    """Qualification Step - Redirect to existing academic qualifications form"""
+    """Qualification Step - Redirect to academic qualifications form"""
+    from personal_details.models import PersonalDetail
+    
     profile = UserProfile.objects.get(user=request.user)
     
+    # Check if personal info is complete
     if not profile.is_personal_info_complete:
+        messages.warning(request, 'Please complete your personal information first.')
+        return redirect('profile_personal_info')
+    
+    # Check if personal details exist
+    try:
+        personal_detail = PersonalDetail.objects.get(user=request.user)
+        if not personal_detail.first_name or not personal_detail.email:
+            messages.warning(request, 'Please complete your personal information first.')
+            return redirect('profile_personal_info')
+    except PersonalDetail.DoesNotExist:
+        messages.warning(request, 'Please complete your personal information first.')
         return redirect('profile_personal_info')
     
     if request.method == 'POST':
@@ -256,10 +314,10 @@ def profile_qualification(request):
         profile.profile_step = 3
         profile.save()
         
-        messages.success(request, 'Qualification information updated successfully!')
+        messages.success(request, 'Moving to employment details!')
         return redirect('profile_employment')
     
-    # Redirect to the existing academic qualifications form
+    # Redirect to academic qualifications form
     return redirect('phd_academic_qualifications:academic_qualifications')
 
 @login_required
@@ -294,12 +352,77 @@ def debug_profile(request):
     return render(request, 'debug_profile.html', context)
 
 @login_required
+def profile_employment(request):
+    """Employment Step - Conditional based on qualifications"""
+    from personal_details.models import PersonalDetail
+    from phd_academic_qualifications.models import AcademicQualification
+    
+    profile = UserProfile.objects.get(user=request.user)
+    
+    # Check if personal info is complete
+    if not profile.is_personal_info_complete:
+        messages.warning(request, 'Please complete your personal information first.')
+        return redirect('profile_personal_info')
+    
+    # Check if qualifications are complete
+    if not profile.is_qualification_complete:
+        messages.warning(request, 'Please complete your academic qualifications first.')
+        return redirect('profile_qualification')
+    
+    # Check if user has any academic qualifications
+    qualifications = AcademicQualification.objects.filter(user=request.user)
+    if not qualifications.exists():
+        messages.warning(request, 'Please add at least one academic qualification first.')
+        return redirect('phd_academic_qualifications:academic_qualifications')
+    
+    if request.method == 'POST':
+        profile.is_employment_complete = True
+        profile.profile_step = 4
+        profile.save()
+        
+        messages.success(request, 'Application completed successfully!')
+        return redirect('dashboard')
+    
+    # Redirect to employment details form
+    return redirect('employment_details:employment_add')
+
+@login_required
 def complete_employment_step(request):
     """Mark employment step as complete and redirect to dashboard"""
     profile = UserProfile.objects.get(user=request.user)
     profile.is_employment_complete = True
-    profile.profile_step = 4  # Complete
+    profile.profile_step = 4
     profile.save()
     
-    messages.success(request, 'Employment information updated successfully! Profile complete.')
+    messages.success(request, 'Employment details completed successfully!')
     return redirect('dashboard')
+
+@login_required
+def personal_details_view(request):
+    """View and edit personal details"""
+    
+    # Get or create personal details for the user
+    personal_detail, created = PersonalDetail.objects.get_or_create(
+        user=request.user,
+        defaults={
+            'first_name': request.user.first_name,
+            'last_name': request.user.last_name,
+            'email': request.user.email,
+        }
+    )
+    
+    if request.method == 'POST':
+        form = PersonalDetailForm(request.POST, instance=personal_detail)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Personal details updated successfully!')
+            return redirect('personal_details')
+    else:
+        form = PersonalDetailForm(instance=personal_detail)
+    
+    context = {
+        'form': form,
+        'personal_detail': personal_detail,
+    }
+    
+    return render(request, 'personal_details.html', context)

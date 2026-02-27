@@ -331,6 +331,56 @@ select.tb-input {
   gap: 14px;
 }
 
+.btn-back {
+  background: linear-gradient(90deg, #6c757d, #495057);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-back:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
+  color: #fff;
+  text-decoration: none;
+}
+
+.btn-back:active { transform: translateY(0); }
+
+.btn-reset {
+  background: #fff;
+  color: var(--primary);
+  font-family: 'Inter', sans-serif;
+  border: 2px solid var(--primary);
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-reset:hover { 
+  background: #f5f8ff; 
+  border-color: var(--primary); 
+  color: var(--primary); 
+}
+
+.btn-reset:active { transform: translateY(0); }
+
 .btn-add-other {
   display: inline-flex;
   align-items: center;
@@ -411,7 +461,7 @@ select.tb-input {
   <div class="header-card">
     <div class="header-emblem">🎓</div>
     <div class="header-text">
-      <h1>Doctor of Philosophy (Ph.D.) Admission Form</h1>
+      <h1>Admission Form</h1>
 
     </div>
   </div>
@@ -524,8 +574,7 @@ select.tb-input {
 
           <td class="actions">
             <div class="action-btns">
-              <button class="btn-act btn-plus"  title="Add row below" onclick="addRowBelow('qual{{ qualification.id }}')">${PLUS_ICON}</button>
-              <button class="btn-act btn-trash" title="Remove row"    onclick="delRow('qual{{ qualification.id }}')">${TRASH_ICON}</button>
+              <button class="btn-act btn-trash" title="Remove row" onclick="delRow('qual{{ qualification.id }}')">${TRASH_ICON}</button>
             </div>
           </td>
         </tr>
@@ -592,8 +641,7 @@ select.tb-input {
 
           <td class="actions">
             <div class="action-btns">
-              <button class="btn-act btn-plus"  title="Add row below" onclick="addRowBelow('new1')">${PLUS_ICON}</button>
-              <button class="btn-act btn-trash" title="Remove row"    onclick="delRow('new1')">${TRASH_ICON}</button>
+              <button class="btn-act btn-trash" title="Remove row" onclick="delRow('new1')">${TRASH_ICON}</button>
             </div>
           </td>
         </tr>
@@ -606,15 +654,22 @@ select.tb-input {
     <div class="footer-row">
       <button class="btn-add-other" onclick="addCustomRow()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-        Add Other Qualification
+        Add Qualification
       </button>
-      <button class="btn-save" onclick="submitForm()">
+    </div>
+    
+    <div class="footer-row">
+      <a href="{% url 'profile_personal_info' %}" class="btn-back">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+        Back to Personal Details
+      </a>
+      <button class="btn-reset" onclick="resetForm()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.49"/></svg>
+        Reset Form
+      </button>
+      <button type="button" class="btn-save" onclick="submitAndContinue()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         Save &amp; Continue
-      </button>
-      <button class="btn-save" onclick="submitAndComplete()" style="background: #28a745; margin-left: 10px;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        Next Step →
       </button>
     </div>
   </div>
@@ -669,7 +724,7 @@ function makeRow(examName, isDynamic) {
        </td>`
     : `<td><div class="exam-label">${examName}</div></td>`;
 
-  const actionBtn = `<button class="btn-act btn-plus"  title="Add row below" onclick="addBelow('${id}')">${PLUS_ICON}</button><button class="btn-act btn-trash" title="Remove row" onclick="delRow('${id}')">${TRASH_ICON}</button>`;
+  const actionBtn = `<button class="btn-act btn-trash" title="Remove row" onclick="delRow('${id}')">${TRASH_ICON}</button>`;
 
   return `
   <tr data-id="${id}" data-dyn="${isDynamic ? '1' : '0'}" class="row-in">
@@ -1045,6 +1100,95 @@ function toast(type, ico, msg) {
   el.className = `toast ${type}`;
   requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
   setTimeout(() => el.classList.remove('show'), 3800);
+}
+
+function resetForm() {
+  if (confirm('Are you sure you want to reset the form? All entered data will be lost.')) {
+    // Clear all input fields
+    const inputs = document.querySelectorAll('#qualBody .tb-input');
+    inputs.forEach(input => {
+      input.value = '';
+    });
+    
+    // Clear all error messages
+    const errors = document.querySelectorAll('.err-msg.show');
+    errors.forEach(error => {
+      error.classList.remove('show');
+    });
+    
+    // Remove error class from inputs
+    const errorInputs = document.querySelectorAll('#qualBody .tb-input.error');
+    errorInputs.forEach(input => {
+      input.classList.remove('error');
+    });
+    
+    toast('info','ℹ','Form has been reset');
+  }
+}
+
+function submitAndContinue() {
+  if (validate()) {
+    // Collect all active rows data
+    const rows = document.querySelectorAll('#qualBody tr');
+    const formData = new FormData();
+    
+    rows.forEach((row, index) => {
+      const isActive = row.querySelector('.tb-input:not(.computed)')?.value.trim() !== '';
+      
+      if (isActive) {
+        const id = row.dataset.id;
+        formData.append(`exam`, row.querySelector('[data-field="exam"]')?.value || '');
+        formData.append(`custom_exam`, row.querySelector('[data-field="custom_exam"]')?.value || '');
+        formData.append(`board`, row.querySelector('[data-field="board"]')?.value || '');
+        formData.append(`year`, row.querySelector('[data-field="year"]')?.value || '');
+        formData.append(`roll`, row.querySelector('[data-field="roll"]')?.value || '');
+        formData.append(`grade`, row.querySelector('[data-field="grade"]')?.value || '');
+        formData.append(`obtained`, row.querySelector('[data-field="obtained"]')?.value || '');
+        formData.append(`max`, row.querySelector('[data-field="max"]')?.value || '');
+        formData.append(`subjects`, row.querySelector('[data-field="subjects"]')?.value || '');
+      }
+    });
+    
+    // Add 'next' parameter to indicate Save & Continue
+    formData.append('next', 'true');
+    
+    // Submit to Django backend
+    fetch("{% url 'phd_academic_qualifications:submit_qualification_data' %}", {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken')
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        toast('success','✔', data.message);
+        // Always redirect if redirect_url is provided
+        if (data.redirect_url) {
+          setTimeout(() => {
+            window.location.href = data.redirect_url;
+          }, 1500);
+        } else {
+          // Default redirect to employment form
+          setTimeout(() => {
+            window.location.href = '/employment/';
+          }, 1500);
+        }
+      } else {
+        toast('error','✖', data.message);
+      }
+    })
+    .catch(error => {
+      toast('error','✖','An error occurred. Please try again.');
+    });
+  } else {
+    toast('error','✖','Please complete all required fields in started rows.');
+    setTimeout(() => {
+      const first = document.querySelector('#qualBody .tb-input.error');
+      if (first) first.scrollIntoView({ behavior:'smooth', block:'center' });
+    }, 80);
+  }
 }
 
 init();

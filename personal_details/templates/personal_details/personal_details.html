@@ -505,47 +505,19 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
   background: linear-gradient(90deg, #004fa3, #007bff);
   color: #fff;
   font-family: 'Inter', sans-serif;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
+  font-size: .92rem;
   font-weight: 600;
-  font-size: 15px;
+  padding: 12px 38px;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  display: inline-flex; align-items: center; gap: 9px;
+  box-shadow: 0 4px 18px rgba(0,123,255,.35);
+  transition: transform .15s, box-shadow .15s;
+  letter-spacing: .3px;
 }
-
-.btn-save:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
-}
-
+.btn-save:hover  { transform: translateY(-2px); box-shadow: 0 8px 26px rgba(0,123,255,.40); }
 .btn-save:active { transform: translateY(0); }
-
-.btn-back {
-  background: linear-gradient(90deg, #6c757d, #495057);
-  color: #fff;
-  font-family: 'Inter', sans-serif;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 15px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.btn-back:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
-  color: #fff;
-  text-decoration: none;
-}
-
-.btn-back:active { transform: translateY(0); }
 
 /* ─── MANDATORY NOTE ─── */
 .mandatory-note {
@@ -614,26 +586,6 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
   .form-card { padding: 24px 18px 40px; }
   .photo-section { flex-direction: column; }
 }
-
-/* Read-only fields styling for registration data */
-.f-input[readonly], .f-select[disabled] {
-  background-color: #f8f9fa !important;
-  border-color: #dee2e6 !important;
-  cursor: not-allowed !important;
-  opacity: 0.8 !important;
-}
-
-.f-input[readonly]:focus, .f-select[disabled]:focus {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-.registration-info {
-  font-size: 0.75em;
-  color: #6c757d;
-  font-weight: normal;
-  margin-left: 5px;
-}
 </style>
 </head>
 <body>
@@ -644,7 +596,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
   <div class="header-card">
     <div class="header-emblem">🎓</div>
     <div class="header-text">
-      <h1>Admission Form</h1>
+      <h1>dmission Form</h1>
     </div>
   </div>
   <div class="accent-stripe"></div>
@@ -678,8 +630,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
       <span class="progress-label" id="progressLabel">0% Complete</span>
     </div>
 
-    <form method="post" id="personalForm" enctype="multipart/form-data" novalidate>
-      {% csrf_token %}
+    <form id="personalForm" novalidate>
 
       <!-- ══ SECTION 1: PHOTO + BASIC IDENTITY ══ -->
       <div class="photo-section">
@@ -694,7 +645,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
             <img id="photoPreview" alt="Photo preview" />
             <input type="file" id="photoFile" accept="image/*" style="display:none;" onchange="previewPhoto(event)" />
           </div>
-          <p class="photo-box-label">JPG / PNG<br>Max 500 KB<br>3.5 × 4.5 cm</p>
+          <p class="photo-box-label">JPG / PNG<br>Max 200 KB<br>3.5 × 4.5 cm</p>
         </div>
 
         <!-- Identity fields -->
@@ -711,8 +662,18 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
               <!-- Full Name -->
               <div class="field col-span-2">
                 <label>Full Name (In Block Letters) <span class="req-star">*</span></label>
-                <input class="f-input uppercase-field" type="text" id="fullName"
-                  placeholder="FULL NAME AS IN CERTIFICATE" maxlength="80" required />
+                <div class="prefix-group">
+                  <select class="f-select" id="nameTitle" required>
+                    <option value="">Title</option>
+                    <option>Mr.</option>
+                    <option>Ms.</option>
+                    <option>Mrs.</option>
+                    <option>Dr.</option>
+                    <option>Prof.</option>
+                  </select>
+                  <input class="f-input uppercase-field" type="text" id="fullName"
+                    placeholder="FULL NAME AS IN CERTIFICATE" maxlength="80" required />
+                </div>
                 <div class="err-msg" id="e-fullName">
                   <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
                   Full name is required
@@ -722,8 +683,15 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
               <!-- Father's Name -->
               <div class="field">
                 <label>Father's Name (In Block Letters) <span class="req-star">*</span></label>
-                <input class="f-input uppercase-field" type="text" id="fatherName"
-                  placeholder="FATHER'S NAME" maxlength="80" required />
+                <div class="prefix-group">
+                  <select class="f-select" id="fatherTitle" style="width:80px;">
+                    <option value="Sh.">Sh.</option>
+                    <option value="Dr.">Dr.</option>
+                    <option value="Prof.">Prof.</option>
+                  </select>
+                  <input class="f-input uppercase-field" type="text" id="fatherName"
+                    placeholder="FATHER'S NAME" maxlength="80" required />
+                </div>
                 <div class="err-msg" id="e-fatherName">
                   <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
                   Father's name is required
@@ -836,6 +804,24 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
               Nationality is required
             </div>
           </div>
+
+          <!-- Religion -->
+          <div class="field col-span-2">
+            <label>Religion</label>
+            <select class="f-select" id="religion">
+              <option value="">-- Select --</option>
+              <option>Hindu</option>
+              <option>Muslim</option>
+              <option>Christian</option>
+              <option>Sikh</option>
+              <option>Buddhist</option>
+              <option>Jain</option>
+              <option>Parsi / Zoroastrian</option>
+              <option>Other</option>
+            </select>
+          </div>
+
+          <!-- Category -->
           <div class="field col-span-2">
             <label>Category <span class="req-star">*</span></label>
             <select class="f-select" id="category" required>
@@ -852,6 +838,14 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
               Category is required
             </div>
           </div>
+
+          <!-- Place of Birth -->
+          <div class="field col-span-2">
+            <label>Place of Birth</label>
+            <input class="f-input" type="text" id="placeOfBirth" placeholder="City / Town" maxlength="60" />
+          </div>
+
+        </div>
       </div>
 
       <hr class="divider" />
@@ -910,14 +904,16 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
 
           <!-- Mobile -->
           <div class="field">
-            <label>Mobile Number <span class="req-star">*</span><span class="registration-info">(from registration)</span></label>
+            <label>Mobile Number <span class="req-star">*</span></label>
             <div class="prefix-group">
-              <select class="f-select" style="width:90px;" id="mobileCode" disabled>
+              <select class="f-select" style="width:90px;" id="mobileCode">
                 <option>+91</option>
+                <option>+1</option>
+                <option>+44</option>
+                <option>+971</option>
               </select>
-              <input class="f-input" type="tel" id="mobile" name="mobile_number" 
-                value="{{ personal_detail.mobile_number|default:profile.mobile_number }}" readonly
-                placeholder="9876543210" maxlength="10" inputmode="numeric" required />
+              <input class="f-input" type="tel" id="mobile" placeholder="9876543210"
+                maxlength="10" inputmode="numeric" required />
             </div>
             <div class="err-msg" id="e-mobile">
               <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
@@ -925,11 +921,17 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
             </div>
           </div>
 
+          <!-- Alternate Phone -->
+          <div class="field">
+            <label>Alternate / WhatsApp No.</label>
+            <input class="f-input" type="tel" id="altPhone"
+              placeholder="Optional" maxlength="10" inputmode="numeric" />
+          </div>
+
           <!-- Email -->
           <div class="field">
-            <label>Email Address <span class="req-star">*</span><span class="registration-info">(from registration)</span></label>
-            <input class="f-input" type="email" id="email" name="email"
-              value="{{ personal_detail.email|default:user.email }}" readonly 
+            <label>Email Address <span class="req-star">*</span></label>
+            <input class="f-input" type="email" id="email"
               placeholder="example@email.com" required />
             <div class="err-msg" id="e-email">
               <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
@@ -1122,15 +1124,11 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
 
       <!-- FOOTER -->
       <div class="footer-row">
-        <a href="{% url 'dashboard' %}" class="btn-back">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
-          Back to Dashboard
-        </a>
         <button type="button" class="btn-reset" onclick="resetForm()">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.49"/></svg>
           Reset Form
         </button>
-        <button type="submit" name="next" value="true" class="btn-save">
+        <button type="button" class="btn-save" onclick="submitForm()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           Save &amp; Continue
         </button>
@@ -1180,22 +1178,6 @@ function aadharJump(el, nextId) {
 function previewPhoto(e) {
   const file = e.target.files[0];
   if (!file) return;
-  
-  // Check file size (500 KB = 500 * 1024 bytes)
-  const maxSize = 500 * 1024;
-  if (file.size > maxSize) {
-    alert('Photo size must be less than 500 KB');
-    e.target.value = '';
-    return;
-  }
-  
-  // Check file type
-  if (!file.type.match('image.*')) {
-    alert('Please select an image file (JPG or PNG)');
-    e.target.value = '';
-    return;
-  }
-  
   const reader = new FileReader();
   reader.onload = ev => {
     const img  = document.getElementById('photoPreview');
@@ -1430,17 +1412,19 @@ function validate() {
   return ok;
 }
 
-/* ─── FORM SUBMISSION ─── */
-document.getElementById('personalForm').addEventListener('submit', function(e) {
-  // Remove any existing validation that might prevent submission
-  // Let Django handle the validation on the backend
-  return true;
-});
-
 /* ─── SUBMIT ─── */
 function submitForm() {
-  // This function is now deprecated - form uses proper Django submission
-  document.getElementById('personalForm').submit();
+  if (validate()) {
+    toast('success','✔','Personal details saved successfully!');
+    document.getElementById('progressBar').style.width = '100%';
+    document.getElementById('progressLabel').textContent = '100% Complete';
+  } else {
+    toast('error','✖','Please fill all required fields correctly.');
+    setTimeout(() => {
+      const first = document.querySelector('.f-input.error, .f-select.error');
+      if (first) first.scrollIntoView({ behavior:'smooth', block:'center' });
+    }, 80);
+  }
 }
 
 /* ─── RESET ─── */

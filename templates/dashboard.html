@@ -9,8 +9,8 @@
         <div class="col-12">
             <div class="welcome-card">
                 <div class="welcome-content">
-                    <h1>Welcome back, {{ user.first_name|default:user.username }}! 👋</h1>
-                    <p class="text-muted">Manage your admission journey from your personal dashboard</p>
+                    <h1>Welcome Back, {{ user.first_name|default:user.username }}! 👋</h1>
+                    {% comment %} <p class="text-muted">Manage your admission journey from your personal dashboard</p> {% endcomment %}
                 </div>
                 <div class="welcome-avatar">
                     <div class="avatar-circle">
@@ -71,13 +71,13 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3 mb-3">
-                            <a href="{% url 'employment_details:employment_details' %}" class="action-card">
+                            <a href="{% url 'profile_personal_info' %}" class="action-card">
                                 <div class="action-icon blue">
-                                    <i class="fas fa-briefcase"></i>
+                                    <i class="fas fa-user-edit"></i>
                                 </div>
                                 <div class="action-content">
-                                    <h6>Employment Details</h6>
-                                    <small>Add your work experience</small>
+                                    <h6>Complete Profile</h6>
+                                    <small>Fill in your information</small>
                                 </div>
                             </a>
                         </div>
@@ -93,6 +93,17 @@
                             </a>
                         </div>
                         <div class="col-md-3 mb-3">
+                            <a href="{% url 'employment_details:employment_details' %}" class="action-card">
+                                <div class="action-icon blue">
+                                    <i class="fas fa-briefcase"></i>
+                                </div>
+                                <div class="action-content">
+                                    <h6>Employment Details</h6>
+                                    <small>Add your work experience</small>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
                             <a href="#" class="action-card" onclick="alert('University Admission feature coming soon!')">
                                 <div class="action-icon orange">
                                     <i class="fas fa-university"></i>
@@ -100,17 +111,6 @@
                                 <div class="action-content">
                                     <h6>University Admission</h6>
                                     <small>Apply for programs</small>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{% url 'profile_personal_info' %}" class="action-card">
-                                <div class="action-icon blue">
-                                    <i class="fas fa-user-edit"></i>
-                                </div>
-                                <div class="action-content">
-                                    <h6>Complete Profile</h6>
-                                    <small>Fill in your information</small>
                                 </div>
                             </a>
                         </div>

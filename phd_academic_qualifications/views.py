@@ -49,28 +49,26 @@ def submit_qualification_data(request):
                 subjects=subjects or ''
             )
             
-            # Mark profile qualification step as complete if user is logged in
+            # Update user profile to mark qualification step as complete
             if request.user.is_authenticated:
                 from phd_admission.models import UserProfile
                 profile, created = UserProfile.objects.get_or_create(user=request.user)
                 profile.is_qualification_complete = True
                 profile.profile_step = 3
                 profile.save()
-                
+            
+            # Check if this is a "Save & Continue" request
+            if 'next' in request.POST:
                 return JsonResponse({
                     'status': 'success', 
-                    'message': 'Academic qualifications saved successfully!',
+                    'message': 'Qualification saved! Redirecting to employment details...',
                     'redirect_url': '/employment/'
                 })
-            else:
-                return JsonResponse({
-                    'status': 'success', 
-                    'message': 'Academic qualifications saved successfully!',
-                    'redirect_url': None
-                })
+            
+            return JsonResponse({'status': 'success', 'message': 'Qualification added successfully!'})
             
         except Exception as e:
-            return JsonResponse({'status': 'error', 'message': f'Error: {str(e)}'})
+            return JsonResponse({'status': 'error', 'message': str(e)})
     
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 

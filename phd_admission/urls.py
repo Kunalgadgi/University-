@@ -20,6 +20,7 @@ from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('admin/login/', views.admin_login_view, name='admin_login'),
     path('', views.home, name='home'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('login/', views.login_view, name='login'),
@@ -27,9 +28,12 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('profile/', views.profile_personal_info, name='profile_personal_info'),
     path('profile/qualification/', views.profile_qualification, name='profile_qualification'),
+    path('profile/employment/', views.profile_employment, name='profile_employment'),
     path('profile/complete-qualification/', views.complete_qualification_step, name='complete_qualification'),
     path('profile/complete-employment/', views.complete_employment_step, name='complete_employment'),
+    path('personal-details/', views.personal_details_view, name='personal_details'),
     path('debug/', views.debug_profile, name='debug_profile'),
     path('employment/', include('employment_details.urls')),
     path('qualifications/', include('phd_academic_qualifications.urls')),
+    path('personal/', include('personal_details.urls')),
 ]
