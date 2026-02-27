@@ -227,58 +227,9 @@ def profile_personal_info(request):
     )
     
     if request.method == 'POST':
-        # Handle photo upload
-        if 'photo' in request.FILES:
-            personal_detail.photo = request.FILES['photo']
-        
-        # Update personal information
-        request.user.first_name = request.POST.get('first_name', '').strip()
-        request.user.last_name = request.POST.get('last_name', '').strip()
-        # Email comes from registration and should not be changed here
-        request.user.save()
-        
-        personal_detail.first_name = request.POST.get('first_name', '').strip()
-        personal_detail.last_name = request.POST.get('last_name', '').strip()
-        # Email and mobile number are fetched from registration - not editable here
-        personal_detail.email = request.user.email or profile.email or ''
-        personal_detail.mobile_number = profile.mobile_number or ''
-        personal_detail.alternate_email = request.POST.get('alternate_email', '').strip()
-        
-        date_of_birth = request.POST.get('date_of_birth', '').strip()
-        if date_of_birth:
-            personal_detail.date_of_birth = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
-        
-        personal_detail.gender = request.POST.get('gender', '')
-        personal_detail.blood_group = request.POST.get('blood_group', '')
-        personal_detail.marital_status = request.POST.get('marital_status', '')
-        personal_detail.nationality = request.POST.get('nationality', 'Indian')
-        
-        # Address fields
-        personal_detail.current_address = request.POST.get('current_address', '').strip()
-        personal_detail.permanent_address = request.POST.get('permanent_address', '').strip()
-        personal_detail.city = request.POST.get('city', '').strip()
-        personal_detail.state = request.POST.get('state', '').strip()
-        personal_detail.pincode = request.POST.get('pincode', '').strip()
-        personal_detail.country = request.POST.get('country', 'India')
-        
-        # Emergency contact
-        personal_detail.emergency_contact_name = request.POST.get('emergency_contact_name', '').strip()
-        personal_detail.emergency_contact_number = request.POST.get('emergency_contact_number', '').strip()
-        personal_detail.emergency_contact_relation = request.POST.get('emergency_contact_relation', '').strip()
-        
-        personal_detail.save()
-        
-        profile.is_personal_info_complete = True
-        profile.profile_step = 2
-        profile.save()
-        
-        messages.success(request, 'Personal information updated successfully!')
-        
-        # Check if "Save & Continue" was clicked
-        if 'next' in request.POST:
-            return redirect('phd_academic_qualifications:academic_qualifications')
-        
-        return redirect('profile_personal_info')
+        # Delegate POST handling to the dedicated personal_details_view
+        from personal_details.views import personal_details_view as dedicated_personal_details_view
+        return dedicated_personal_details_view(request)
     
     context = {
         'profile': profile,
@@ -412,11 +363,76 @@ def personal_details_view(request):
     )
     
     if request.method == 'POST':
-        form = PersonalDetailForm(request.POST, instance=personal_detail)
+        print("DEBUG: POST request received")
+        print(f"DEBUG: POST data keys: {list(request.POST.keys())}")
+        print(f"DEBUG: FILES data keys: {list(request.FILES.keys())}")
+        
+        # Handle photo upload
+        if 'photo' in request.FILES:
+            print(f"DEBUG: Photo file received: {request.FILES['photo']}")
+            personal_detail.photo = request.FILES['photo']
+        
+        # Combine Aadhaar number parts
+        aadhar1 = request.POST.get('aadhar1', '')
+        aadhar2 = request.POST.get('aadhar2', '')
+        aadhar3 = request.POST.get('aadhar3', '')
+        full_aadhar = aadhar1 + aadhar2 + aadhar3 if (aadhar1 and aadhar2 and aadhar3) else ''
+        print(f"DEBUG: Combined Aadhaar: {full_aadhar}")
+        
+        # Update POST data with combined Aadhaar
+        post_data = request.POST.copy()
+        if full_aadhar:
+            post_data['aadhar_number'] = full_aadhar
+        
+        # Handle other fields
+        post_data['first_name'] = request.POST.get('fullName', '')
+        post_data['father_name'] = request.POST.get('fatherName', '')
+        post_data['mother_name'] = request.POST.get('motherName', '')
+        post_data['date_of_birth'] = request.POST.get('date_of_birth', '')
+        post_data['gender'] = request.POST.get('gender', '')
+        post_data['marital_status'] = request.POST.get('marital', '')
+        post_data['email'] = request.POST.get('email', '')
+        post_data['alternate_phone'] = request.POST.get('alternate_phone', '')
+        
+        print(f"DEBUG: Processed POST data: {dict(post_data)}")
+        
+        form = PersonalDetailForm(post_data, request.FILES, instance=personal_detail)
+        print(f"DEBUG: Form is valid: {form.is_valid()}")
+        if not form.is_valid():
+            print(f"DEBUG: Form errors: {form.errors}")
+        
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Personal details updated successfully!')
-            return redirect('personal_details')
+            saved_obj = form.save()
+            print(f"DEBUG: Saved personal detail ID: {saved_obj.id}")
+            
+            # Check if this is an AJAX request
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                # Check if "Save & Continue" was clicked
+                if 'next' in request.POST:
+                    return JsonResponse({
+                        'status': 'success',
+                        'message': 'Personal details saved! Redirecting to academic qualifications...',
+                        'redirect_url': '/qualifications/'
+                    })
+                else:
+                    return JsonResponse({
+                        'status': 'success',
+                        'message': 'Personal details saved successfully!'
+                    })
+            else:
+                messages.success(request, 'Personal details updated successfully!')
+                # Check if "Save & Continue" was clicked
+                if 'next' in request.POST:
+                    return redirect('phd_academic_qualifications:academic_qualifications')
+                return redirect('personal_details')
+        else:
+            # Handle form validation errors for AJAX
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Please correct the errors below.',
+                    'errors': form.errors
+                })
     else:
         form = PersonalDetailForm(instance=personal_detail)
     

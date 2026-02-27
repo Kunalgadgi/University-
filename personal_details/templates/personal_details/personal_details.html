@@ -630,7 +630,8 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
       <span class="progress-label" id="progressLabel">0% Complete</span>
     </div>
 
-    <form id="personalForm" novalidate>
+    <form id="personalForm" method="POST" action="/personal-details/" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
 
       <!-- ══ SECTION 1: PHOTO + BASIC IDENTITY ══ -->
       <div class="photo-section">
@@ -643,7 +644,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
               <p>Upload<br>Passport<br>Photo</p>
             </div>
             <img id="photoPreview" alt="Photo preview" />
-            <input type="file" id="photoFile" accept="image/*" style="display:none;" onchange="previewPhoto(event)" />
+            <input type="file" id="photoFile" name="photo" accept="image/*" style="display:none;" onchange="previewPhoto(event)" />
           </div>
           <p class="photo-box-label">JPG / PNG<br>Max 200 KB<br>3.5 × 4.5 cm</p>
         </div>
@@ -671,7 +672,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
                     <option>Dr.</option>
                     <option>Prof.</option>
                   </select>
-                  <input class="f-input uppercase-field" type="text" id="fullName"
+                  <input class="f-input uppercase-field" type="text" id="fullName" name="fullName"
                     placeholder="FULL NAME AS IN CERTIFICATE" maxlength="80" required />
                 </div>
                 <div class="err-msg" id="e-fullName">
@@ -689,7 +690,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
                     <option value="Dr.">Dr.</option>
                     <option value="Prof.">Prof.</option>
                   </select>
-                  <input class="f-input uppercase-field" type="text" id="fatherName"
+                  <input class="f-input uppercase-field" type="text" id="fatherName" name="fatherName"
                     placeholder="FATHER'S NAME" maxlength="80" required />
                 </div>
                 <div class="err-msg" id="e-fatherName">
@@ -701,7 +702,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
               <!-- Mother's Name -->
               <div class="field">
                 <label>Mother's Name <span class="req-star">*</span></label>
-                <input class="f-input uppercase-field" type="text" id="motherName"
+                <input class="f-input uppercase-field" type="text" id="motherName" name="motherName"
                   placeholder="MOTHER'S NAME" maxlength="80" required />
                 <div class="err-msg" id="e-motherName">
                   <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
@@ -727,7 +728,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
           <!-- Date of Birth -->
           <div class="field col-span-2">
             <label>Date of Birth <span class="req-star">*</span></label>
-            <input class="f-input" type="date" id="dob" required onchange="calcAge()" />
+            <input class="f-input" type="date" id="dob" name="date_of_birth" required onchange="calcAge()" />
             <span class="hint">As given in Matriculation Certificate</span>
             <div class="err-msg" id="e-dob">
               <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
@@ -791,7 +792,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
           <!-- Nationality -->
           <div class="field col-span-2">
             <label>Nationality <span class="req-star">*</span></label>
-            <select class="f-select" id="nationality" required>
+            <select class="f-select" id="nationality" name="nationality" required>
               <option value="">-- Select --</option>
               <option value="Indian" selected>Indian</option>
               <option value="NRI">NRI (Non-Resident Indian)</option>
@@ -824,7 +825,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
           <!-- Category -->
           <div class="field col-span-2">
             <label>Category <span class="req-star">*</span></label>
-            <select class="f-select" id="category" required>
+            <select class="f-select" id="category" name="category" required>
               <option value="">-- Select Category --</option>
               <option>General / UR</option>
               <option>OBC (Non-Creamy Layer)</option>
@@ -864,13 +865,13 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
           <div class="field col-span-2">
             <label>Aadhar Card Number <span class="req-star">*</span></label>
             <div class="aadhar-group">
-              <input class="f-input" type="text" id="aadhar1" maxlength="4" placeholder="XXXX"
+              <input class="f-input" type="text" id="aadhar1" name="aadhar1" maxlength="4" placeholder="XXXX"
                 oninput="aadharJump(this,'aadhar2')" inputmode="numeric" pattern="\d*" />
               <span class="aadhar-sep">–</span>
-              <input class="f-input" type="text" id="aadhar2" maxlength="4" placeholder="XXXX"
+              <input class="f-input" type="text" id="aadhar2" name="aadhar2" maxlength="4" placeholder="XXXX"
                 oninput="aadharJump(this,'aadhar3')" inputmode="numeric" pattern="\d*" />
               <span class="aadhar-sep">–</span>
-              <input class="f-input" type="text" id="aadhar3" maxlength="4" placeholder="XXXX"
+              <input class="f-input" type="text" id="aadhar3" name="aadhar3" maxlength="4" placeholder="XXXX"
                 inputmode="numeric" pattern="\d*" oninput="updateProgress()" />
             </div>
             <div class="err-msg" id="e-aadhar">
@@ -912,7 +913,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
                 <option>+44</option>
                 <option>+971</option>
               </select>
-              <input class="f-input" type="tel" id="mobile" placeholder="9876543210"
+              <input class="f-input" type="tel" id="mobile" name="mobile_number" placeholder="9876543210"
                 maxlength="10" inputmode="numeric" required />
             </div>
             <div class="err-msg" id="e-mobile">
@@ -924,14 +925,14 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
           <!-- Alternate Phone -->
           <div class="field">
             <label>Alternate / WhatsApp No.</label>
-            <input class="f-input" type="tel" id="altPhone"
+            <input class="f-input" type="tel" id="altPhone" name="alternate_phone"
               placeholder="Optional" maxlength="10" inputmode="numeric" />
           </div>
 
           <!-- Email -->
           <div class="field">
             <label>Email Address <span class="req-star">*</span></label>
-            <input class="f-input" type="email" id="email"
+            <input class="f-input" type="email" id="email" name="email"
               placeholder="example@email.com" required />
             <div class="err-msg" id="e-email">
               <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
@@ -957,7 +958,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
 
             <div class="field col-span-2">
               <label>Address Line 1 <span class="req-star">*</span></label>
-              <input class="f-input" type="text" id="permAddr1"
+              <input class="f-input" type="text" id="permAddr1" name="permanent_address"
                 placeholder="House No., Street / Mohalla / Colony" maxlength="100" required />
               <div class="err-msg" id="e-permAddr1">
                 <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
@@ -973,7 +974,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
 
             <div class="field">
               <label>City / Town <span class="req-star">*</span></label>
-              <input class="f-input" type="text" id="permCity"
+              <input class="f-input" type="text" id="permCity" name="city"
                 placeholder="City" maxlength="50" required />
               <div class="err-msg" id="e-permCity">
                 <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
@@ -989,7 +990,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
 
             <div class="field">
               <label>State / UT <span class="req-star">*</span></label>
-              <select class="f-select" id="permState" required>
+              <select class="f-select" id="permState" name="state" required>
                 <option value="">-- Select State --</option>
                 <option>Andhra Pradesh</option><option>Arunachal Pradesh</option>
                 <option>Assam</option><option>Bihar</option><option>Chhattisgarh</option>
@@ -1017,7 +1018,7 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
 
             <div class="field">
               <label>PIN Code <span class="req-star">*</span></label>
-              <input class="f-input" type="text" id="permPin"
+              <input class="f-input" type="text" id="permPin" name="pincode"
                 placeholder="123456" maxlength="6" inputmode="numeric" required />
               <div class="err-msg" id="e-permPin">
                 <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
@@ -1415,9 +1416,39 @@ function validate() {
 /* ─── SUBMIT ─── */
 function submitForm() {
   if (validate()) {
-    toast('success','✔','Personal details saved successfully!');
-    document.getElementById('progressBar').style.width = '100%';
-    document.getElementById('progressLabel').textContent = '100% Complete';
+    // Check if "Save & Continue" was clicked - add next parameter
+    const formData = new FormData(document.getElementById('personalForm'));
+    formData.append('next', 'true');
+    
+    // Submit the form via fetch to handle redirect properly
+    fetch(document.getElementById('personalForm').action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        toast('success','✔', data.message || 'Personal details saved successfully!');
+        document.getElementById('progressBar').style.width = '100%';
+        document.getElementById('progressLabel').textContent = '100% Complete';
+        
+        // Redirect if URL provided
+        if (data.redirect_url) {
+          setTimeout(() => {
+            window.location.href = data.redirect_url;
+          }, 1500);
+        }
+      } else {
+        toast('error','✖', data.message || 'Error saving personal details.');
+      }
+    })
+    .catch(error => {
+      // Fallback to regular form submission
+      document.getElementById('personalForm').submit();
+    });
   } else {
     toast('error','✖','Please fill all required fields correctly.');
     setTimeout(() => {

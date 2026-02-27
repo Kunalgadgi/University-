@@ -31,9 +31,9 @@ urlpatterns = [
     path('profile/employment/', views.profile_employment, name='profile_employment'),
     path('profile/complete-qualification/', views.complete_qualification_step, name='complete_qualification'),
     path('profile/complete-employment/', views.complete_employment_step, name='complete_employment'),
-    path('personal-details/', views.personal_details_view, name='personal_details'),
+    path('personal-details/', include('personal_details.urls')),
     path('debug/', views.debug_profile, name='debug_profile'),
     path('employment/', include('employment_details.urls')),
     path('qualifications/', include('phd_academic_qualifications.urls')),
-    path('personal/', include('personal_details.urls')),
+    path('personal/', include(('personal_details.urls', 'personal_details'), namespace='personal_details_legacy')),
 ]
