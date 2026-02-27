@@ -80,6 +80,7 @@ class PortalSettings(TimeStampedModel):
     class Meta:
         verbose_name = "Portal Setting"
         verbose_name_plural = "Portal Settings"
+        app_label = 'master_control'
 
     def clean(self):
         """Validate singleton pattern and date logic."""
@@ -488,11 +489,103 @@ class AdmissionApplication(TimeStampedModel):
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default="draft", db_index=True)
     is_data_locked = models.BooleanField(default=False, db_index=True)
     submitted_at = models.DateTimeField(null=True, blank=True)
+    
+    # PERSONAL INFORMATION
+    first_name = models.CharField(max_length=100, blank=True)
+    last_name = models.CharField(max_length=100, blank=True)
+    full_name = models.CharField(max_length=200, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    gender = models.CharField(max_length=10, blank=True)
+    father_name = models.CharField(max_length=100, blank=True)
+    mother_name = models.CharField(max_length=100, blank=True)
+    marital_status = models.CharField(max_length=20, blank=True)
+    nationality = models.CharField(max_length=50, blank=True)
+    aadhar_number = models.CharField(max_length=20, blank=True)
+    category = models.CharField(max_length=50, blank=True)
+    category_tick = models.CharField(max_length=50, blank=True)
+    category_other = models.CharField(max_length=100, blank=True)
+    
+    # CONTACT INFORMATION
+    mobile_number = models.CharField(max_length=20, blank=True)
+    email = models.EmailField(blank=True)
+    
+    # ADDRESS INFORMATION
+    permanent_address = models.TextField(blank=True)
+    current_address = models.TextField(blank=True)
+    corr_address_block = models.TextField(blank=True)
+    district = models.CharField(max_length=100, blank=True)
+    state = models.CharField(max_length=100, blank=True)
+    pincode = models.CharField(max_length=10, blank=True)
+    mobile_telephone = models.CharField(max_length=20, blank=True)
+    email_correspondence = models.EmailField(blank=True)
+    
+    # ACADEMIC QUALIFICATIONS (JSON)
+    academic_data = models.JSONField(default=dict, blank=True, help_text="Stores all academic qualifications as JSON")
+    
+    # SPECIALIZATION
+    specialization_area = models.TextField(blank=True)
+    proposed_supervisor = models.TextField(blank=True)
+    
+    # FELLOWSHIP
+    fellowship_validity = models.DateField(null=True, blank=True)
+    fellowship_category = models.CharField(max_length=100, blank=True)
+    
+    # UGC CATEGORY (as per UGC notification regarding NET as entrance test 27.03.2024)
+    # Will be enabled after first application submission creates the database table
+    ugc_category = models.CharField(
+        max_length=50, 
+        blank=True,
+        choices=[
+            ('Category I (JRF)', 'Category I (JRF)'),
+            ('Category II (NET)', 'Category II (NET)'),
+            ('Category III (Ph.D. Only)', 'Category III (Ph.D. Only)'),
+            ('Not Applicable', 'Not Applicable'),
+        ],
+        help_text="UGC category as per NET entrance test notification"
+    )
+    
+    # EMPLOYMENT DETAILS
+    employed_status = models.CharField(max_length=10, blank=True)
+    emp_post_current = models.CharField(max_length=200, blank=True)
+    job_nature = models.CharField(max_length=100, blank=True)
+    date_of_joining = models.DateField(null=True, blank=True)
+    service_period = models.CharField(max_length=100, blank=True)
+    organization_name_current = models.CharField(max_length=200, blank=True)
+    organization_address = models.TextField(blank=True)
+    org_telephone = models.CharField(max_length=20, blank=True)
+    org_email = models.EmailField(blank=True)
+    
+    # EMPLOYMENT HISTORY (JSON)
+    employment_history = models.JSONField(default=dict, blank=True, help_text="Stores all employment history as JSON")
+    
+    # RESEARCH AND PUBLICATIONS
+    research_experience = models.TextField(blank=True)
+    publications = models.TextField(blank=True)
+    
+    # OTHER COURSE
+    pursuing_other_course = models.CharField(max_length=10, blank=True)
+    other_institution = models.CharField(max_length=200, blank=True)
+    other_class = models.CharField(max_length=100, blank=True)
+    other_session = models.CharField(max_length=50, blank=True)
+    other_result = models.CharField(max_length=50, blank=True)
+    
+    # FILES
+    photo = models.ImageField(upload_to='applications/photos/', null=True, blank=True)
+    signature = models.ImageField(upload_to='applications/signatures/', null=True, blank=True)
+    
+    # PRINT STATUS
+    is_printed = models.BooleanField(default=False, help_text="Mark if application has been printed")
+    printed_date = models.DateTimeField(null=True, blank=True)
+    printed_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='printed_applications')
 
     class Meta:
         indexes = [
             models.Index(fields=["student", "status"]),
             models.Index(fields=["advertisement", "course"]),
+            models.Index(fields=["application_no"]),
+            models.Index(fields=["-created_at"]),
+            models.Index(fields=["category"]),
+            models.Index(fields=["is_printed"]),
         ]
 
     def lock(self):
@@ -500,8 +593,23 @@ class AdmissionApplication(TimeStampedModel):
             self.is_data_locked = True
             self.save(update_fields=["is_data_locked", "updated_at"])
 
+    def get_academic_qualifications(self):
+        """Parse academic data JSON into readable format"""
+        return self.academic_data.get('qualifications', [])
+
+    def get_employment_history(self):
+        """Parse employment history JSON into readable format"""
+        return self.employment_history.get('employments', [])
+
+    def mark_as_printed(self, user):
+        """Mark application as printed"""
+        self.is_printed = True
+        self.printed_date = timezone.now()
+        self.printed_by = user
+        self.save()
+
     def __str__(self):
-        return self.application_no
+        return f"{self.application_no} - {self.full_name or self.student.username}"
 
 
 class ApplicationFieldValue(TimeStampedModel):
@@ -535,28 +643,55 @@ class ApplicationFieldValue(TimeStampedModel):
 
 
 class ApplicationProfileSnapshot(TimeStampedModel):
-    application = models.OneToOneField(
+    application = models.ForeignKey(
         AdmissionApplication,
         on_delete=models.CASCADE,
-        related_name="profile_snapshot",
+        related_name="profile_snapshots",
     )
 
     first_name = models.CharField(max_length=100, blank=True, default="")
     last_name = models.CharField(max_length=100, blank=True, default="")
-    father_name = models.CharField(max_length=255, blank=True, default="")
-    mother_name = models.CharField(max_length=255, blank=True, default="")
+    father_name = models.CharField(max_length=100, blank=True, default="")
+    mother_name = models.CharField(max_length=100, blank=True, default="")
     dob = models.DateField(null=True, blank=True)
-    gender = models.CharField(max_length=50, blank=True, default="")
-    category = models.CharField(max_length=100, blank=True, default="")
+    gender = models.CharField(max_length=10, blank=True, default="")
+    marital_status = models.CharField(max_length=20, blank=True, default="")
+    nationality = models.CharField(max_length=50, blank=True, default="")
     aadhar_no = models.CharField(max_length=20, blank=True, default="")
-
+    category = models.CharField(max_length=50, blank=True, default="")
+    category_tick = models.CharField(max_length=20, blank=True, default="")
+    category_other = models.CharField(max_length=50, blank=True, default="")
+    address = models.TextField(blank=True, default="")
+    corr_address_block = models.TextField(blank=True, default="")
+    state = models.CharField(max_length=50, blank=True, default="")
+    district = models.CharField(max_length=50, blank=True, default="")
+    pincode = models.CharField(max_length=10, blank=True, default="")
+    mobile_number = models.CharField(max_length=20, blank=True, default="")
+    mobile_telephone = models.CharField(max_length=20, blank=True, default="")
+    email = models.EmailField(blank=True, default="")
+    email_correspondence = models.EmailField(blank=True, default="")
+    specialization_area = models.CharField(max_length=200, blank=True, default="")
+    proposed_supervisor = models.CharField(max_length=200, blank=True, default="")
+    fellowship_validity = models.DateField(null=True, blank=True)
+    fellowship_category = models.CharField(max_length=50, blank=True, default="")
+    employed_status = models.CharField(max_length=10, blank=True, default="")
+    emp_post_current = models.CharField(max_length=200, blank=True, default="")
+    job_nature = models.CharField(max_length=20, blank=True, default="")
+    date_of_joining = models.DateField(null=True, blank=True)
+    service_period = models.CharField(max_length=50, blank=True, default="")
+    organization_name_current = models.CharField(max_length=200, blank=True, default="")
+    organization_address = models.TextField(blank=True, default="")
+    org_telephone = models.CharField(max_length=20, blank=True, default="")
+    org_email = models.EmailField(blank=True, default="")
+    research_experience = models.TextField(blank=True, default="")
+    publications = models.TextField(blank=True, default="")
+    pursuing_other_course = models.CharField(max_length=10, blank=True, default="")
+    other_institution = models.CharField(max_length=200, blank=True, default="")
+    other_class = models.CharField(max_length=100, blank=True, default="")
+    other_session = models.CharField(max_length=50, blank=True, default="")
+    other_result = models.CharField(max_length=50, blank=True, default="")
     photo = models.ImageField(upload_to=upload_path, null=True, blank=True)
     signature = models.ImageField(upload_to=upload_path, null=True, blank=True)
-
-    address = models.TextField(blank=True, default="")
-    state = models.CharField(max_length=100, blank=True, default="")
-    district = models.CharField(max_length=100, blank=True, default="")
-    pincode = models.CharField(max_length=10, blank=True, default="")
 
     snapshot_created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 
@@ -579,6 +714,7 @@ class ApplicationEducationSnapshot(TimeStampedModel):
     board_university = models.CharField(max_length=255, blank=True, default="")
     institution_name = models.CharField(max_length=255, blank=True, default="")
     passing_year = models.CharField(max_length=10, blank=True, default="")
+    roll_number = models.CharField(max_length=50, blank=True, default="")
     percentage = models.CharField(max_length=20, blank=True, default="")
     cgpa = models.CharField(max_length=20, blank=True, default="")
     subjects = models.TextField(blank=True, default="")
@@ -609,6 +745,7 @@ class ApplicationExperienceSnapshot(TimeStampedModel):
     from_date = models.DateField(null=True, blank=True)
     to_date = models.DateField(null=True, blank=True)
     experience_type = models.CharField(max_length=100, blank=True, default="")
+    remarks = models.TextField(blank=True, default="")
     document_file = models.FileField(upload_to=upload_path, null=True, blank=True)
 
     snapshot_created_at = models.DateTimeField(auto_now_add=True, db_index=True)

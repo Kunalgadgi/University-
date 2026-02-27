@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'employment_details',
     'phd_academic_qualifications',
     'personal_details',
-    'master_control',
+    'master_control_project.master_control.apps.MasterControlConfig',
 ]
 
 MIDDLEWARE = [
@@ -121,10 +121,19 @@ USE_I18N = True
 USE_TZ = True
 
 
+# Auth redirects
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/dashboard/'
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Media uploads (photos, attachments)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

@@ -138,18 +138,16 @@ body::before {
 
 /* ─── TABLE SCROLL ─── */
 .table-scroll {
-  overflow-x: auto;
+  overflow-x: visible;
   border-radius: 10px;
   border: 1.5px solid var(--border);
   box-shadow: 0 2px 12px rgba(0,123,255,.07);
-  padding-right: 12px;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 1060px;
-  margin-right: 12px;
+  min-width: 100%;
 }
 
 /* THEAD */
@@ -490,20 +488,20 @@ select.tb-input {
       <table id="qualTable">
         <thead>
           <tr>
-            <th style="min-width:148px;">Examination Passed <span class="th-ast">*</span></th>
-            <th style="min-width:175px;">Name of University / Board <span class="th-ast">*</span></th>
-            <th style="min-width:110px;">Year of Passing <span class="th-ast">*</span></th>
-            <th style="min-width:100px;">Roll No. <span class="th-ast">*</span></th>
-            <th style="min-width:195px;">
+            <th style="min-width:120px;">Examination Passed <span class="th-ast">*</span></th>
+            <th style="min-width:140px;">Name of University / Board <span class="th-ast">*</span></th>
+            <th style="min-width:90px;">Year of Passing <span class="th-ast">*</span></th>
+            <th style="min-width:80px;">Roll No. <span class="th-ast">*</span></th>
+            <th style="min-width:160px;">
               Grade or Marks Obtained / Max Marks <span class="th-ast">*</span>
               <span class="th-note">Enter Grade OR Obtained / Max Marks</span>
             </th>
-            <th style="min-width:100px;">
+            <th style="min-width:80px;">
               %Age of Marks
               <span class="th-note">Auto Calculated</span>
             </th>
-            <th style="min-width:165px;">Subjects <span class="th-ast">*</span></th>
-            <th style="min-width:82px;">Actions</th>
+            <th style="min-width:130px;">Subjects <span class="th-ast">*</span></th>
+            <th style="min-width:70px;">Actions</th>
           </tr>
         </thead>
         <tbody id="qualBody">
@@ -788,8 +786,11 @@ function makeRow(examName, isDynamic) {
 
 /* ─── INIT ─── */
 function init() {
-  document.getElementById('qualBody').innerHTML =
-    EXAMS.map(name => makeRow(name, false)).join('');
+  // Avoid adding rows if table already has content (e.g., after Save & Continue)
+  const tbody = document.getElementById('qualBody');
+  if (tbody && tbody.innerHTML.trim() !== '') return;
+
+  tbody.innerHTML = EXAMS.map(name => makeRow(name, false)).join('');
 }
 
 /* ─── PERCENTAGE CALC ─── */

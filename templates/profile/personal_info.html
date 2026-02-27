@@ -712,14 +712,14 @@ input[type="date"].f-input::-webkit-calendar-picker-indicator {
               <div class="field col-span-2">
                 <label>Full Name (In Block Letters) <span class="req-star">*</span></label>
                 <div class="prefix-group">
-                  <select class="f-select" id="nameTitle" name="nameTitle" required>
+                  {% comment %} <select class="f-select" id="nameTitle" name="nameTitle" required>
                     <option value="">Title</option>
                     <option>Mr.</option>
                     <option>Ms.</option>
                     <option>Mrs.</option>
                     <option>Dr.</option>
                     <option>Prof.</option>
-                  </select>
+                  </select> {% endcomment %}
                   <input class="f-input uppercase-field" type="text" id="fullName" name="fullName"
                     value="{{ personal_detail.first_name|default:'' }}"
                     placeholder="FULL NAME AS IN CERTIFICATE" maxlength="80" required />

@@ -3,5 +3,5 @@ from django.apps import AppConfig
 
 class MasterControlConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'master_control'
+    name = 'master_control_project.master_control'
     verbose_name = 'Master Control'

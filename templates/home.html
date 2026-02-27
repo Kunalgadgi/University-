@@ -3,6 +3,18 @@
 {% block title %}Home - Admission System{% endblock %}
 
 {% block content %}
+{% comment %} {% url 'admission_form_single' as admission_form_url %}
+
+<div style="margin: 0 0 14px 0;">
+    <a href="{% if user.is_authenticated %}{{ admission_form_url }}{% else %}{% url 'login' %}?next={{ admission_form_url|urlencode }}{% endif %}"
+       style="display:block; text-decoration:none; background:#b91c1c; color:#fff; border:1px solid rgba(255,255,255,0.25); padding:10px 12px; border-radius:10px; font-weight:700; letter-spacing:0.2px; box-shadow:0 6px 20px rgba(185,28,28,0.25);">
+        <span style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+            <span><i class="fas fa-circle-dot" style="margin-right:8px;"></i>PhD Admission Open</span>
+            <span style="font-weight:600; opacity:0.95;">Click to Fill Form</span>
+        </span>
+    </a>
+</div> {% endcomment %}
+
 <!-- Hero Section -->
 <section class="hero-section">
     <div class="container-fluid">
@@ -74,7 +86,7 @@
 </section>
 
 <!-- Features Section -->
-{% if user.is_authenticated %}
+{% comment %} {% if user.is_authenticated %}
 <section class="features-section py-5">
     <div class="container-fluid">
         <div class="row">
@@ -231,7 +243,7 @@
         </div>
     </div>
 </section>
-{% endif %}
+{% endif %} {% endcomment %}
 
 <style>
 /* Hero Section */

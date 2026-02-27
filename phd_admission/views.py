@@ -8,9 +8,33 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 import re
 from datetime import datetime
+from django.utils import timezone
 from .models import UserProfile
 from personal_details.models import PersonalDetail
 from personal_details.forms import PersonalDetailForm
+
+
+def _get_next_url(request):
+    return request.POST.get('next') or request.GET.get('next')
+
+
+def _safe_redirect_next_or(request, fallback_name):
+    next_url = _get_next_url(request)
+    if next_url:
+        return redirect(next_url)
+    return redirect(fallback_name)
+
+
+def _generate_application_no():
+    from master_control_project.master_control.models import AdmissionApplication
+
+    prefix = timezone.now().strftime('PHD%Y%m%d')
+    for seq in range(1, 10000):
+        candidate = f"{prefix}{seq:04d}"
+        if not AdmissionApplication.objects.filter(application_no=candidate).exists():
+            return candidate
+    raise RuntimeError('Unable to generate unique application number')
+
 
 def home(request):
     """Home page view"""
@@ -44,6 +68,7 @@ def dashboard(request):
     # Get real data for the dashboard
     from employment_details.models import EmploymentDetail
     from phd_academic_qualifications.models import AcademicQualification
+    from master_control_project.master_control.models import AdmissionApplication
     from .models import UserProfile
     
     # Get or create user profile
@@ -52,13 +77,16 @@ def dashboard(request):
     # Get user's personal data (filtered by user)
     user_employment_count = EmploymentDetail.objects.filter(user=request.user).count()
     user_qualifications_count = AcademicQualification.objects.filter(user=request.user).count()
-    user_applications_count = 0  # No university admission model yet
+    user_applications_count = AdmissionApplication.objects.filter(student=request.user).count()
+    
+    # Get user's latest application for preview
+    latest_application = AdmissionApplication.objects.filter(student=request.user).order_by('-submitted_at').first()
     
     # Get overall statistics
     total_users = User.objects.count()
     total_employment = EmploymentDetail.objects.count()
     total_qualifications = AcademicQualification.objects.count()
-    total_applications = 0  # No university admission model yet
+    total_applications = AdmissionApplication.objects.count()
     
     context = {
         'user_employment_count': user_employment_count,
@@ -71,6 +99,7 @@ def dashboard(request):
         'user': request.user,
         'profile': profile,
         'profile_completion': profile.completion_percentage,
+        'latest_application': latest_application,
     }
     
     return render(request, 'dashboard.html', context)
@@ -104,11 +133,14 @@ def login_view(request):
         if user is not None:
             login(request, user)
             messages.success(request, 'Welcome back! You have successfully logged in.')
-            return redirect('dashboard')
+            return _safe_redirect_next_or(request, 'dashboard')
         else:
             messages.error(request, 'Invalid username/email or password. Please try again.')
     
-    return render(request, 'login.html')
+    context = {
+        'next': _get_next_url(request) or '',
+    }
+    return render(request, 'login.html', context)
 
 def register_view(request):
     """Register page view"""
@@ -193,6 +225,9 @@ def register_view(request):
                 )
                 
                 messages.success(request, f'Account created successfully! You can now login.')
+                next_url = request.POST.get('next') or request.GET.get('next')
+                if next_url:
+                    return redirect(f"/login/?next={next_url}")
                 return redirect('login')
                 
             except Exception as e:
@@ -201,13 +236,427 @@ def register_view(request):
             # If there are errors, redirect back to registration page
             return redirect('register')
     
-    return render(request, 'register.html')
+    context = {
+        'next': _get_next_url(request) or '',
+    }
+    return render(request, 'register.html', context)
 
 def logout_view(request):
     """Logout view"""
     logout(request)
     messages.success(request, 'You have been successfully logged out.')
     return redirect('home')
+
+
+@login_required
+def admission_form_single(request):
+    personal_detail, _ = PersonalDetail.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        from master_control_project.master_control.models import AdmissionApplication, ApplicationProfileSnapshot, ApplicationEducationSnapshot, ApplicationExperienceSnapshot
+        from master_control_project.master_control.models import Advertisement, Course
+
+        # Check if this is save or submit action
+        action = request.POST.get('action', 'save')
+        
+        # For save action, create/update draft in AdmissionApplication
+        if action == 'save':
+            # Get or create draft application
+            ad = Advertisement.objects.filter(is_active=True).order_by('-created_at').first()
+            course = Course.objects.filter(is_active=True).order_by('display_priority', 'course_name').first()
+            
+            if not ad or not course:
+                messages.error(request, 'No active Advertisement/Course found. Please add them in Master Control first.')
+                return redirect('admission_form_single')
+            
+            # Get existing draft or create new one
+            draft_application = AdmissionApplication.objects.filter(
+                student=request.user,
+                status='draft'
+            ).first()
+            
+            if not draft_application:
+                app_no = _generate_application_no()
+                draft_application = AdmissionApplication.objects.create(
+                    application_no=app_no,
+                    student=request.user,
+                    advertisement=ad,
+                    course=course,
+                    department_name=getattr(course, 'department_name', '') or '',
+                    status='draft'
+                )
+            
+            # Update PersonalDetail
+            personal_detail.first_name = request.POST.get('full_name') or personal_detail.first_name
+            personal_detail.father_name = request.POST.get('father_name') or personal_detail.father_name
+            personal_detail.mother_name = request.POST.get('mother_name') or personal_detail.mother_name
+            personal_detail.nationality = request.POST.get('nationality') or personal_detail.nationality
+            personal_detail.marital_status = request.POST.get('marital_status') or personal_detail.marital_status
+            personal_detail.gender = request.POST.get('gender') or personal_detail.gender
+            personal_detail.aadhar_number = request.POST.get('aadhar') or personal_detail.aadhar_number
+            personal_detail.permanent_address = request.POST.get('perm_address') or personal_detail.permanent_address
+            personal_detail.current_address = request.POST.get('corr_address') or personal_detail.current_address
+            personal_detail.mobile_number = request.POST.get('mobile') or personal_detail.mobile_number
+            personal_detail.email = request.POST.get('email') or personal_detail.email
+            personal_detail.category = request.POST.get('category') or personal_detail.category
+            personal_detail.state = request.POST.get('state') or personal_detail.state
+            personal_detail.city = request.POST.get('district') or personal_detail.city
+            personal_detail.pincode = request.POST.get('pincode') or personal_detail.pincode
+            personal_detail.date_of_birth = request.POST.get('dob') or personal_detail.date_of_birth
+
+            upload = request.FILES.get('photo')
+            if upload:
+                personal_detail.photo = upload
+
+            personal_detail.save()
+            
+            # Update draft application with form data
+            draft_application.first_name = request.POST.get('full_name') or ''
+            draft_application.father_name = request.POST.get('father_name') or ''
+            draft_application.mother_name = request.POST.get('mother_name') or ''
+            draft_application.nationality = request.POST.get('nationality') or ''
+            draft_application.marital_status = request.POST.get('marital_status') or ''
+            draft_application.gender = request.POST.get('gender') or ''
+            draft_application.aadhar_number = request.POST.get('aadhar') or ''
+            draft_application.category = request.POST.get('category') or ''
+            draft_application.category_tick = request.POST.get('category_tick') or ''
+            draft_application.category_other = request.POST.get('category_other') or ''
+            draft_application.ugc_category = request.POST.get('ugc_category') or ''
+            draft_application.mobile_number = request.POST.get('mobile') or ''
+            draft_application.email = request.POST.get('email') or ''
+            draft_application.permanent_address = request.POST.get('perm_address') or ''
+            draft_application.current_address = request.POST.get('corr_address') or ''
+            draft_application.corr_address_block = request.POST.get('corr_address_block') or ''
+            draft_application.district = request.POST.get('district') or ''
+            draft_application.state = request.POST.get('state') or ''
+            draft_application.pincode = request.POST.get('pincode') or ''
+            draft_application.mobile_telephone = request.POST.get('mobile_telephone') or ''
+            draft_application.email_correspondence = request.POST.get('email_correspondence') or ''
+            
+            # Handle photo upload for application
+            if upload:
+                draft_application.photo = upload
+            
+            signature_upload = request.FILES.get('signature')
+            if signature_upload:
+                draft_application.signature = signature_upload
+            
+            draft_application.save()
+            
+            messages.success(request, f'Application draft saved successfully! Your draft (Application No: {draft_application.application_no}) is saved in the database.')
+            return redirect('admission_form_single')
+
+        # For submit action, create/update AdmissionApplication
+        # Initialize data collections for unified storage
+        employment_history_data = []
+        academic_qualifications = []
+
+        # 1) Update PersonalDetail (basic fields + photo)
+        personal_detail.first_name = request.POST.get('full_name') or personal_detail.first_name
+        personal_detail.father_name = request.POST.get('father_name') or personal_detail.father_name
+        personal_detail.mother_name = request.POST.get('mother_name') or personal_detail.mother_name
+        personal_detail.nationality = request.POST.get('nationality') or personal_detail.nationality
+        personal_detail.marital_status = request.POST.get('marital_status') or personal_detail.marital_status
+        personal_detail.gender = request.POST.get('gender') or personal_detail.gender
+        personal_detail.aadhar_number = request.POST.get('aadhar') or personal_detail.aadhar_number
+        personal_detail.permanent_address = request.POST.get('perm_address') or personal_detail.permanent_address
+        personal_detail.current_address = request.POST.get('corr_address') or personal_detail.current_address
+        personal_detail.mobile_number = request.POST.get('mobile') or personal_detail.mobile_number
+        personal_detail.email = request.POST.get('email') or personal_detail.email
+        personal_detail.category = request.POST.get('category') or personal_detail.category
+        personal_detail.state = request.POST.get('state') or personal_detail.state
+        personal_detail.city = request.POST.get('district') or personal_detail.city
+        personal_detail.pincode = request.POST.get('pincode') or personal_detail.pincode
+
+        upload = request.FILES.get('photo')
+        if upload:
+            personal_detail.photo = upload
+
+        signature_upload = request.FILES.get('signature')
+        if signature_upload:
+            personal_detail.signature = signature_upload
+
+        personal_detail.save()
+
+        # 2) Create application shell (needs advertisement/course)
+        ad = Advertisement.objects.filter(is_active=True).order_by('-created_at').first()
+        course = Course.objects.filter(is_active=True).order_by('display_priority', 'course_name').first()
+        if not ad or not course:
+            messages.error(request, 'No active Advertisement/Course found. Please add them in Master Control first.')
+            return redirect('admission_form_single')
+
+        # Check if user already has a submitted application (prevent duplicates)
+        existing_application = AdmissionApplication.objects.filter(
+            student=request.user,
+            status='submitted'
+        ).first()
+        
+        if existing_application:
+            messages.error(request, f'You have already submitted an application (Application No: {existing_application.application_no}). You cannot submit multiple applications.')
+            return redirect('admission_form_single')
+
+        app_no = _generate_application_no()
+        application = AdmissionApplication.objects.create(
+            application_no=app_no,
+            student=request.user,
+            advertisement=ad,
+            course=course,
+            department_name=getattr(course, 'department_name', '') or '',
+            status='submitted',
+            submitted_at=timezone.now(),
+            is_data_locked=True,
+        )
+
+        # 6) Save unified data to single table for database viewing
+        try:
+            from master_control_project.master_control.models import UnifiedApplicationData
+        except ImportError:
+            UnifiedApplicationData = None
+
+        # Prepare academic data as JSON
+        aq_exam = request.POST.getlist('aq_exam[]')
+        aq_board = request.POST.getlist('aq_board[]')
+        aq_year = request.POST.getlist('aq_year[]')
+        aq_roll = request.POST.getlist('aq_roll[]')
+        aq_marks_obtained = request.POST.getlist('aq_marks_obtained[]')
+        aq_total_marks = request.POST.getlist('aq_total_marks[]')
+        aq_subjects = request.POST.getlist('aq_subjects[]')
+
+        row_count = max(len(aq_exam), len(aq_board), len(aq_year), len(aq_roll), len(aq_marks_obtained), len(aq_total_marks), len(aq_subjects))
+        for i in range(row_count):
+            qualification = (aq_exam[i] if i < len(aq_exam) else '').strip()
+            board_university = (aq_board[i] if i < len(aq_board) else '').strip()
+            passing_year = (aq_year[i] if i < len(aq_year) else '').strip()
+            roll_number = (aq_roll[i] if i < len(aq_roll) else '').strip()
+            marks_obtained = (aq_marks_obtained[i] if i < len(aq_marks_obtained) else '').strip()
+            total_marks = (aq_total_marks[i] if i < len(aq_total_marks) else '').strip()
+            subjects = (aq_subjects[i] if i < len(aq_subjects) else '').strip()
+
+            if not (qualification or board_university or passing_year or roll_number or marks_obtained or total_marks or subjects):
+                continue
+
+            # Validation: marks obtained should not be greater than total marks
+            if marks_obtained and total_marks:
+                try:
+                    marks_obtained_num = float(marks_obtained)
+                    total_marks_num = float(total_marks)
+                    if marks_obtained_num > total_marks_num:
+                        messages.error(request, f'Error: Marks obtained ({marks_obtained}) cannot be greater than total marks ({total_marks}) for {qualification or "examination"}')
+                        return redirect('admission_form_single')
+                except ValueError:
+                    pass
+
+            # Calculate percentage if both values are provided
+            percentage = ""
+            if marks_obtained and total_marks:
+                try:
+                    marks_obtained_num = float(marks_obtained)
+                    total_marks_num = float(total_marks)
+                    if total_marks_num > 0:
+                        percentage = f"{(marks_obtained_num / total_marks_num) * 100:.2f}%"
+                except ValueError:
+                    percentage = f"{marks_obtained}/{total_marks}"
+            elif marks_obtained or total_marks:
+                percentage = f"{marks_obtained or '-'}/{total_marks or '-'}"
+
+            ApplicationEducationSnapshot.objects.create(
+                application=application,
+                qualification=qualification,
+                board_university=board_university,
+                passing_year=passing_year,
+                roll_number=roll_number,
+                percentage=percentage,
+                subjects=subjects,
+            )
+
+        # 5) Save employment rows as snapshots
+        emp_post = request.POST.getlist('emp_post[]')
+        emp_org = request.POST.getlist('emp_org[]')
+        emp_from = request.POST.getlist('emp_from[]')
+        emp_to = request.POST.getlist('emp_to[]')
+        emp_type = request.POST.getlist('emp_type[]')
+        emp_remarks = request.POST.getlist('emp_remarks[]')
+
+        emp_rows = max(len(emp_post), len(emp_org), len(emp_from), len(emp_to), len(emp_type), len(emp_remarks))
+        for i in range(emp_rows):
+            designation = (emp_post[i] if i < len(emp_post) else '').strip()
+            org = (emp_org[i] if i < len(emp_org) else '').strip()
+            from_raw = (emp_from[i] if i < len(emp_from) else '').strip()
+            to_raw = (emp_to[i] if i < len(emp_to) else '').strip()
+            typ = (emp_type[i] if i < len(emp_type) else '').strip()
+            remarks = (emp_remarks[i] if i < len(emp_remarks) else '').strip()
+
+            if not (designation or org or from_raw or to_raw or typ or remarks):
+                continue
+
+            from_dt = None
+            to_dt = None
+            try:
+                from_dt = datetime.strptime(from_raw, '%Y-%m-%d').date() if from_raw else None
+            except Exception:
+                from_dt = None
+            try:
+                to_dt = datetime.strptime(to_raw, '%Y-%m-%d').date() if to_raw else None
+            except Exception:
+                to_dt = None
+
+            ApplicationExperienceSnapshot.objects.create(
+                application=application,
+                organization_name=org,
+                designation=designation,
+                from_date=from_dt,
+                to_date=to_dt,
+                experience_type=typ,
+                remarks=remarks,
+            )
+
+        # 7) Save all data directly to AdmissionApplication table for unified database view
+        application.first_name = personal_detail.first_name or ''
+        application.last_name = personal_detail.last_name or ''
+        application.full_name = f"{personal_detail.first_name or ''} {personal_detail.last_name or ''}".strip()
+        application.date_of_birth = personal_detail.date_of_birth
+        application.gender = personal_detail.gender
+        application.father_name = personal_detail.father_name
+        application.mother_name = personal_detail.mother_name
+        application.marital_status = personal_detail.marital_status
+        application.nationality = personal_detail.nationality
+        application.aadhar_number = personal_detail.aadhar_number or ''
+        application.category = personal_detail.category
+        application.category_tick = request.POST.get('category_tick') or ''
+        application.category_other = request.POST.get('category_other') or ''
+        application.ugc_category = request.POST.get('ugc_category') or ''
+        application.mobile_number = personal_detail.mobile_number or request.POST.get('mobile') or '0000000000'
+        application.email = personal_detail.email or request.POST.get('email') or 'no-email@example.com'
+        application.permanent_address = personal_detail.permanent_address
+        application.current_address = personal_detail.current_address
+        application.corr_address_block = request.POST.get('corr_address_block') or ''
+        application.district = personal_detail.city
+        application.state = personal_detail.state
+        application.pincode = personal_detail.pincode
+        application.mobile_telephone = request.POST.get('mobile_telephone') or ''
+        application.email_correspondence = request.POST.get('email_correspondence') or ''
+        application.academic_data = {'qualifications': academic_qualifications}
+        application.specialization_area = request.POST.get('specialization_area') or ''
+        application.proposed_supervisor = request.POST.get('proposed_supervisor') or ''
+        application.fellowship_validity = datetime.strptime(request.POST.get('fellowship_validity'), '%Y-%m-%d').date() if request.POST.get('fellowship_validity') else None
+        application.fellowship_category = request.POST.get('fellowship_category') or ''
+        application.employed_status = request.POST.get('employed_status') or ''
+        application.emp_post_current = request.POST.get('emp_post_current') or ''
+        application.job_nature = request.POST.get('job_nature') or ''
+        application.date_of_joining = datetime.strptime(request.POST.get('date_of_joining'), '%Y-%m-%d').date() if request.POST.get('date_of_joining') else None
+        application.service_period = request.POST.get('service_period') or ''
+        application.organization_name_current = request.POST.get('organization_name_current') or ''
+        application.organization_address = request.POST.get('organization_address') or ''
+        application.org_telephone = request.POST.get('org_telephone') or ''
+        application.org_email = request.POST.get('org_email') or ''
+        application.employment_history = {'employments': employment_history_data}
+        application.research_experience = request.POST.get('research_experience') or ''
+        application.publications = request.POST.get('publications') or ''
+        application.pursuing_other_course = request.POST.get('pursuing_other_course') or ''
+        application.other_institution = request.POST.get('other_institution') or ''
+        application.other_class = request.POST.get('other_class') or ''
+        application.other_session = request.POST.get('other_session') or ''
+        application.other_result = request.POST.get('other_result') or ''
+        # Save photo and signature directly to application as well
+        photo_upload = request.FILES.get('photo')
+        if photo_upload:
+            application.photo = photo_upload
+        else:
+            application.photo = personal_detail.photo
+
+        signature_upload = request.FILES.get('signature')
+        if signature_upload:
+            application.signature = signature_upload
+        else:
+            application.signature = personal_detail.signature
+
+        application.save()
+        
+        # Also save to UnifiedApplicationData if available
+        if UnifiedApplicationData:
+            UnifiedApplicationData.objects.update_or_create(
+                application=application,
+                defaults={
+                    'application_no': application.application_no,
+                    'first_name': personal_detail.first_name or '',
+                    'last_name': personal_detail.last_name or '',
+                    'full_name': f"{personal_detail.first_name or ''} {personal_detail.last_name or ''}".strip(),
+                    'date_of_birth': personal_detail.date_of_birth,
+                    'gender': personal_detail.gender,
+                    'father_name': personal_detail.father_name,
+                    'mother_name': personal_detail.mother_name,
+                    'marital_status': personal_detail.marital_status,
+                    'nationality': personal_detail.nationality,
+                    'aadhar_number': personal_detail.aadhar_number,
+                    'category': personal_detail.category,
+                    'category_tick': request.POST.get('category_tick') or '',
+                    'category_other': request.POST.get('category_other') or '',
+                    'mobile_number': personal_detail.mobile_number,
+                    'email': personal_detail.email,
+                    'permanent_address': personal_detail.permanent_address,
+                    'current_address': personal_detail.current_address,
+                    'corr_address_block': request.POST.get('corr_address_block') or '',
+                    'district': personal_detail.city,
+                    'state': personal_detail.state,
+                    'pincode': personal_detail.pincode,
+                    'mobile_telephone': request.POST.get('mobile_telephone') or '',
+                    'email_correspondence': request.POST.get('email_correspondence') or '',
+                    'academic_data': {'qualifications': academic_qualifications},
+                    'specialization_area': request.POST.get('specialization_area') or '',
+                    'proposed_supervisor': request.POST.get('proposed_supervisor') or '',
+                    'fellowship_validity': datetime.strptime(request.POST.get('fellowship_validity'), '%Y-%m-%d').date() if request.POST.get('fellowship_validity') else None,
+                    'fellowship_category': request.POST.get('fellowship_category') or '',
+                    'employed_status': request.POST.get('employed_status') or '',
+                    'emp_post_current': request.POST.get('emp_post_current') or '',
+                    'job_nature': request.POST.get('job_nature') or '',
+                    'date_of_joining': datetime.strptime(request.POST.get('date_of_joining'), '%Y-%m-%d').date() if request.POST.get('date_of_joining') else None,
+                    'service_period': request.POST.get('service_period') or '',
+                    'organization_name_current': request.POST.get('organization_name_current') or '',
+                    'organization_address': request.POST.get('organization_address') or '',
+                    'org_telephone': request.POST.get('org_telephone') or '',
+                    'org_email': request.POST.get('org_email') or '',
+                    'employment_history': {'employments': employment_history_data},
+                    'research_experience': request.POST.get('research_experience') or '',
+                    'publications': request.POST.get('publications') or '',
+                    'pursuing_other_course': request.POST.get('pursuing_other_course') or '',
+                    'other_institution': request.POST.get('other_institution') or '',
+                    'other_class': request.POST.get('other_class') or '',
+                    'other_session': request.POST.get('other_session') or '',
+                    'other_result': request.POST.get('other_result') or '',
+                    'photo': personal_detail.photo,
+                    'signature': personal_detail.signature,
+                }
+            )
+
+        messages.success(request, f'Application submitted successfully! Application No: {application.application_no}')
+        return redirect(f"/application_preview/?app={application.id}")
+
+    # Check if user already has a submitted application
+    has_submitted_application = False
+    draft_application = None
+    try:
+        from master_control_project.master_control.models import AdmissionApplication
+        existing_app = AdmissionApplication.objects.filter(
+            student=request.user,
+            status='submitted'
+        ).first()
+        has_submitted_application = existing_app is not None
+        
+        # Get draft application if it exists
+        draft_application = AdmissionApplication.objects.filter(
+            student=request.user,
+            status='draft'
+        ).first()
+    except ImportError:
+        pass
+
+    context = {
+        'user': request.user,
+        'personal_detail': personal_detail,
+        'has_submitted_application': has_submitted_application,
+        'draft_application': draft_application,
+    }
+    return render(request, 'admission_form_single.html', context)
 
 @login_required
 def profile_personal_info(request):
@@ -339,7 +788,7 @@ def profile_employment(request):
 
 def create_application_snapshots(user):
     """Create snapshots for all draft applications when user completes profile"""
-    from master_control.models import (
+    from master_control_project.master_control.models import (
         AdmissionApplication, ApplicationProfileSnapshot, 
         ApplicationEducationSnapshot, ApplicationExperienceSnapshot
     )
@@ -539,7 +988,7 @@ def personal_details_view(request):
 @login_required
 def apply_now(request):
     """Display active advertisements and available courses for application"""
-    from master_control.models import Advertisement, AdvertisementCourse, Course
+    from master_control_project.master_control.models import Advertisement, AdvertisementCourse, Course
     from django.utils import timezone
     
     # Get active advertisements
@@ -576,7 +1025,7 @@ def apply_now(request):
 @login_required
 def create_application(request):
     """Create a draft application when student applies for a course"""
-    from master_control.models import AdmissionApplication, AdvertisementCourse
+    from master_control_project.master_control.models import AdmissionApplication, AdvertisementCourse
     from django.shortcuts import get_object_or_404
     
     if request.method != 'POST':
@@ -596,8 +1045,8 @@ def create_application(request):
                                      advertisement_id=advertisement_id, 
                                      course_id=course_id)
         
-        # Check if seats are available
-        if ad_course.available_seats <= 0:
+        # Check if seats are available (schema uses total_seats)
+        if getattr(ad_course, 'total_seats', 0) <= 0:
             messages.error(request, 'No seats available for this course.')
             return redirect('apply_now')
         
@@ -616,16 +1065,17 @@ def create_application(request):
                 messages.info(request, 'You already have a draft application for this course. Please complete it.')
                 return redirect('profile_personal_info')
         
-        # Create new draft application
+        # Create new draft application (AdmissionApplication requires application_no)
         application = AdmissionApplication.objects.create(
+            application_no=_generate_application_no(),
             student=request.user,
             advertisement=ad_course.advertisement,
             course=ad_course.course,
+            department_name=getattr(ad_course.course, 'department_name', '') or '',
             status='draft',
-            application_fee=ad_course.application_fee
         )
         
-        messages.success(request, f'Application started for {ad_course.course.name}. Please complete your profile.')
+        messages.success(request, f'Application started for {ad_course.course.course_name}. Please complete your profile.')
         
         # Redirect to profile personal info to start the application process
         return redirect('profile_personal_info')
@@ -640,6 +1090,31 @@ def application_preview(request):
     from personal_details.models import PersonalDetail
     from phd_academic_qualifications.models import AcademicQualification
     from employment_details.models import EmploymentDetail
+
+    app_id = request.GET.get('app')
+    if app_id:
+        from master_control_project.master_control.models import AdmissionApplication
+
+        try:
+            application = AdmissionApplication.objects.select_related('advertisement', 'course').get(id=app_id, student=request.user)
+        except AdmissionApplication.DoesNotExist:
+            messages.error(request, 'Application not found.')
+            return redirect('dashboard')
+
+        personal = PersonalDetail.objects.filter(user=request.user).first()
+        profile_snapshot = getattr(application, 'profile_snapshot', None)
+        edu = getattr(application, 'education_snapshots', None)
+        exp = getattr(application, 'experience_snapshots', None)
+
+        context = {
+            'application': application,
+            'application_no': application.application_no,
+            'personal': personal,
+            'profile_snapshot': profile_snapshot,
+            'qualifications': edu.all() if edu else [],
+            'employments': exp.all() if exp else [],
+        }
+        return render(request, 'application_preview.html', context)
 
     profile = request.user.profile
 
@@ -668,3 +1143,168 @@ def application_preview(request):
     }
 
     return render(request, "application_preview.html", context)
+
+
+@login_required
+def application_single_table(request):
+    """Display complete application data in a single table with print option"""
+    app_id = request.GET.get('app')
+    
+    if app_id:
+        application = get_object_or_404(AdmissionApplication, id=app_id, user=request.user)
+        
+        personal = PersonalDetail.objects.filter(user=request.user).first()
+        profile_snapshot = getattr(application, 'profile_snapshot', None)
+        edu = getattr(application, 'education_snapshots', None)
+        exp = getattr(application, 'experience_snapshots', None)
+
+        context = {
+            'application': application,
+            'application_no': application.application_no,
+            'personal': personal,
+            'profile_snapshot': profile_snapshot,
+            'qualifications': edu.all() if edu else [],
+            'employments': exp.all() if exp else [],
+        }
+        return render(request, 'application_single_table.html', context)
+
+    profile = request.user.profile
+
+    # 🔒 Step validation
+    if not (
+        profile.is_personal_info_complete and
+        profile.is_qualification_complete and
+        profile.is_employment_complete
+    ):
+        messages.warning(request, "Please complete all steps first.")
+        return redirect('dashboard')
+
+    # ✅ Fetch SINGLE data
+    personal = PersonalDetail.objects.filter(user=request.user).select_related().first()
+
+    # ✅ Fetch MULTIPLE data (FK related)
+    qualifications = AcademicQualification.objects.filter(user=request.user).select_related()
+    employments = EmploymentDetail.objects.filter(user=request.user).select_related()
+
+    context = {
+        "profile": profile,
+        "personal": personal,
+        "qualifications": qualifications,
+        "employments": employments,
+    }
+
+    return render(request, "application_single_table.html", context)
+
+
+@login_required
+def print_application(request):
+    """Print admission application from database"""
+    from django.shortcuts import get_object_or_404
+    app_id = request.GET.get('app')
+    
+    if not app_id:
+        messages.error(request, 'Application ID is required')
+        return redirect('dashboard')
+    
+    try:
+        from master_control_project.master_control.models import AdmissionApplication
+        
+        application = get_object_or_404(AdmissionApplication, id=app_id)
+        
+        # Check if user owns this application or is staff
+        if not (request.user.is_staff or application.student == request.user):
+            messages.error(request, 'Access denied')
+            return redirect('dashboard')
+        
+        # Get personal data like application_preview does
+        from personal_details.models import PersonalDetail
+        personal = PersonalDetail.objects.filter(user=request.user).first()
+        profile_snapshot = getattr(application, 'profile_snapshot', None)
+        
+        # Mark as printed
+        application.is_printed = True
+        application.printed_date = timezone.now()
+        application.printed_by = request.user
+        application.save()
+        
+        # Get academic qualifications from ApplicationEducationSnapshots
+        try:
+            from master_control_project.master_control.models import ApplicationEducationSnapshot
+            academic_qualifications = ApplicationEducationSnapshot.objects.filter(application=application)
+        except:
+            academic_qualifications = []
+        
+        # Get employment history from ApplicationExperienceSnapshots
+        try:
+            from master_control_project.master_control.models import ApplicationExperienceSnapshot
+            employment_history = ApplicationExperienceSnapshot.objects.filter(application=application)
+        except:
+            employment_history = []
+        
+        context = {
+            'application': application,
+            'personal': personal,
+            'profile_snapshot': profile_snapshot,
+            'academic_qualifications': academic_qualifications,
+            'employment_history': employment_history,
+        }
+        
+        return render(request, 'print_application.html', context)
+        
+    except Exception as e:
+        messages.error(request, f'Error printing application: {str(e)}')
+        return redirect('dashboard')
+
+
+@login_required
+def unified_application_view(request):
+    """Display unified application data from single database table"""
+    try:
+        from master_control_project.master_control.models import UnifiedApplicationData
+    except ImportError:
+        UnifiedApplicationData = None
+    
+    app_id = request.GET.get('app')
+    
+    if app_id:
+        # Get specific application
+        if UnifiedApplicationData:
+            unified_data = get_object_or_404(UnifiedApplicationData, application__id=app_id)
+            
+            context = {
+                'unified_data': unified_data,
+                'application': unified_data.application,
+                'academic_qualifications': unified_data.get_academic_qualifications(),
+                'employment_history': unified_data.get_employment_history(),
+            }
+            
+            # Mark as printed if requested
+            if request.POST.get('mark_printed'):
+                unified_data.mark_as_printed(request.user)
+                messages.success(request, "Application marked as printed!")
+            
+            return render(request, 'unified_application_display.html', context)
+        else:
+            # Fallback to AdmissionApplication
+            application = get_object_or_404(AdmissionApplication, id=app_id, user=request.user)
+            context = {
+                'unified_data': application,
+                'application': application,
+                'academic_qualifications': application.get_academic_qualifications(),
+                'employment_history': application.get_employment_history(),
+            }
+            return render(request, 'unified_application_display.html', context)
+    
+    # Get all applications for admin view
+    if request.user.is_staff:
+        if UnifiedApplicationData:
+            all_applications = UnifiedApplicationData.objects.all().order_by('-created_at')
+        else:
+            all_applications = AdmissionApplication.objects.all().order_by('-created_at')
+        context = {
+            'all_applications': all_applications,
+        }
+        return render(request, 'unified_applications_list.html', context)
+    
+    # Redirect regular users to dashboard
+    return redirect('dashboard')

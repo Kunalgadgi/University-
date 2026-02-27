@@ -15,6 +15,7 @@
             <div class="card-body">
                 <form method="post">
                     {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ next|default:'' }}" />
                     
                     <div class="mb-3">
                         <label for="name" class="form-label">Full Name</label>

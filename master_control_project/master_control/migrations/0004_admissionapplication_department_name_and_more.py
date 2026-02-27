@@ -2,7 +2,6 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
-import master_control.models
 
 
 class Migration(migrations.Migration):
@@ -32,8 +31,8 @@ class Migration(migrations.Migration):
                 ('gender', models.CharField(blank=True, default='', max_length=50)),
                 ('category', models.CharField(blank=True, default='', max_length=100)),
                 ('aadhar_no', models.CharField(blank=True, default='', max_length=20)),
-                ('photo', models.ImageField(blank=True, null=True, upload_to=master_control.models.upload_path)),
-                ('signature', models.ImageField(blank=True, null=True, upload_to=master_control.models.upload_path)),
+                ('photo', models.ImageField(blank=True, null=True, upload_to='photos/')),
+                ('signature', models.ImageField(blank=True, null=True, upload_to='signatures/')),
                 ('address', models.TextField(blank=True, default='')),
                 ('state', models.CharField(blank=True, default='', max_length=100)),
                 ('district', models.CharField(blank=True, default='', max_length=100)),
@@ -58,7 +57,7 @@ class Migration(migrations.Migration):
                 ('from_date', models.DateField(blank=True, null=True)),
                 ('to_date', models.DateField(blank=True, null=True)),
                 ('experience_type', models.CharField(blank=True, default='', max_length=100)),
-                ('document_file', models.FileField(blank=True, null=True, upload_to=master_control.models.upload_path)),
+                ('document_file', models.FileField(blank=True, null=True, upload_to='documents/')),
                 ('snapshot_created_at', models.DateTimeField(auto_now_add=True, db_index=True)),
                 ('application', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='experience_snapshots', to='master_control.admissionapplication')),
             ],
@@ -82,7 +81,7 @@ class Migration(migrations.Migration):
                 ('percentage', models.CharField(blank=True, default='', max_length=20)),
                 ('cgpa', models.CharField(blank=True, default='', max_length=20)),
                 ('subjects', models.TextField(blank=True, default='')),
-                ('document_file', models.FileField(blank=True, null=True, upload_to=master_control.models.upload_path)),
+                ('document_file', models.FileField(blank=True, null=True, upload_to='documents/')),
                 ('snapshot_created_at', models.DateTimeField(auto_now_add=True, db_index=True)),
                 ('application', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='education_snapshots', to='master_control.admissionapplication')),
             ],

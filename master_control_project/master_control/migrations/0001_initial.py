@@ -2,7 +2,6 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
-import master_control.models
 
 
 class Migration(migrations.Migration):
@@ -22,7 +21,7 @@ class Migration(migrations.Migration):
                 ('is_active', models.BooleanField(db_index=True, default=True)),
                 ('title', models.CharField(db_index=True, max_length=255, verbose_name='Advertisement Title')),
                 ('description', models.TextField(blank=True, help_text='Brief description of the advertisement', verbose_name='Description')),
-                ('image', models.ImageField(help_text='Upload banner/image (Recommended: 1920x600px for banners)', upload_to=master_control.models.upload_path, verbose_name='Advertisement Image')),
+                ('image', models.ImageField(help_text='Upload banner/image (Recommended: 1920x600px for banners)', upload_to='advertisements/', verbose_name='Advertisement Image')),
                 ('redirect_url', models.URLField(blank=True, help_text='URL to redirect when clicked', verbose_name='Redirect URL')),
                 ('display_type', models.CharField(choices=[('banner', 'Banner'), ('sidebar', 'Sidebar'), ('notice', 'Notice')], default='banner', help_text='Where to display this advertisement', max_length=20, verbose_name='Display Type')),
                 ('priority', models.PositiveIntegerField(default=0, help_text='Lower number = displayed first', verbose_name='Priority')),
@@ -85,7 +84,7 @@ class Migration(migrations.Migration):
                 ('is_active', models.BooleanField(db_index=True, default=True)),
                 ('title', models.CharField(db_index=True, max_length=255, verbose_name='Notice Title')),
                 ('content', models.TextField(help_text='Full notice text', verbose_name='Notice Content')),
-                ('attachment', models.FileField(blank=True, help_text='Optional PDF, DOC, or image attachment', null=True, upload_to=master_control.models.upload_path, verbose_name='Attachment')),
+                ('attachment', models.FileField(blank=True, help_text='Optional PDF, DOC, or image attachment', null=True, upload_to='attachments/', verbose_name='Attachment')),
                 ('priority', models.PositiveIntegerField(default=0, help_text='Lower number = displayed first on homepage', verbose_name='Priority')),
             ],
             options={
@@ -104,7 +103,7 @@ class Migration(migrations.Migration):
                 ('is_active', models.BooleanField(db_index=True, default=True)),
                 ('title', models.CharField(help_text='Main headline for the slider', max_length=255, verbose_name='Slider Title')),
                 ('subtitle', models.CharField(blank=True, help_text='Supporting text below the title', max_length=255, verbose_name='Subtitle')),
-                ('image', models.ImageField(help_text='Upload slider image (Recommended: 1920x600px)', upload_to=master_control.models.upload_path, verbose_name='Slider Image')),
+                ('image', models.ImageField(help_text='Upload slider image (Recommended: 1920x600px)', upload_to='sliders/', verbose_name='Slider Image')),
                 ('priority', models.PositiveIntegerField(default=0, help_text='Display order - lower number appears first', verbose_name='Priority')),
             ],
             options={

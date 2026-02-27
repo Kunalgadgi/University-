@@ -20,9 +20,19 @@
             </div>
         </div>
     </div>
+    {% url 'admission_form_single' as admission_form_url %}
 
+<div style="margin: 0 0 14px 0;">
+    <a href="{% if user.is_authenticated %}{{ admission_form_url }}{% else %}{% url 'login' %}?next={{ admission_form_url|urlencode }}{% endif %}"
+       style="display:block; text-decoration:none; background:#b91c1c; color:#fff; border:1px solid rgba(255,255,255,0.25); padding:10px 12px; border-radius:10px; font-weight:700; letter-spacing:0.2px; box-shadow:0 6px 20px rgba(185,28,28,0.25);">
+        <span style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+            <span><i class="fas fa-circle-dot" style="margin-right:8px;"></i>PhD Admission Open</span>
+            <span style="font-weight:600; opacity:0.95;">Click to Fill Form</span>
+        </span>
+    </a>
+</div>
     <!-- Personal Statistics -->
-    <div class="row mb-4">
+    {% comment %} <div class="row mb-4">
         <div class="col-md-3">
             <div class="stats-card personal">
                 <div class="stats-icon blue">
@@ -104,17 +114,30 @@
                             </a>
                         </div>
                         <div class="col-md-3 mb-3">
-                            <a href="#" class="action-card" onclick="alert('University Admission feature coming soon!')">
+                            <a href="{% url 'admission_form_single' %}" class="action-card">
                                 <div class="action-icon orange">
                                     <i class="fas fa-university"></i>
                                 </div>
                                 <div class="action-content">
-                                    <h6>University Admission</h6>
-                                    <small>Apply for programs</small>
+                                    <h6>PhD Admission</h6>
+                                    <small>Apply for PhD program</small>
+                                </div>
+                            </a>
+                        </div> {% endcomment %}
+                        {% if latest_application %}
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'application_preview' %}?app={{ latest_application.id }}" class="action-card">
+                                <div class="action-icon green">
+                                    <i class="fas fa-eye"></i>
+                                </div>
+                                <div class="action-content">
+                                    <h6>Application Preview</h6>
+                                    <small>View your application</small>
                                 </div>
                             </a>
                         </div>
-                        <div class="col-md-3 mb-3">
+                        {% endif %}
+                        {% comment %} <div class="col-md-3 mb-3">
                             <a href="{% url 'debug_profile' %}" class="action-card">
                                 <div class="action-icon orange">
                                     <i class="fas fa-bug"></i>
@@ -124,7 +147,7 @@
                                     <small>Check profile status</small>
                                 </div>
                             </a>
-                        </div>
+                        </div> {% endcomment %}
                     </div>
                 </div>
             </div>
@@ -132,7 +155,7 @@
     </div>
 
     <!-- System Overview -->
-    <div class="row">
+    {% comment %} <div class="row">
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">
@@ -216,7 +239,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> {% endcomment %}
 </div>
 
 <style>

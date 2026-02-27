@@ -19,6 +19,7 @@ class PersonalDetail(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='personal_detail')
 
     photo = models.ImageField(upload_to='profile_photos/', blank=True, null=True)
+    signature = models.ImageField(upload_to='signatures/', blank=True, null=True)
 
     first_name = models.CharField(max_length=100, blank=True, null=True)
     last_name = models.CharField(max_length=100, blank=True, null=True)

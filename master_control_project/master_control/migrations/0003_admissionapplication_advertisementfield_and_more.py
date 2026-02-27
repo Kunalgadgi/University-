@@ -3,7 +3,6 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import master_control.models
 
 
 class Migration(migrations.Migration):
@@ -85,7 +84,7 @@ class Migration(migrations.Migration):
                 ('is_active', models.BooleanField(db_index=True, default=True)),
                 ('field_snapshot', models.JSONField(default=dict)),
                 ('value_text', models.TextField(blank=True)),
-                ('value_file', models.FileField(blank=True, null=True, upload_to=master_control.models.upload_path)),
+                ('value_file', models.FileField(blank=True, null=True, upload_to='documents/')),
                 ('application', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='field_values', to='master_control.admissionapplication')),
                 ('field', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='application_values', to='master_control.advertisementfield')),
             ],

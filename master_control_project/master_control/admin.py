@@ -6,6 +6,7 @@ Production-grade Django Admin customization with full features.
 from django.contrib import admin
 from django.db.models import Count, Sum
 from django.utils.html import format_html
+from django.urls import reverse
 from .models import (
     PortalSettings, Course, FormConfiguration,
     Advertisement, Notice, HomepageSlider,
@@ -266,6 +267,20 @@ class AdvertisementFieldAdmin(BaseAdmin):
     inlines = [AdvertisementFieldOptionInline]
 
 
+@admin.action(description="Print selected applications")
+def print_applications(modeladmin, request, queryset):
+    """Print selected applications"""
+    from django.http import HttpResponseRedirect
+    
+    if queryset.count() == 1:
+        # Single application - redirect to print view
+        app = queryset.first()
+        return HttpResponseRedirect(f"/application_preview/?app={app.id}")
+    else:
+        # Multiple applications - show message
+        modeladmin.message_user(request, "Please select only one application to print.", level='warning')
+
+
 @admin.register(AdmissionApplication)
 class AdmissionApplicationAdmin(BaseAdmin):
     list_display = (
@@ -275,11 +290,41 @@ class AdmissionApplicationAdmin(BaseAdmin):
         "course",
         "status",
         "is_data_locked",
+        "print_status",
         "created_at",
+        "print_button",
     )
     search_fields = ("application_no", "student__username", "student__email")
-    list_filter = ("status", "is_data_locked", "is_active")
+    list_filter = ("status", "is_data_locked", "is_active", "is_printed")
     ordering = ("-created_at",)
+    actions = [activate_selected, deactivate_selected, print_applications]
+    
+    def print_status(self, obj):
+        """Show print status with indicator."""
+        if obj.is_printed:
+            return format_html(
+                '<span style="color: #22c55e; font-weight: 600;">'
+                '<i class="fas fa-check-circle"></i> Printed<br>'
+                '<small>{}</small></span>',
+                obj.printed_date.strftime("%d %b %Y") if obj.printed_date else ""
+            )
+        return format_html(
+            '<span style="color: #ef4444; font-weight: 600;">'
+            '<i class="fas fa-times-circle"></i> Not Printed</span>'
+        )
+    print_status.short_description = "Print Status"
+    
+    def print_button(self, obj):
+        """Add print button for each application."""
+        return format_html(
+            '<a href="/print_application/?app={}" target="_blank" '
+            'style="background: #3b82f6; color: white; padding: 4px 8px; '
+            'border-radius: 4px; text-decoration: none; font-size: 12px;">'
+            '<i class="fas fa-print"></i> Print</a>',
+            obj.id
+        )
+    print_button.short_description = "Print"
+    print_button.allow_tags = True
 
 
 @admin.register(ApplicationFieldValue)

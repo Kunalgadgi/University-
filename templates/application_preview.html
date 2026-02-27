@@ -157,7 +157,16 @@
     <!-- HEADER -->
     <div class="header">
         <h2>Admission Application Preview</h2>
+        {% if application_no %}
+            <div style="margin-top:8px; font-size:14px; font-weight:600;">Application No: {{ application_no }}</div>
+        {% endif %}
     </div>
+
+    {% if profile_snapshot and profile_snapshot.photo %}
+    <div style="text-align:center; margin-bottom: 12px;">
+        <img src="{{ profile_snapshot.photo.url }}" alt="Photo" style="width:120px; height:140px; object-fit:cover; border:1px solid #000; padding:3px;" />
+    </div>
+    {% endif %}
 
     <!-- PERSONAL DETAILS -->
     <h4>1. Personal Details</h4>
@@ -169,32 +178,38 @@
                 <table style="width: 100%; border-collapse: collapse;">
                     <tr>
                         <th>Full Name</th>
-                        <td>{{ personal.full_name }}</td>
+                        <td>{% if application %}{{ application.first_name|default:"-" }} {{ application.last_name|default:"-" }}{% elif profile_snapshot %}{{ profile_snapshot.first_name|default:"-" }} {{ profile_snapshot.last_name|default:"-" }}{% else %}{{ personal.first_name|default:"-" }} {{ personal.last_name|default:"-" }}{% endif %}</td>
                     </tr>
                     <tr>
                         <th>Email</th>
-                        <td>{{ personal.email }}</td>
+                        <td>{% if application %}{{ application.email|default:"-" }}{% else %}{{ personal.email|default:"-" }}{% endif %}</td>
                     </tr>
                     <tr>
                         <th>Date of Birth</th>
-                        <td>{{ personal.date_of_birth }}</td>
+                        <td>{% if application %}{{ application.date_of_birth|date:"d/m/Y"|default:"-" }}{% elif profile_snapshot and profile_snapshot.dob %}{{ profile_snapshot.dob }}{% else %}{{ personal.date_of_birth|default:"-" }}{% endif %}</td>
                     </tr>
                     <tr>
                         <th>Gender</th>
-                        <td>{{ personal.get_gender_display }}</td>
+                        <td>{% if application %}{{ application.gender|default:"-" }}{% elif profile_snapshot %}{{ profile_snapshot.gender|default:"-" }}{% else %}{{ personal.get_gender_display|default:"-" }}{% endif %}</td>
                     </tr>
                     <tr>
                         <th>Aadhar No</th>
-                        <td>{{ personal.aadhar_no }}</td>
+                        <td>{% if application %}{{ application.aadhar_number|default:"-" }}{% elif profile_snapshot %}{{ profile_snapshot.aadhar_no|default:"-" }}{% else %}{{ personal.aadhar_number|default:"-" }}{% endif %}</td>
                     </tr>
                 </table>
             </td>
-            <td style="width: 20%; text-align: center; border: none;">
-                {% if personal.photo %}
-                    <img src="{{ personal.photo.url }}" width="120">
-                {% else %}
-                    <span>No Photo</span>
-                {% endif %}
+            <td style="width: 30%; padding: 0; border: none;">
+                <div class="photo-cell">
+                    {% if profile_snapshot and profile_snapshot.photo %}
+                        <img src="{{ profile_snapshot.photo.url }}" alt="Photo" width="80px" />
+                    {% elif personal and personal.photo %}
+                        <img src="{{ personal.photo.url }}" alt="Photo" width="80px" />
+                    {% elif application and application.photo %}
+                        <img src="{{ application.photo.url }}" alt="Photo" width="80px" />
+                    {% else %}
+                        <br><br><small>Photo</small>
+                    {% endif %}
+                </div>
             </td>
         </tr>
     </table>
@@ -202,85 +217,198 @@
     <!-- Remaining personal fields as normal table -->
     <table>
         <tr>
-            <th>Blood Group</th>
-            <td>{{ personal.blood_group }}</td>
+            <th>Father's Name</th>
+            <td>{% if application %}{{ application.father_name|default:"-" }}{% elif profile_snapshot %}{{ profile_snapshot.father_name|default:"-" }}{% else %}{{ personal.father_name|default:"-" }}{% endif %}</td>
+            <th>Mother's Name</th>
+            <td>{% if application %}{{ application.mother_name|default:"-" }}{% elif profile_snapshot %}{{ profile_snapshot.mother_name|default:"-" }}{% else %}{{ personal.mother_name|default:"-" }}{% endif %}</td>
+        </tr>
+        <tr>
             <th>Marital Status</th>
-            <td>{{ personal.get_marital_status_display }}</td>
-        </tr>
-        <tr>
+            <td>{% if application %}{{ application.marital_status|default:"-" }}{% elif profile_snapshot %}{{ profile_snapshot.marital_status|default:"-" }}{% else %}{{ personal.marital_status|default:"-" }}{% endif %}</td>
             <th>Nationality</th>
-            <td>{{ personal.nationality }}</td>
-            <th>Country</th>
-            <td>{{ personal.country }}</td>
-        </tr>
-    </table>
-
-    <!-- CONTACT -->
-    <h4>2. Contact Information</h4>
-
-    <table>
-        <tr>
-            <th>Mobile</th>
-            <td>{{ personal.mobile_number }}</td>
-            <th>Email</th>
-            <td>{{ personal.email }}</td>
+            <td>{% if application %}{{ application.nationality|default:"-" }}{% elif profile_snapshot %}{{ profile_snapshot.nationality|default:"-" }}{% else %}{{ personal.nationality|default:"-" }}{% endif %}</td>
         </tr>
         <tr>
-            <th>Alternate Email</th>
-            <td colspan="3">{{ personal.alternate_email }}</td>
-        </tr>
-    </table>
-
-    <!-- PERMANENT ADDRESS -->
-    <h4>3. Permanent Address</h4>
-
-    <table>
-        <tr>
-            <th>Address</th>
-            <td colspan="3">{{ personal.permanent_address }}</td>
+            <th>Mobile / Telephone</th>
+            <td>{% if application %}{{ application.mobile_number|default:"-" }}{% elif profile_snapshot %}{{ profile_snapshot.mobile_number|default:"-" }}{% else %}{{ personal.mobile_number|default:"-" }}{% endif %}</td>
+            <th>Category</th>
+            <td>{% if application %}{{ application.category|default:"-" }}{% elif profile_snapshot %}{{ profile_snapshot.category|default:"-" }}{% else %}{{ personal.category|default:"-" }}{% endif %}</td>
         </tr>
         <tr>
-            <th>City</th>
-            <td>{{ personal.city }}</td>
+            <th>Permanent Address</th>
+            <td colspan="3">{% if application %}{{ application.permanent_address|default:"-" }}{% elif profile_snapshot %}{{ profile_snapshot.permanent_address|default:"-" }}{% else %}{{ personal.permanent_address|default:"-" }}{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Correspondence Address</th>
+            <td colspan="3">{% if application %}{{ application.current_address|default:"-" }}{% elif profile_snapshot %}{{ profile_snapshot.current_address|default:"-" }}{% else %}{{ personal.current_address|default:"-" }}{% endif %}</td>
+        </tr>
+        <tr>
+            <th>District</th>
+            <td>{% if application %}{{ application.district|default:"-" }}{% elif profile_snapshot %}{{ profile_snapshot.city|default:"-" }}{% else %}{{ personal.city|default:"-" }}{% endif %}</td>
             <th>State</th>
-            <td>{{ personal.state }}</td>
+            <td>{% if application %}{{ application.state|default:"-" }}{% elif profile_snapshot %}{{ profile_snapshot.state|default:"-" }}{% else %}{{ personal.state|default:"-" }}{% endif %}</td>
         </tr>
         <tr>
             <th>Pincode</th>
-            <td>{{ personal.pincode }}</td>
-            <th>Country</th>
-            <td>{{ personal.country }}</td>
+            <td>{% if application %}{{ application.pincode|default:"-" }}{% elif profile_snapshot %}{{ profile_snapshot.pincode|default:"-" }}{% else %}{{ personal.pincode|default:"-" }}{% endif %}</td>
+            {% comment %} <th>Mobile (Correspondence)</th>
+            <td>{% if application %}{{ application.mobile_telephone|default:"-" }}{% else %}-{% endif %}</td> {% endcomment %}
         </tr>
+        {% comment %} <tr>
+            <th>Email (Correspondence)</th>
+            <td colspan="3">{% if application %}{{ application.email_correspondence|default:"-" }}{% else %}-{% endif %}</td>
+        </tr> {% endcomment %}
     </table>
 
-    <!-- CURRENT ADDRESS -->
-    <h4>4. Current Address</h4>
+    <!-- CORRESPONDENCE ADDRESS IN BLOCK LETTERS -->
+    {% comment %} <h4>2. Correspondence Address (in block letters)</h4>
 
     <table>
         <tr>
-            <th>Address</th>
-            <td>{{ personal.current_address }}</td>
+            <th style="width: 30%">Correspondence Address</th>
+            <td colspan="3">{% if application %}{{ application.corr_address_block|default:"-" }}{% elif profile_snapshot %}{{ profile_snapshot.current_address|default:"-" }}{% else %}{{ personal.current_address|default:"-" }}{% endif %}</td>
         </tr>
-    </table>
+        <tr>
+            <th>Mobile/Telephone No.</th>
+            <td>{% if application %}{{ application.mobile_telephone|default:"-" }}{% elif profile_snapshot %}{{ profile_snapshot.mobile_number|default:"-" }}{% else %}{{ personal.mobile_number|default:"-" }}{% endif %}</td>
+            <th>Email</th>
+            <td>{% if application %}{{ application.email_correspondence|default:"-" }}{% else %}{{ personal.email|default:"-" }}{% endif %}</td>
+        </tr>
+    </table> {% endcomment %}
 
-    <!-- EMERGENCY -->
-    <h4>5. Emergency Contact</h4>
+    <!-- CATEGORY -->
+    <h4>2. Category</h4>
 
     <table>
         <tr>
-            <th>Name</th>
-            <td>{{ personal.emergency_contact_name }}</td>
-            <th>Relation</th>
-            <td>{{ personal.emergency_contact_relation }}</td>
+            <th style="width: 30%">Category</th>
+            <td colspan="3">
+                {% if application %}
+                    {% if application.category_tick %}{{ application.category_tick }}{% else %}{{ application.category|default:"-" }}{% endif %}
+                {% elif profile_snapshot %}
+                    {{ profile_snapshot.category|default:"-" }}
+                {% else %}
+                    {{ personal.category|default:"-" }}
+                {% endif %}
+                {% if application and application.category_other %} - {{ application.category_other }}{% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <!-- SPECIALIZATION -->
+    <h4>4. Broad area of Specialization in Ph.D. course</h4>
+
+    <table>
+        <tr>
+            <th style="width: 30%">Area of Specialization</th>
+            <td colspan="3">{{ application.specialization_area|default:"-" }}</td>
         </tr>
         <tr>
-            <th>Contact Number</th>
-            <td colspan="3">{{ personal.emergency_contact_number }}</td>
+            <th>Name of Proposed Supervisor(s)</th>
+            <td colspan="3">{{ application.proposed_supervisor|default:"-" }}</td>
         </tr>
+    </table>
+
+    <!-- FELLOWSHIP -->
+    <h4>5. Fellowship Details</h4>
+
+    <table>
+        <tr>
+            <th style="width: 30%">Fellowship Category</th>
+            <td>{{ application.fellowship_category|default:"-" }}</td>
+            <th style="width: 30%">Date of Validity</th>
+            <td>{{ application.fellowship_validity|date:"d/m/Y"|default:"-" }}</td>
+        </tr>
+        <tr>
+            <th>UGC Category</th>
+            <td colspan="3">{{ application.ugc_category|default:"-" }}</td>
+        </tr>
+    </table>
+
+    <!-- EMPLOYMENT STATUS -->
+    <h4>6. Employment Details</h4>
+
+    <table>
+        <tr>
+            <th style="width: 30%">Currently Employed?</th>
+            <td>{{ application.employed_status|default:"-" }}</td>
+            <th style="width: 30%">Post</th>
+            <td>{{ application.emp_post_current|default:"-" }}</td>
+        </tr>
+        <tr>
+            <th>Nature of Job</th>
+            <td>{{ application.job_nature|default:"-" }}</td>
+            <th>Date of Joining</th>
+            <td>{{ application.date_of_joining|date:"d/m/Y"|default:"-" }}</td>
+        </tr>
+        <tr>
+            <th>Total period of Service</th>
+            <td>{{ application.service_period|default:"-" }}</td>
+            <th>Name of the Organization</th>
+            <td>{{ application.organization_name_current|default:"-" }}</td>
+        </tr>
+        <tr>
+            <th>Address of the Organization</th>
+            <td colspan="3">{{ application.organization_address|default:"-" }}</td>
+        </tr>
+        <tr>
+            <th>Telephone/Mobile</th>
+            <td>{{ application.org_telephone|default:"-" }}</td>
+            <th>Email</th>
+            <td>{{ application.org_email|default:"-" }}</td>
+        </tr>
+    </table>
+
+    <!-- RESEARCH EXPERIENCE -->
+    <h4>7. Details of previous research experience</h4>
+
+    <table>
+        <tr>
+            <th>Research Experience</th>
+            <td>{{ application.research_experience|default:"-" }}</td>
+        </tr>
+    </table>
+
+    <!-- PUBLICATIONS -->
+    <h4>8. Details of publications, if any</h4>
+
+    <table>
+        <tr>
+            <th>Publications</th>
+            <td>{{ application.publications|default:"-" }}</td>
+        </tr>
+    </table>
+
+    <!-- OTHER COURSE -->
+    <h4>9. Whether pursuing any other course of study</h4>
+
+    <table>
+        <tr>
+            <th style="width: 30%">Pursuing Other Course</th>
+            <td>{{ application.pursuing_other_course|default:"-" }}</td>
+        </tr>
+        {% if application.pursuing_other_course == 'Yes' %}
+        <tr>
+            <th>Name of Institution</th>
+            <td>{{ application.other_institution|default:"-" }}</td>
+        </tr>
+        <tr>
+            <th>Class/Course</th>
+            <td>{{ application.other_class|default:"-" }}</td>
+        </tr>
+        <tr>
+            <th>Session</th>
+            <td>{{ application.other_session|default:"-" }}</td>
+        </tr>
+        <tr>
+            <th>Result</th>
+            <td>{{ application.other_result|default:"-" }}</td>
+        </tr>
+        {% endif %}
     </table>
 
     <!-- ACADEMIC -->
-    <h4>6. Academic Qualifications</h4>
+    <h4>10. Academic Qualifications</h4>
 
     <table>
         <tr>
@@ -288,30 +416,43 @@
             <th>Board</th>
             <th>Year</th>
             <th>Roll No</th>
-            <th>Marks</th>
+            <th>Marks Obtained</th>
+            <th>Total Marks</th>
             <th>Result</th>
             <th>Subjects</th>
         </tr>
 
         {% for q in qualifications %}
         <tr>
-            <td>{{ q.examination_name }}</td>
-            <td>{{ q.university_board }}</td>
-            <td>{{ q.year_of_passing }}</td>
-            <td>{{ q.roll_number }}</td>
-            <td>{{ q.marks_obtained }}/{{ q.max_marks }}</td>
-            <td>{{ q.result_display }}</td>
-            <td>{{ q.subjects }}</td>
+            {% if q.qualification %}
+                <td>{{ q.qualification }}</td>
+                <td>{{ q.board_university }}</td>
+                <td>{{ q.passing_year }}</td>
+                <td>{{ q.roll_number }}</td>
+                <td>{% if "/" in q.percentage %}{{ q.percentage|cut:"/"|first }}{% else %}{{ q.percentage|cut:"%"|default:"-" }}{% endif %}</td>
+                <td>{% if "/" in q.percentage %}{{ q.percentage|cut:"/"|last }}{% else %}-{% endif %}</td>
+                <td>{{ q.percentage|default:"-" }}</td>
+                <td>{{ q.subjects }}</td>
+            {% else %}
+                <td>{{ q.examination_name }}</td>
+                <td>{{ q.university_board }}</td>
+                <td>{{ q.year_of_passing }}</td>
+                <td>{{ q.roll_number }}</td>
+                <td>{{ q.marks_obtained }}</td>
+                <td>{{ q.max_marks }}</td>
+                <td>{{ q.result_display }}</td>
+                <td>{{ q.subjects }}</td>
+            {% endif %}
         </tr>
         {% empty %}
         <tr>
-            <td colspan="7" class="center">No Academic Records</td>
+            <td colspan="8" class="center">No Academic Records</td>
         </tr>
         {% endfor %}
     </table>
 
     <!-- EMPLOYMENT -->
-    <h4>7. Employment Details</h4>
+    <h4>11. Employment History</h4>
 
     <table>
         <tr>
@@ -327,14 +468,25 @@
 
         {% for emp in employments %}
         <tr>
-            <td>{{ emp.sr_no }}</td>
-            <td>{{ emp.post_held }}</td>
-            <td>{{ emp.organization }}</td>
-            <td>{{ emp.from_date }}</td>
-            <td>{{ emp.to_date }}</td>
-            <td>{{ emp.formatted_experience }}</td>
-            <td>{{ emp.job_type }}</td>
-            <td>{{ emp.remarks }}</td>
+            {% if emp.designation %}
+                <td>{{ forloop.counter }}</td>
+                <td>{{ emp.designation }}</td>
+                <td>{{ emp.organization_name }}</td>
+                <td>{% if emp.from_date %}{{ emp.from_date|date:"d-m-Y" }}{% else %}-{% endif %}</td>
+                <td>{% if emp.to_date %}{{ emp.to_date|date:"d-m-Y" }}{% else %}-{% endif %}</td>
+                <td>-</td>
+                <td>{{ emp.experience_type }}</td>
+                <td>{{ emp.remarks|default:"-" }}</td>
+            {% else %}
+                <td>{{ forloop.counter }}</td>
+                <td>{{ emp.post_held }}</td>
+                <td>{{ emp.organization }}</td>
+                <td>{% if emp.from_date %}{{ emp.from_date|date:"d-m-Y" }}{% else %}-{% endif %}</td>
+                <td>{% if emp.to_date %}{{ emp.to_date|date:"d-m-Y" }}{% else %}-{% endif %}</td>
+                <td>{{ emp.formatted_experience }}</td>
+                <td>{{ emp.job_type }}</td>
+                <td>{{ emp.remarks|default:"-" }}</td>
+            {% endif %}
         </tr>
         {% empty %}
         <tr>
@@ -344,11 +496,10 @@
     </table>
 
     <!-- DECLARATION -->
-    <h4>8. Declaration</h4>
+    <h4>12. Declaration</h4>
 
     <p>
-        I hereby declare that all the information provided above is true and correct.
-        If any information is found incorrect, my application may be rejected.
+        I declare that entries made by me in this Application Form are trues in all aspects and in case any information is found to be false and incorrect, this shall entail automatic cancellation of my candidate besides renedering me liable to such action, as the university may deem proper. 
     </p>
 
     <!-- SIGNATURE -->
@@ -356,13 +507,25 @@
         <tr>
             <td>Date: __________</td>
             <td class="center">Place: __________</td>
-            <td style="text-align:right;">Signature: __________</td>
+            <td style="text-align:right;">
+                {% if profile_snapshot and profile_snapshot.signature %}
+                    <img src="{{ profile_snapshot.signature.url }}" width="150" style="vertical-align: middle;" />
+                {% elif personal and personal.signature %}
+                    <img src="{{ personal.signature.url }}" width="150" style="vertical-align: middle;" />
+                {% else %}
+                    Signature: __________
+                {% endif %}
+            </td>
         </tr>
     </table>
 
     <div class="center">
          <a href="{% url 'dashboard' %}" class="btn back-btn">
         ← Back to Dashboard
+    </a>
+    &nbsp;
+     <a href="https://form.qfixonline.com/focblubof" class="btn back-btn" target="_blank">
+        Make Payment
     </a>
 &nbsp;
     <button class="btn print-btn" onclick="window.print()">

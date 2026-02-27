@@ -17,14 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('admin/login/', views.admin_login_view, name='admin_login'),
-    path('master-control/', include('master_control.urls')),
-    path('master/', include('master_control.urls')),
     path('', views.home, name='home'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('admission-form/', views.admission_form_single, name='admission_form_single'),
     path('login/', views.login_view, name='login'),
     path('register/', views.register_view, name='register'),
     path('logout/', views.logout_view, name='logout'),
@@ -41,4 +42,10 @@ urlpatterns = [
     path('apply/', views.apply_now, name='apply_now'),
     path('apply/create/', views.create_application, name='create_application'),
     path('application_preview/', views.application_preview, name='application_preview'),
+    path('print_application/', views.print_application, name='print_application'),
+    path('application_single_table/', views.application_single_table, name='application_single_table'),
+    path('unified_application/', views.unified_application_view, name='unified_application'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
