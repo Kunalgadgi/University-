@@ -249,6 +249,25 @@ def logout_view(request):
 
 
 @login_required
+def profile_personal_info(request):
+    """Personal Information Step"""
+    from personal_details.models import PersonalDetail
+    
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    
+    if request.method == 'POST':
+        # Delegate POST handling to the dedicated personal_details_view
+        from personal_details.views import personal_details_view as dedicated_personal_details_view
+        return dedicated_personal_details_view(request)
+    
+    context = {
+        'profile': profile,
+        'user': request.user,
+        'personal_detail': personal_detail,
+    }
+    return render(request, 'profile/personal_info.html', context)
+
+@login_required
 def admission_form_single(request):
     personal_detail, _ = PersonalDetail.objects.get_or_create(user=request.user)
 
@@ -302,7 +321,7 @@ def admission_form_single(request):
             personal_detail.state = request.POST.get('state') or personal_detail.state
             personal_detail.city = request.POST.get('district') or personal_detail.city
             personal_detail.pincode = request.POST.get('pincode') or personal_detail.pincode
-            personal_detail.date_of_birth = request.POST.get('dob') or personal_detail.date_of_birth
+            personal_detail.date_of_birth = datetime.strptime(request.POST.get('dob'), '%Y-%m-%d').date() if request.POST.get('dob') else personal_detail.date_of_birth
 
             upload = request.FILES.get('photo')
             if upload:
@@ -310,37 +329,196 @@ def admission_form_single(request):
 
             personal_detail.save()
             
-            # Update draft application with form data
-            draft_application.first_name = request.POST.get('full_name') or ''
-            draft_application.father_name = request.POST.get('father_name') or ''
-            draft_application.mother_name = request.POST.get('mother_name') or ''
-            draft_application.nationality = request.POST.get('nationality') or ''
-            draft_application.marital_status = request.POST.get('marital_status') or ''
-            draft_application.gender = request.POST.get('gender') or ''
-            draft_application.aadhar_number = request.POST.get('aadhar') or ''
-            draft_application.category = request.POST.get('category') or ''
-            draft_application.category_tick = request.POST.get('category_tick') or ''
-            draft_application.category_other = request.POST.get('category_other') or ''
-            draft_application.ugc_category = request.POST.get('ugc_category') or ''
-            draft_application.mobile_number = request.POST.get('mobile') or ''
-            draft_application.email = request.POST.get('email') or ''
-            draft_application.permanent_address = request.POST.get('perm_address') or ''
-            draft_application.current_address = request.POST.get('corr_address') or ''
-            draft_application.corr_address_block = request.POST.get('corr_address_block') or ''
-            draft_application.district = request.POST.get('district') or ''
-            draft_application.state = request.POST.get('state') or ''
-            draft_application.pincode = request.POST.get('pincode') or ''
-            draft_application.mobile_telephone = request.POST.get('mobile_telephone') or ''
-            draft_application.email_correspondence = request.POST.get('email_correspondence') or ''
-            
-            # Handle photo upload for application
-            if upload:
-                draft_application.photo = upload
-            
-            signature_upload = request.FILES.get('signature')
-            if signature_upload:
-                draft_application.signature = signature_upload
-            
+            # Update draft application with form data - only update if field is present in POST
+            if 'full_name' in request.POST:
+                draft_application.first_name = request.POST.get('full_name') or ''
+            if 'father_name' in request.POST:
+                draft_application.father_name = request.POST.get('father_name') or ''
+            if 'mother_name' in request.POST:
+                draft_application.mother_name = request.POST.get('mother_name') or ''
+            if 'nationality' in request.POST:
+                draft_application.nationality = request.POST.get('nationality') or ''
+            if 'marital_status' in request.POST:
+                draft_application.marital_status = request.POST.get('marital_status') or ''
+            if 'gender' in request.POST:
+                draft_application.gender = request.POST.get('gender') or ''
+            if 'aadhar' in request.POST:
+                draft_application.aadhar_number = request.POST.get('aadhar') or ''
+            if 'category' in request.POST:
+                draft_application.category = request.POST.get('category') or ''
+            if 'category_tick' in request.POST:
+                draft_application.category_tick = request.POST.get('category_tick') or ''
+            if 'category_other' in request.POST:
+                draft_application.category_other = request.POST.get('category_other') or ''
+            if 'ugc_category' in request.POST:
+                draft_application.ugc_category = request.POST.get('ugc_category') or ''
+            if 'ugc_validity_date' in request.POST:
+                draft_application.ugc_validity_date = datetime.strptime(request.POST.get('ugc_validity_date'), '%Y-%m-%d').date() if request.POST.get('ugc_validity_date') else None
+            if 'apply_course' in request.POST:
+                draft_application.apply_course = request.POST.get('apply_course') or ''
+            if 'department' in request.POST:
+                draft_application.department = request.POST.get('department') or ''
+            if 'study_mode' in request.POST:
+                draft_application.study_mode = request.POST.get('study_mode') or ''
+            if 'mobile' in request.POST:
+                draft_application.mobile_number = request.POST.get('mobile') or ''
+
+            # Handle payment fields for draft applications
+            if 'payment_date' in request.POST:
+                draft_application.payment_date = datetime.strptime(request.POST.get('payment_date'), '%Y-%m-%d').date() if request.POST.get('payment_date') else None
+            if 'payment_id' in request.POST:
+                draft_application.payment_id = request.POST.get('payment_id') or ''
+
+            # Add all missing fields to ensure complete data storage - only update if present
+            if 'dob' in request.POST:
+                draft_application.date_of_birth = datetime.strptime(request.POST.get('dob'), '%Y-%m-%d').date() if request.POST.get('dob') else None
+            if 'specialization_area' in request.POST:
+                draft_application.specialization_area = request.POST.get('specialization_area') or ''
+            if 'proposed_supervisor' in request.POST:
+                draft_application.proposed_supervisor = request.POST.get('proposed_supervisor') or ''
+            if 'fellowship_validity' in request.POST:
+                draft_application.fellowship_validity = datetime.strptime(request.POST.get('fellowship_validity'), '%Y-%m-%d').date() if request.POST.get('fellowship_validity') else None
+            if 'fellowship_category' in request.POST:
+                draft_application.fellowship_category = request.POST.get('fellowship_category') or ''
+            if 'employed_status' in request.POST:
+                draft_application.employed_status = request.POST.get('employed_status') or ''
+            if 'emp_post_current' in request.POST:
+                draft_application.emp_post_current = request.POST.get('emp_post_current') or ''
+            if 'job_nature' in request.POST:
+                draft_application.job_nature = request.POST.get('job_nature') or ''
+            if 'date_of_joining' in request.POST:
+                draft_application.date_of_joining = datetime.strptime(request.POST.get('date_of_joining'), '%Y-%m-%d').date() if request.POST.get('date_of_joining') else None
+            if 'service_period' in request.POST:
+                draft_application.service_period = request.POST.get('service_period') or ''
+            if 'organization_name_current' in request.POST:
+                draft_application.organization_name_current = request.POST.get('organization_name_current') or ''
+            if 'organization_address' in request.POST:
+                draft_application.organization_address = request.POST.get('organization_address') or ''
+            if 'org_telephone' in request.POST:
+                draft_application.org_telephone = request.POST.get('org_telephone') or ''
+            if 'org_email' in request.POST:
+                draft_application.org_email = request.POST.get('org_email') or ''
+            if 'research_experience' in request.POST:
+                draft_application.research_experience = request.POST.get('research_experience') or ''
+            if 'publications' in request.POST:
+                draft_application.publications = request.POST.get('publications') or ''
+            if 'pursuing_other_course' in request.POST:
+                draft_application.pursuing_other_course = request.POST.get('pursuing_other_course') or ''
+            if 'other_institution' in request.POST:
+                draft_application.other_institution = request.POST.get('other_institution') or ''
+            if 'other_class' in request.POST:
+                draft_application.other_class = request.POST.get('other_class') or ''
+            if 'other_session' in request.POST:
+                draft_application.other_session = request.POST.get('other_session') or ''
+            if 'other_result' in request.POST:
+                draft_application.other_result = request.POST.get('other_result') or ''
+
+            # Handle other fields
+            if 'email' in request.POST:
+                draft_application.email = request.POST.get('email') or ''
+            if 'perm_address' in request.POST:
+                draft_application.permanent_address = request.POST.get('perm_address') or ''
+            if 'corr_address' in request.POST:
+                draft_application.current_address = request.POST.get('corr_address') or ''
+            if 'corr_address_block' in request.POST:
+                draft_application.corr_address_block = request.POST.get('corr_address_block') or ''
+            if 'district' in request.POST:
+                draft_application.district = request.POST.get('district') or ''
+            if 'state' in request.POST:
+                draft_application.state = request.POST.get('state') or ''
+            if 'pincode' in request.POST:
+                draft_application.pincode = request.POST.get('pincode') or ''
+            if 'mobile_telephone' in request.POST:
+                draft_application.mobile_telephone = request.POST.get('mobile_telephone') or ''
+            if 'email_correspondence' in request.POST:
+                draft_application.email_correspondence = request.POST.get('email_correspondence') or ''
+
+            # Handle file uploads
+            if 'photo' in request.FILES:
+                draft_application.photo = request.FILES['photo']
+            if 'signature' in request.FILES:
+                draft_application.signature = request.FILES['signature']
+                # Also store the file name separately
+                draft_application.signature_name = request.FILES['signature'].name
+
+            # Handle academic qualifications data for draft
+            draft_academic_qualifications = []
+            aq_exam = request.POST.getlist('aq_exam[]')
+            aq_board = request.POST.getlist('aq_board[]')
+            aq_year = request.POST.getlist('aq_year[]')
+            aq_roll = request.POST.getlist('aq_roll[]')
+            aq_marks_obtained = request.POST.getlist('aq_marks_obtained[]')
+            aq_total_marks = request.POST.getlist('aq_total_marks[]')
+            aq_subjects = request.POST.getlist('aq_subjects[]')
+            aq_certificates = request.FILES.getlist('aq_certificate[]')
+
+            row_count = max(len(aq_exam), len(aq_board), len(aq_year), len(aq_roll), len(aq_marks_obtained), len(aq_total_marks), len(aq_subjects))
+            for i in range(row_count):
+                qualification = (aq_exam[i] if i < len(aq_exam) else '').strip()
+                board_university = (aq_board[i] if i < len(aq_board) else '').strip()
+                passing_year = (aq_year[i] if i < len(aq_year) else '').strip()
+                roll_number = (aq_roll[i] if i < len(aq_roll) else '').strip()
+                marks_obtained = (aq_marks_obtained[i] if i < len(aq_marks_obtained) else '').strip()
+                total_marks = (aq_total_marks[i] if i < len(aq_total_marks) else '').strip()
+                subjects = (aq_subjects[i] if i < len(aq_subjects) else '').strip()
+                certificate_file = (aq_certificates[i] if i < len(aq_certificates) else None)
+
+                if not (qualification or board_university or passing_year or roll_number or marks_obtained or total_marks or subjects or certificate_file):
+                    continue
+
+                qual_data = {
+                    'qualification': qualification,
+                    'board_university': board_university,
+                    'passing_year': passing_year,
+                    'roll_number': roll_number,
+                    'marks_obtained': marks_obtained,
+                    'total_marks': total_marks,
+                    'subjects': subjects,
+                }
+                
+                # Handle certificate file - store file info instead of file object
+                if certificate_file:
+                    qual_data['certificate_file_name'] = certificate_file.name
+                    qual_data['certificate_file_size'] = certificate_file.size
+                    qual_data['certificate_file_content_type'] = certificate_file.content_type
+                    # Note: The actual file needs to be saved separately to a FileField
+                    
+                draft_academic_qualifications.append(qual_data)
+
+            # Handle employment history data for draft
+            draft_employment_history = []
+            emp_post = request.POST.getlist('emp_post[]')
+            emp_org = request.POST.getlist('emp_org[]')
+            emp_from = request.POST.getlist('emp_from[]')
+            emp_to = request.POST.getlist('emp_to[]')
+            emp_type = request.POST.getlist('emp_type[]')
+            emp_remarks = request.POST.getlist('emp_remarks[]')
+
+            emp_rows = max(len(emp_post), len(emp_org), len(emp_from), len(emp_to), len(emp_type), len(emp_remarks))
+            for i in range(emp_rows):
+                designation = (emp_post[i] if i < len(emp_post) else '').strip()
+                org = (emp_org[i] if i < len(emp_org) else '').strip()
+                from_raw = (emp_from[i] if i < len(emp_from) else '').strip()
+                to_raw = (emp_to[i] if i < len(emp_to) else '').strip()
+                typ = (emp_type[i] if i < len(emp_type) else '').strip()
+                remarks = (emp_remarks[i] if i < len(emp_remarks) else '').strip()
+
+                if not (designation or org or from_raw or to_raw or typ or remarks):
+                    continue
+
+                draft_employment_history.append({
+                    'designation': designation,
+                    'organization_name': org,
+                    'from_date': from_raw,
+                    'to_date': to_raw,
+                    'experience_type': typ,
+                    'remarks': remarks,
+                })
+
+            # Save academic and employment data to JSON fields
+            draft_application.academic_data = {'qualifications': draft_academic_qualifications}
+            draft_application.employment_history = {'employments': draft_employment_history}
+
             draft_application.save()
             
             messages.success(request, f'Application draft saved successfully! Your draft (Application No: {draft_application.application_no}) is saved in the database.')
@@ -395,17 +573,32 @@ def admission_form_single(request):
             messages.error(request, f'You have already submitted an application (Application No: {existing_application.application_no}). You cannot submit multiple applications.')
             return redirect('admission_form_single')
 
-        app_no = _generate_application_no()
-        application = AdmissionApplication.objects.create(
-            application_no=app_no,
+        # Get existing draft application and upgrade it to submitted, or create new one
+        draft_application = AdmissionApplication.objects.filter(
             student=request.user,
-            advertisement=ad,
-            course=course,
-            department_name=getattr(course, 'department_name', '') or '',
-            status='submitted',
-            submitted_at=timezone.now(),
-            is_data_locked=True,
-        )
+            status='draft'
+        ).first()
+        
+        if draft_application:
+            # Upgrade existing draft to submitted
+            application = draft_application
+            application.status = 'submitted'
+            application.submitted_at = timezone.now()
+            application.is_data_locked = True
+            application.save()
+        else:
+            # Create new submitted application (no draft exists)
+            app_no = _generate_application_no()
+            application = AdmissionApplication.objects.create(
+                application_no=app_no,
+                student=request.user,
+                advertisement=ad,
+                course=course,
+                department_name=getattr(course, 'department_name', '') or '',
+                status='submitted',
+                submitted_at=timezone.now(),
+                is_data_locked=True,
+            )
 
         # 6) Save unified data to single table for database viewing
         try:
@@ -459,6 +652,18 @@ def admission_form_single(request):
             elif marks_obtained or total_marks:
                 percentage = f"{marks_obtained or '-'}/{total_marks or '-'}"
 
+            # Add to academic qualifications list for JSON storage
+            academic_qualifications.append({
+                'qualification': qualification,
+                'board_university': board_university,
+                'passing_year': passing_year,
+                'roll_number': roll_number,
+                'marks_obtained': marks_obtained,
+                'total_marks': total_marks,
+                'percentage': percentage,
+                'subjects': subjects,
+            })
+
             ApplicationEducationSnapshot.objects.create(
                 application=application,
                 qualification=qualification,
@@ -500,6 +705,16 @@ def admission_form_single(request):
             except Exception:
                 to_dt = None
 
+            # Add to employment history list for JSON storage
+            employment_history_data.append({
+                'designation': designation,
+                'organization_name': org,
+                'from_date': from_raw,
+                'to_date': to_raw,
+                'experience_type': typ,
+                'remarks': remarks,
+            })
+
             ApplicationExperienceSnapshot.objects.create(
                 application=application,
                 organization_name=org,
@@ -520,13 +735,12 @@ def admission_form_single(request):
         application.mother_name = personal_detail.mother_name
         application.marital_status = personal_detail.marital_status
         application.nationality = personal_detail.nationality
-        application.aadhar_number = personal_detail.aadhar_number or ''
+        application.aadhar_number = personal_detail.aadhar_number
         application.category = personal_detail.category
         application.category_tick = request.POST.get('category_tick') or ''
         application.category_other = request.POST.get('category_other') or ''
-        application.ugc_category = request.POST.get('ugc_category') or ''
-        application.mobile_number = personal_detail.mobile_number or request.POST.get('mobile') or '0000000000'
-        application.email = personal_detail.email or request.POST.get('email') or 'no-email@example.com'
+        application.mobile_number = personal_detail.mobile_number
+        application.email = personal_detail.email
         application.permanent_address = personal_detail.permanent_address
         application.current_address = personal_detail.current_address
         application.corr_address_block = request.POST.get('corr_address_block') or ''
@@ -535,11 +749,26 @@ def admission_form_single(request):
         application.pincode = personal_detail.pincode
         application.mobile_telephone = request.POST.get('mobile_telephone') or ''
         application.email_correspondence = request.POST.get('email_correspondence') or ''
+
+        # Course and department information
+        application.apply_course = request.POST.get('apply_course') or ''
+        application.department = request.POST.get('department') or ''
+        application.study_mode = request.POST.get('study_mode') or ''
+
+        # UGC and fellowship information
+        application.ugc_category = request.POST.get('ugc_category') or ''
+        application.ugc_validity_date = datetime.strptime(request.POST.get('ugc_validity_date'), '%Y-%m-%d').date() if request.POST.get('ugc_validity_date') else None
+        application.fellowship_validity = datetime.strptime(request.POST.get('fellowship_validity'), '%Y-%m-%d').date() if request.POST.get('fellowship_validity') else None
+        application.fellowship_category = request.POST.get('fellowship_category') or ''
+
+        # Academic and research information
         application.academic_data = {'qualifications': academic_qualifications}
         application.specialization_area = request.POST.get('specialization_area') or ''
         application.proposed_supervisor = request.POST.get('proposed_supervisor') or ''
-        application.fellowship_validity = datetime.strptime(request.POST.get('fellowship_validity'), '%Y-%m-%d').date() if request.POST.get('fellowship_validity') else None
-        application.fellowship_category = request.POST.get('fellowship_category') or ''
+        application.research_experience = request.POST.get('research_experience') or ''
+        application.publications = request.POST.get('publications') or ''
+
+        # Employment information
         application.employed_status = request.POST.get('employed_status') or ''
         application.emp_post_current = request.POST.get('emp_post_current') or ''
         application.job_nature = request.POST.get('job_nature') or ''
@@ -550,13 +779,14 @@ def admission_form_single(request):
         application.org_telephone = request.POST.get('org_telephone') or ''
         application.org_email = request.POST.get('org_email') or ''
         application.employment_history = {'employments': employment_history_data}
-        application.research_experience = request.POST.get('research_experience') or ''
-        application.publications = request.POST.get('publications') or ''
+
+        # Other course information
         application.pursuing_other_course = request.POST.get('pursuing_other_course') or ''
         application.other_institution = request.POST.get('other_institution') or ''
         application.other_class = request.POST.get('other_class') or ''
         application.other_session = request.POST.get('other_session') or ''
         application.other_result = request.POST.get('other_result') or ''
+
         # Save photo and signature directly to application as well
         photo_upload = request.FILES.get('photo')
         if photo_upload:
@@ -570,8 +800,12 @@ def admission_form_single(request):
         else:
             application.signature = personal_detail.signature
 
+        # Handle payment fields for submitted applications
+        application.payment_date = datetime.strptime(request.POST.get('payment_date'), '%Y-%m-%d').date() if request.POST.get('payment_date') else None
+        application.payment_id = request.POST.get('payment_id') or ''
+
         application.save()
-        
+
         # Also save to UnifiedApplicationData if available
         if UnifiedApplicationData:
             UnifiedApplicationData.objects.update_or_create(
@@ -650,42 +884,102 @@ def admission_form_single(request):
     except ImportError:
         pass
 
+    # Prepare draft_data context from draft_application
+    draft_data = {}
+    employment_history_data = []  # Initialize employment_history_data
+    if draft_application:
+        draft_data = {
+            'full_name': draft_application.first_name or '',
+            'father_name': draft_application.father_name or '',
+            'mother_name': draft_application.mother_name or '',
+            'nationality': draft_application.nationality or '',
+            'marital_status': draft_application.marital_status or '',
+            'gender': draft_application.gender or '',
+            'aadhar': draft_application.aadhar_number or '',
+            'category': draft_application.category or '',
+            'category_tick': draft_application.category_tick or '',
+            'category_other': draft_application.category_other or '',
+            'ugc_category': draft_application.ugc_category or '',
+            'ugc_validity_date': draft_application.ugc_validity_date.strftime('%Y-%m-%d') if draft_application.ugc_validity_date else '',
+            'apply_course': draft_application.apply_course or '',
+            'department': draft_application.department or '',
+            'study_mode': draft_application.study_mode or '',
+            'mobile': draft_application.mobile_number or '',
+            'email': draft_application.email or '',
+            'perm_address': draft_application.permanent_address or '',
+            'corr_address': draft_application.current_address or '',
+            'corr_address_block': draft_application.corr_address_block or '',
+            'district': draft_application.district or '',
+            'state': draft_application.state or '',
+            'pincode': draft_application.pincode or '',
+            'mobile_telephone': draft_application.mobile_telephone or '',
+            'email_correspondence': draft_application.email_correspondence or '',
+            'specialization_area': draft_application.specialization_area or '',
+            'proposed_supervisor': draft_application.proposed_supervisor or '',
+            'fellowship_validity': draft_application.fellowship_validity.strftime('%Y-%m-%d') if draft_application.fellowship_validity else '',
+            'fellowship_category': draft_application.fellowship_category or '',
+            'employed_status': draft_application.employed_status or '',
+            'emp_post_current': draft_application.emp_post_current or '',
+            'job_nature': draft_application.job_nature or '',
+            'date_of_joining': draft_application.date_of_joining.strftime('%Y-%m-%d') if draft_application.date_of_joining else '',
+            'service_period': draft_application.service_period or '',
+            'organization_name_current': draft_application.organization_name_current or '',
+            'organization_address': draft_application.organization_address or '',
+            'org_telephone': draft_application.org_telephone or '',
+            'org_email': draft_application.org_email or '',
+            'employment_history': {'employments': employment_history_data},
+            'research_experience': draft_application.research_experience or '',
+            'publications': draft_application.publications or '',
+            'pursuing_other_course': draft_application.pursuing_other_course or '',
+            'signature_name': getattr(draft_application, 'signature_name', '') or '',
+            'other_institution': draft_application.other_institution or '',
+            'other_class': draft_application.other_class or '',
+            'other_session': draft_application.other_session or '',
+            'other_result': draft_application.other_result or '',
+            'dob': draft_application.date_of_birth.strftime('%Y-%m-%d') if draft_application.date_of_birth else '',
+            'payment_date': draft_application.payment_date.strftime('%Y-%m-%d') if draft_application.payment_date else '',
+            'payment_id': draft_application.payment_id or '',
+        }
+        
+        # Extract academic and employment data from JSON fields
+        if draft_application.academic_data:
+            draft_data['academic_qualifications'] = draft_application.academic_data.get('qualifications', [])
+        else:
+            draft_data['academic_qualifications'] = []
+            
+        if draft_application.employment_history:
+            draft_data['employment_history_data'] = draft_application.employment_history.get('employments', [])
+        else:
+            draft_data['employment_history_data'] = []
+        
+        # Log successful draft data loading
+        print(f"✅ Draft loaded: {draft_application.application_no} - {draft_data.get('full_name', 'N/A')}")
+    else:
+        draft_data = {
+            'ugc_category': '',
+            'ugc_validity_date': '',
+            'apply_course': '',
+            'department': '',
+            'study_mode': '',
+            'dob': '',
+            'payment_date': '',
+            'payment_id': '',
+            'academic_qualifications': [],
+            'employment_history_data': [],
+        }
+        print("ℹ️ No draft application found - showing empty form")
+
     context = {
         'user': request.user,
         'personal_detail': personal_detail,
         'has_submitted_application': has_submitted_application,
+        'has_draft_application': draft_application is not None,
         'draft_application': draft_application,
+        'draft_data': draft_data,
+        'is_read_only': has_submitted_application,
+        'submitted_application': existing_app if has_submitted_application else None,
     }
     return render(request, 'admission_form_single.html', context)
-
-@login_required
-def profile_personal_info(request):
-    """Personal Information Step"""
-    from personal_details.models import PersonalDetail
-    
-    profile, created = UserProfile.objects.get_or_create(user=request.user)
-    personal_detail, created = PersonalDetail.objects.get_or_create(
-        user=request.user,
-        defaults={
-            'first_name': request.user.first_name or '',
-            'last_name': request.user.last_name or '',
-            'email': request.user.email or '',  # From registration
-            'mobile_number': profile.mobile_number or '',  # From registration
-            'date_of_birth': profile.date_of_birth or datetime(1990, 1, 1).date(),  # From registration if available
-        }
-    )
-    
-    if request.method == 'POST':
-        # Delegate POST handling to the dedicated personal_details_view
-        from personal_details.views import personal_details_view as dedicated_personal_details_view
-        return dedicated_personal_details_view(request)
-    
-    context = {
-        'profile': profile,
-        'user': request.user,
-        'personal_detail': personal_detail,
-    }
-    return render(request, 'profile/personal_info.html', context)
 
 @login_required
 def profile_qualification(request):
@@ -1249,6 +1543,13 @@ def print_application(request):
             'employment_history': employment_history,
         }
         
+        # Mark as printed
+        if not application.is_printed:
+            application.is_printed = True
+            application.printed_date = timezone.now()
+            application.printed_by = request.user
+            application.save()
+
         return render(request, 'print_application.html', context)
         
     except Exception as e:

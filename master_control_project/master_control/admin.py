@@ -299,18 +299,92 @@ class AdmissionApplicationAdmin(BaseAdmin):
     ordering = ("-created_at",)
     actions = [activate_selected, deactivate_selected, print_applications]
     
+    fieldsets = (
+        ("Basic Information", {
+            "fields": (
+                "application_no", "student", "advertisement", "course", 
+                "status", "is_data_locked", "is_active"
+            )
+        }),
+        ("Personal Details", {
+            "fields": (
+                "first_name", "last_name", "full_name", "date_of_birth", 
+                "gender", "father_name", "mother_name", "marital_status", 
+                "nationality", "aadhar_number", "category", "category_tick", 
+                "category_other"
+            )
+        }),
+        ("Contact Information", {
+            "fields": (
+                "mobile_number", "email", "mobile_telephone", 
+                "email_correspondence"
+            )
+        }),
+        ("Address Information", {
+            "fields": (
+                "permanent_address", "current_address", "corr_address_block",
+                "district", "state", "pincode"
+            )
+        }),
+        ("Academic Information", {
+            "fields": (
+                "specialization_area", "proposed_supervisor", 
+                "fellowship_validity", "fellowship_category", 
+                "ugc_category", "ugc_validity_date"
+            )
+        }),
+        ("Course Details", {
+            "fields": (
+                "apply_course", "department", "study_mode"
+            )
+        }),
+        ("Employment Details", {
+            "fields": (
+                "employed_status", "emp_post_current", "job_nature", 
+                "date_of_joining", "service_period", 
+                "organization_name_current", "organization_address", 
+                "org_telephone", "org_email"
+            )
+        }),
+        ("Other Information", {
+            "fields": (
+                "research_experience", "publications", 
+                "pursuing_other_course", "other_institution", 
+                "other_class", "other_session", "other_result"
+            )
+        }),
+        ("Payment Information", {
+            "fields": (
+                "payment_date", "payment_id"
+            )
+        }),
+        ("Files", {
+            "fields": (
+                "photo", "signature"
+            )
+        }),
+        ("System Information", {
+            "fields": (
+                "academic_data", "employment_history", "submitted_at", 
+                "is_printed", "printed_date"
+            )
+        }),
+    )
+    
     def print_status(self, obj):
         """Show print status with indicator."""
         if obj.is_printed:
+            date_str = obj.printed_date.strftime("%d %b %Y") if obj.printed_date else ""
             return format_html(
                 '<span style="color: #22c55e; font-weight: 600;">'
                 '<i class="fas fa-check-circle"></i> Printed<br>'
                 '<small>{}</small></span>',
-                obj.printed_date.strftime("%d %b %Y") if obj.printed_date else ""
+                date_str
             )
         return format_html(
             '<span style="color: #ef4444; font-weight: 600;">'
-            '<i class="fas fa-times-circle"></i> Not Printed</span>'
+            '<i class="fas fa-times-circle"></i> Not Printed</span>',
+            ''  # Empty argument since no placeholder needed
         )
     print_status.short_description = "Print Status"
     
@@ -376,9 +450,10 @@ class NoticeAdmin(BaseAdmin):
         """Indicate if notice has an attachment."""
         if obj.attachment:
             return format_html(
-                '<span style="color: #3b82f6;"><i class="fas fa-paperclip"></i> Yes</span>'
+                '<span style="color: #3b82f6;"><i class="fas fa-paperclip"></i> Yes</span>',
+                ''  # Empty argument since no placeholder needed
             )
-        return format_html('<span style="color: #94a3b8;">No</span>')
+        return format_html('<span style="color: #94a3b8;">No</span>', '')
     has_attachment.short_description = "Attachment"
     
     def created_at_display(self, obj):
@@ -423,7 +498,7 @@ class HomepageSliderAdmin(BaseAdmin):
                 '<img src="{}" style="max-height: 50px; border-radius: 4px;" />',
                 obj.image.url
             )
-        return format_html('<span style="color: #94a3b8;">No Image</span>')
+        return format_html('<span style="color: #94a3b8;">No Image</span>', '')
     preview_image.short_description = "Preview"
     
     fieldsets = (

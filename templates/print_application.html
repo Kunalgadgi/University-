@@ -169,9 +169,9 @@
         <button onclick="window.print()" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;">
             <i class="fas fa-print"></i> Print Application
         </button>
-        {% comment %} <a href="{% url 'dashboard' %}" style="padding: 10px 20px; background: #6c757d; color: white; text-decoration: none; border-radius: 4px; display: inline-block;">
+        <a href="/admin/master_control/admissionapplication/" style="padding: 10px 20px; background: #6c757d; color: white; text-decoration: none; border-radius: 4px; display: inline-block;">
             <i class="fas fa-arrow-left"></i> Back to Dashboard
-        </a> {% endcomment %}
+        </a>
     </div>
 
     <div class="page">
@@ -293,8 +293,26 @@
             </tr>
         </table> {% endcomment %}
 
+        <!-- COURSE DETAILS -->
+        <h4>2. Course Details</h4>
+        
+        <table>
+            <tr>
+                <th>Apply Course</th>
+                <td>{% if application %}{{ application.apply_course|default:"-" }}{% else %}-{% endif %}</td>
+            </tr>
+            <tr>
+                <th>Department</th>
+                <td>{% if application %}{{ application.department|default:"-" }}{% else %}-{% endif %}</td>
+            </tr>
+            <tr>
+                <th>Study Mode</th>
+                <td>{% if application %}{{ application.study_mode|default:"-" }}{% else %}-{% endif %}</td>
+            </tr>
+        </table>
+
         <!-- CATEGORY -->
-        <h4>2. Category</h4>
+        <h4>3. Category</h4>
 
         <table>
             <tr>
@@ -313,7 +331,7 @@
         </table>
 
         <!-- SPECIALIZATION -->
-        <h4>3. Broad area of Specialization in Ph.D. course</h4>
+        <h4>4. Broad area of Specialization in Ph.D. course</h4>
 
         <table>
             <tr>
@@ -327,7 +345,7 @@
         </table>
 
         <!-- FELLOWSHIP -->
-        <h4>4. Fellowship Details</h4>
+        <h4>5. Fellowship Details</h4>
 
         <table>
             <tr>
@@ -343,7 +361,7 @@
         </table>
 
         <!-- EMPLOYMENT STATUS -->
-        <h4>5. Employment Details</h4>
+        <h4>6. Employment Details</h4>
 
         <table>
             <tr>
@@ -377,7 +395,7 @@
         </table>
 
         <!-- RESEARCH EXPERIENCE -->
-        <h4>6. Details of previous research experience</h4>
+        <h4>7. Details of previous research experience</h4>
 
         <table>
             <tr>
@@ -387,7 +405,7 @@
         </table>
 
         <!-- PUBLICATIONS -->
-        <h4>7. Details of publications, if any</h4>
+        <h4>8. Details of publications, if any</h4>
 
         <table>
             <tr>
@@ -397,7 +415,7 @@
         </table>
 
         <!-- OTHER COURSE -->
-        <h4>8. Whether pursuing any other course of study</h4>
+        <h4>9. Whether pursuing any other course of study</h4>
 
         <table>
             <tr>
@@ -425,7 +443,7 @@
         </table>
 
         <!-- ACADEMIC QUALIFICATIONS -->
-        <h4>9. Academic Qualifications</h4>
+        <h4>10. Academic Qualifications</h4>
 
         <table>
             <tr>
@@ -449,7 +467,7 @@
         </table>
 
         <!-- EMPLOYMENT HISTORY -->
-        <h4>10. Employment History</h4>
+        <h4>11. Employment History</h4>
 
         <table>
             <tr>
@@ -481,85 +499,21 @@
             {% endfor %}
         </table>
 
-        <!-- EMPLOYMENT STATUS -->
-        <h4>11. Employment Status</h4>
-
+        <!-- PAYMENT DETAILS -->
+        <h4>12. Payment Details</h4>
+        
         <table>
             <tr>
-                <th style="width: 30%">Currently Employed?</th>
-                <td>{{ application.employed_status|default:"-" }}</td>
-                <th style="width: 30%">Post</th>
-                <td>{{ application.emp_post_current|default:"-" }}</td>
+                <th style="width: 30%">Payment Date</th>
+                <td>{% if application %}{{ application.payment_date|date:"d/m/Y"|default:"-" }}{% elif profile_snapshot %}{{ profile_snapshot.payment_date|date:"d/m/Y"|default:"-" }}{% else %}-{% endif %}</td>
+                <th style="width: 30%">Payment ID</th>
+                <td>{% if application %}{{ application.payment_id|default:"-" }}{% elif profile_snapshot %}{{ profile_snapshot.payment_id|default:"-" }}{% else %}-{% endif %}</td>
             </tr>
-            <tr>
-                <th>Nature of Job</th>
-                <td>{{ application.job_nature|default:"-" }}</td>
-                <th>Date of Joining</th>
-                <td>{{ application.date_of_joining|date:"d/m/Y"|default:"-" }}</td>
-            </tr>
-            <tr>
-                <th>Total period of Service</th>
-                <td>{{ application.service_period|default:"-" }}</td>
-                <th>Organization Name</th>
-                <td>{{ application.organization_name_current|default:"-" }}</td>
-            </tr>
-            <tr>
-                <th>Organization Address</th>
-                <td colspan="3">{{ application.organization_address|default:"-" }}</td>
-            </tr>
-            <tr>
-                <th>Telephone/Mobile</th>
-                <td>{{ application.org_telephone|default:"-" }}</td>
-                <th>Email</th>
-                <td>{{ application.org_email|default:"-" }}</td>
-            </tr>
-        </table>
-
-        <!-- RESEARCH & PUBLICATIONS -->
-        <h4>12. Research & Publications</h4>
-
-        <table>
-            <tr>
-                <th>Research Experience</th>
-                <td>{{ application.research_experience|default:"-" }}</td>
-            </tr>
-            <tr>
-                <th>Publications</th>
-                <td>{{ application.publications|default:"-" }}</td>
-            </tr>
-        </table>
-
-        <!-- OTHER COURSE DETAILS -->
-        <h4>13. Other Course Details</h4>
-
-        <table>
-            <tr>
-                <th style="width: 30%">Pursuing Other Course</th>
-                <td>{{ application.pursuing_other_course|default:"-" }}</td>
-            </tr>
-            {% if application.pursuing_other_course == 'Yes' %}
-            <tr>
-                <th>Institution</th>
-                <td>{{ application.other_institution|default:"-" }}</td>
-            </tr>
-            <tr>
-                <th>Class/Course</th>
-                <td>{{ application.other_class|default:"-" }}</td>
-            </tr>
-            <tr>
-                <th>Session</th>
-                <td>{{ application.other_session|default:"-" }}</td>
-            </tr>
-            <tr>
-                <th>Result</th>
-                <td>{{ application.other_result|default:"-" }}</td>
-            </tr>
-            {% endif %}
         </table>
 
         <!-- Declaration -->
         <div class="declaration">
-            <h4>7. Declaration</h4>
+            <h4>13. Declaration</h4>
             <p>
                 I hereby declare that all the information provided above is true and correct. 
                 If any information is found incorrect, my application may be rejected.
