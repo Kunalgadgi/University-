@@ -506,7 +506,7 @@
 
             {% comment %} <th>Mobile (Correspondence)</th>
 
-            <td>{% if application %}{{ application.mobile_telephone|default:"-" }}{% else %}-{% endif %}</td> {% endcomment %}
+            <td>{% if application %}{{ application.mobile_number|default:"-" }}{% else %}-{% endif %}</td> {% endcomment %}
 
         </tr>
 
@@ -514,7 +514,7 @@
 
             <th>Email (Correspondence)</th>
 
-            <td colspan="3">{% if application %}{{ application.email_correspondence|default:"-" }}{% else %}-{% endif %}</td>
+            <td colspan="3">{% if application %}{{ application.email|default:"-" }}{% else %}-{% endif %}</td>
 
         </tr> {% endcomment %}
 
@@ -611,10 +611,9 @@
 
 
 
-    <!-- SPECIALIZATION -->
-
+    <!-- SPECIALIZATION - Only for PHD -->
+    {% if application and application.apply_course == 'Ph.D.' %}
     <h4>4. Broad area of Specialization in Ph.D. course</h4>
-
     <table>
         <tr>
             <th style="width: 30%">Area of Specialization</th>
@@ -625,154 +624,95 @@
             <td colspan="3">{{ application.proposed_supervisor|default:"-" }}</td>
         </tr>
     </table>
+    {% endif %}
 
 
 
-    <!-- FELLOWSHIP -->
-
+    <!-- FELLOWSHIP - Only for PHD -->
+    {% if application and application.apply_course == 'Ph.D.' %}
     <h4>5. Fellowship Details</h4>
-
-
-
     <table>
-
         <tr>
-
             <th style="width: 30%">Fellowship Category</th>
-
             <td>{{ application.fellowship_category|default:"-" }}</td>
-
             <th style="width: 30%">Date of Validity</th>
-
             <td>{{ application.fellowship_validity|date:"d/m/Y"|default:"-" }}</td>
-
         </tr>
-
         <tr>
-
             <th>UGC Category</th>
-
             <td colspan="3">{{ application.ugc_category|default:"-" }}</td>
-
         </tr>
-
     </table>
+    {% endif %}
 
 
 
-    <!-- EMPLOYMENT STATUS -->
-
+    <!-- EMPLOYMENT STATUS - Only for PHD -->
+    {% if application and application.apply_course == 'Ph.D.' %}
     <h4>6. Employment Details</h4>
-
-
-
     <table>
-
         <tr>
-
             <th style="width: 30%">Currently Employed?</th>
-
             <td>{{ application.employed_status|default:"-" }}</td>
-
             <th style="width: 30%">Post</th>
-
             <td>{{ application.emp_post_current|default:"-" }}</td>
-
         </tr>
-
         <tr>
-
             <th>Nature of Job</th>
-
             <td>{{ application.job_nature|default:"-" }}</td>
-
             <th>Date of Joining</th>
-
             <td>{{ application.date_of_joining|date:"d/m/Y"|default:"-" }}</td>
-
         </tr>
-
         <tr>
-
             <th>Total period of Service</th>
-
             <td>{{ application.service_period|default:"-" }}</td>
-
             <th>Name of the Organization</th>
-
             <td>{{ application.organization_name_current|default:"-" }}</td>
-
         </tr>
-
         <tr>
-
             <th>Address of the Organization</th>
-
             <td colspan="3">{{ application.organization_address|default:"-" }}</td>
-
         </tr>
-
         <tr>
-
             <th>Telephone/Mobile</th>
-
             <td>{{ application.org_telephone|default:"-" }}</td>
-
             <th>Email</th>
-
             <td>{{ application.org_email|default:"-" }}</td>
-
         </tr>
-
     </table>
+    {% endif %}
 
 
 
-    <!-- RESEARCH EXPERIENCE -->
-
+    <!-- RESEARCH EXPERIENCE - Only for PHD -->
+    {% if application and application.apply_course == 'Ph.D.' %}
     <h4>7. Details of previous research experience</h4>
-
-
-
     <table>
-
         <tr>
-
             <th>Research Experience</th>
-
             <td>{{ application.research_experience|default:"-" }}</td>
-
         </tr>
-
     </table>
+    {% endif %}
 
 
 
-    <!-- PUBLICATIONS -->
-
+    <!-- PUBLICATIONS - Only for PHD -->
+    {% if application and application.apply_course == 'Ph.D.' %}
     <h4>8. Details of publications, if any</h4>
-
-
-
     <table>
-
         <tr>
-
             <th>Publications</th>
-
             <td>{{ application.publications|default:"-" }}</td>
-
         </tr>
-
     </table>
+    {% endif %}
 
 
 
     <!-- OTHER COURSE -->
 
     <h4>9. Whether pursuing any other course of study</h4>
-
-
 
     <table>
 
@@ -828,8 +768,6 @@
 
     <h4>10. Academic Qualifications</h4>
 
-
-
     <table>
 
         <tr>
@@ -851,8 +789,6 @@
             <th>Subjects</th>
 
         </tr>
-
-
 
         {% for q in qualifications %}
 
@@ -910,82 +846,31 @@
 
     </table>
 
-
-
-    <!-- EMPLOYMENT -->
-
+    <!-- EMPLOYMENT HISTORY - Only for PHD -->
+    {% if application and application.apply_course == 'Ph.D.' %}
     <h4>11. Employment History</h4>
-
-
-
     <table>
-
         <tr>
-
             <th>Sr</th>
-
             <th>Post</th>
-
             <th>Organization</th>
-
             <th>From</th>
-
             <th>To</th>
-
             <th>Experience</th>
-
             <th>Type</th>
-
             <th>Remarks</th>
-
         </tr>
-
-
-
         {% for emp in employments %}
-
         <tr>
-
-            {% if emp.designation %}
-
-                <td>{{ forloop.counter }}</td>
-
-                <td>{{ emp.designation }}</td>
-
-                <td>{{ emp.organization_name }}</td>
-
-                <td>{% if emp.from_date %}{{ emp.from_date|date:"d-m-Y" }}{% else %}-{% endif %}</td>
-
-                <td>{% if emp.to_date %}{{ emp.to_date|date:"d-m-Y" }}{% else %}-{% endif %}</td>
-
-                <td>-</td>
-
-                <td>{{ emp.experience_type }}</td>
-
-                <td>{{ emp.remarks|default:"-" }}</td>
-
-            {% else %}
-
-                <td>{{ forloop.counter }}</td>
-
-                <td>{{ emp.post_held }}</td>
-
-                <td>{{ emp.organization }}</td>
-
-                <td>{% if emp.from_date %}{{ emp.from_date|date:"d-m-Y" }}{% else %}-{% endif %}</td>
-
-                <td>{% if emp.to_date %}{{ emp.to_date|date:"d-m-Y" }}{% else %}-{% endif %}</td>
-
-                <td>{{ emp.formatted_experience }}</td>
-
-                <td>{{ emp.job_type }}</td>
-
-                <td>{{ emp.remarks|default:"-" }}</td>
-
-            {% endif %}
-
+            <td>{{ forloop.counter }}</td>
+            <td>{% if emp.designation %}{{ emp.designation }}{% else %}{{ emp.post_held }}{% endif %}</td>
+            <td>{% if emp.organization_name %}{{ emp.organization_name }}{% else %}{{ emp.organization }}{% endif %}</td>
+            <td>{% if emp.from_date %}{{ emp.from_date|date:"d-m-Y" }}{% else %}-{% endif %}</td>
+            <td>{% if emp.to_date %}{{ emp.to_date|date:"d-m-Y" }}{% else %}-{% endif %}</td>
+            <td>{% if emp.formatted_experience %}{{ emp.formatted_experience }}{% else %}-{% endif %}</td>
+            <td>{% if emp.experience_type %}{{ emp.experience_type }}{% else %}{{ emp.job_type }}{% endif %}</td>
+            <td>{{ emp.remarks|default:"-" }}</td>
         </tr>
-
         {% empty %}
 
         <tr>
@@ -997,6 +882,7 @@
         {% endfor %}
 
     </table>
+    {% endif %}
 
 
 
@@ -1022,9 +908,153 @@
 
 
 
+    <!-- UPLOADED DOCUMENTS -->
+
+    <h4>13. Uploaded Documents</h4>
+
+    <table>
+
+        <tr>
+
+            <th style="width: 5%"></th>
+
+            <th style="width: 55%">Document Name</th>
+
+            <th style="width: 20%">Status</th>
+
+        </tr>
+
+        {% if application.no_objection_certificate %}
+
+        <tr>
+
+            <td>•</td>
+
+            <td>No Objection cum Service Certificate (SOP-II)</td>
+
+            <td style="color: green;">✓ Uploaded</td>
+
+        </tr>
+
+        {% endif %}
+
+        {% if application.father_guardian_certificate %}
+
+        <tr>
+
+            <td>•</td>
+
+            <td>Certificate from Father/Guardian (SOP-III)</td>
+
+
+            <td style="color: green;">✓ Uploaded</td>
+
+        </tr>
+
+        {% endif %}
+
+        {% if application.parent_guardian_affidavit %}
+
+        <tr>
+
+            <td>•</td>
+
+            <td>Parent/Guardian Affidavit (SOP-IV)</td>
+
+            <td style="color: green;">✓ Uploaded</td>
+
+        </tr>
+
+        {% endif %}
+
+        {% if application.character_certificate %}
+
+        <tr>
+
+            <td>•</td>
+
+            <td>Character Certificate (SOP-V)</td>
+
+            <td style="color: green;">✓ Uploaded</td>
+
+        </tr>
+
+        {% endif %}
+
+        {% if application.category_certificate %}
+
+        <tr>
+
+            <td>•</td>
+
+            <td>Category Certificate (SOP-VI to SOP-XI)</td>
+
+            <td style="color: green;">✓ Uploaded</td>
+
+        </tr>
+
+        {% endif %}
+
+        {% if application.haryana_domicile_certificate %}
+
+        <tr>
+
+            <td>•</td>
+
+            <td>Haryana Domicile Certificate</td>
+
+            <td style="color: green;">✓ Uploaded</td>
+
+        </tr>
+
+        {% endif %}
+
+        {% if application.nri_declaration %}
+
+        <tr>
+
+            <td>•</td>
+
+            <td>NRI Declaration</td>
+
+
+            <td style="color: green;">✓ Uploaded</td>
+
+        </tr>
+
+        {% endif %}
+
+        {% if application.migration_certificate %}
+
+        <tr>
+
+            <td>•</td>
+
+            <td>Migration Certificate</td>
+
+            <td style="color: green;">✓ Uploaded</td>
+
+        </tr>
+
+        {% endif %}
+
+        {% if not application.no_objection_certificate and not application.father_guardian_certificate and not application.parent_guardian_affidavit and not application.character_certificate and not application.category_certificate and not application.haryana_domicile_certificate and not application.nri_declaration and not application.migration_certificate %}
+
+        <tr>
+
+            <td colspan="4" style="text-align: center; color: #666;">No documents uploaded</td>
+
+        </tr>
+
+        {% endif %}
+
+    </table>
+
+
+
     <!-- DECLARATION -->
 
-    <h4>13. Declaration</h4>
+    <h4>14. Declaration</h4>
 
 
 
@@ -1049,17 +1079,13 @@
             <td style="text-align:right;">
 
                 {% if profile_snapshot and profile_snapshot.signature %}
-
                     <img src="{{ profile_snapshot.signature.url }}" width="50" style="vertical-align: middle;" />
-
                 {% elif personal and personal.signature %}
-
                     <img src="{{ personal.signature.url }}" width="50" style="vertical-align: middle;" />
-
+                {% elif application and application.signature %}
+                    <img src="{{ application.signature.url }}" width="50" style="vertical-align: middle;" />
                 {% else %}
-
                     Signature: __________
-
                 {% endif %}
 
             </td>
@@ -1072,7 +1098,7 @@
 
     <div class="center">
 
-         <a href="/admin/master_control/admissionapplication/" class="btn back-btn">
+         <a href="{% url 'dashboard' %}" class="btn back-btn">
 
         ← Back to Dashboard
 

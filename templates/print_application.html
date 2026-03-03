@@ -269,11 +269,11 @@
                 <th>Pincode</th>
                 <td>{% if application %}{{ application.pincode|default:"-" }}{% elif profile_snapshot %}{{ profile_snapshot.pincode|default:"-" }}{% else %}{{ personal.pincode|default:"-" }}{% endif %}</td>
                 <th>Mobile (Correspondence)</th>
-                <td>{% if application %}{{ application.mobile_telephone|default:"-" }}{% else %}-{% endif %}</td>
+                <td>{% if application %}{{ application.mobile_number|default:"-" }}{% else %}-{% endif %}</td>
             </tr>
             <tr>
                 <th>Email (Correspondence)</th>
-                <td colspan="3">{% if application %}{{ application.email_correspondence|default:"-" }}{% else %}-{% endif %}</td>
+                <td colspan="3">{% if application %}{{ application.email|default:"-" }}{% else %}-{% endif %}</td>
             </tr>
         </table>
 
@@ -330,7 +330,8 @@
             </tr>
         </table>
 
-        <!-- SPECIALIZATION -->
+        <!-- SPECIALIZATION - Only for PHD -->
+        {% if application and application.apply_course == 'Ph.D.' %}
         <h4>4. Broad area of Specialization in Ph.D. course</h4>
 
         <table>
@@ -343,8 +344,10 @@
                 <td colspan="3">{{ application.proposed_supervisor|default:"-" }}</td>
             </tr>
         </table>
+        {% endif %}
 
-        <!-- FELLOWSHIP -->
+        <!-- FELLOWSHIP - Only for PHD -->
+        {% if application and application.apply_course == 'Ph.D.' %}
         <h4>5. Fellowship Details</h4>
 
         <table>
@@ -359,8 +362,10 @@
                 <td colspan="3">{{ application.ugc_category|default:"-" }}</td>
             </tr>
         </table>
+        {% endif %}
 
-        <!-- EMPLOYMENT STATUS -->
+        <!-- EMPLOYMENT STATUS - Only for PHD -->
+        {% if application and application.apply_course == 'Ph.D.' %}
         <h4>6. Employment Details</h4>
 
         <table>
@@ -393,8 +398,10 @@
                 <td>{{ application.org_email|default:"-" }}</td>
             </tr>
         </table>
+        {% endif %}
 
-        <!-- RESEARCH EXPERIENCE -->
+        <!-- RESEARCH EXPERIENCE - Only for PHD -->
+        {% if application and application.apply_course == 'Ph.D.' %}
         <h4>7. Details of previous research experience</h4>
 
         <table>
@@ -403,8 +410,10 @@
                 <td>{{ application.research_experience|default:"-" }}</td>
             </tr>
         </table>
+        {% endif %}
 
-        <!-- PUBLICATIONS -->
+        <!-- PUBLICATIONS - Only for PHD -->
+        {% if application and application.apply_course == 'Ph.D.' %}
         <h4>8. Details of publications, if any</h4>
 
         <table>
@@ -413,6 +422,7 @@
                 <td>{{ application.publications|default:"-" }}</td>
             </tr>
         </table>
+        {% endif %}
 
         <!-- OTHER COURSE -->
         <h4>9. Whether pursuing any other course of study</h4>
@@ -466,7 +476,8 @@
             {% endfor %}
         </table>
 
-        <!-- EMPLOYMENT HISTORY -->
+        <!-- EMPLOYMENT HISTORY - Only for PHD -->
+        {% if application and application.apply_course == 'Ph.D.' %}
         <h4>11. Employment History</h4>
 
         <table>
@@ -498,6 +509,7 @@
             </tr>
             {% endfor %}
         </table>
+        {% endif %}
 
         <!-- PAYMENT DETAILS -->
         <h4>12. Payment Details</h4>
@@ -511,9 +523,80 @@
             </tr>
         </table>
 
+        <!-- UPLOADED DOCUMENTS -->
+        <h4>13. Uploaded Documents</h4>
+        <table>
+            <tr>
+                <th style="width: 5%"></th>
+                <th style="width: 55%">Document Name</th>
+                <th style="width: 20%">Status</th>
+            </tr>
+            {% if application.no_objection_certificate %}
+            <tr>
+                <td>•</td>
+                <td>No Objection cum Service Certificate (SOP-II)</td>
+                <td style="color: green;">✓ Uploaded</td>
+            </tr>
+            {% endif %}
+            {% if application.father_guardian_certificate %}
+            <tr>
+                <td>•</td>
+                <td>Certificate from Father/Guardian (SOP-III)</td>
+                <td style="color: green;">✓ Uploaded</td>
+            </tr>
+            {% endif %}
+            {% if application.parent_guardian_affidavit %}
+            <tr>
+                <td>•</td>
+                <td>Parent/Guardian Affidavit (SOP-IV)</td>
+                <td style="color: green;">✓ Uploaded</td>
+            </tr>
+            {% endif %}
+            {% if application.character_certificate %}
+            <tr>
+                <td>•</td>
+                <td>Character Certificate (SOP-V)</td>
+                <td style="color: green;">✓ Uploaded</td>
+            </tr>
+            {% endif %}
+            {% if application.category_certificate %}
+            <tr>
+                <td>•</td>
+                <td>Category Certificate (SOP-VI to SOP-XI)</td>
+                <td style="color: green;">✓ Uploaded</td>
+            </tr>
+            {% endif %}
+            {% if application.haryana_domicile_certificate %}
+            <tr>
+                <td>•</td>
+                <td>Haryana Domicile Certificate</td>
+                <td style="color: green;">✓ Uploaded</td>
+            </tr>
+            {% endif %}
+            {% if application.nri_declaration %}
+            <tr>
+                <td>•</td>
+                <td>NRI Declaration</td>
+                <td style="color: green;">✓ Uploaded</td>
+            </tr>
+            {% endif %}
+            {% if application.migration_certificate %}
+            <tr>
+                <td>•</td>
+                <td>Migration Certificate</td>
+                <td style="color: green;">✓ Uploaded</td>
+            </tr>
+            {% endif %}
+            {% if not application.no_objection_certificate and not application.father_guardian_certificate and not application.parent_guardian_affidavit and not application.character_certificate and not application.category_certificate and not application.haryana_domicile_certificate and not application.nri_declaration and not application.migration_certificate %}
+            <tr>
+                <td colspan="4" style="text-align: center; color: #666;">No documents uploaded</td>
+            </tr>
+            {% endif %}
+        </table>
+
         <!-- Declaration -->
         <div class="declaration">
-            <h4>13. Declaration</h4>
+            <h4>14. Declaration</h4>
             <p>
                 I hereby declare that all the information provided above is true and correct. 
                 If any information is found incorrect, my application may be rejected.
@@ -527,9 +610,9 @@
                     <td style="height: 50px; vertical-align: bottom; text-align: center;">
                         {% if application.signature %}
                             <img src="{{ application.signature.url }}" style="max-height: 40px;" alt="Signature">
-                        {% else %}
-                            _________________________
-                        {% endif %}
+                {% else %}
+                    Signature: __________
+                {% endif %}
                     </td>
                     <td style="vertical-align: bottom; text-align: center;">
                         _________________________<br>

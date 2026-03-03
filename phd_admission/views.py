@@ -25,12 +25,21 @@ def _safe_redirect_next_or(request, fallback_name):
     return redirect(fallback_name)
 
 
-def _generate_application_no():
+def _generate_application_no(course_type):
     from master_control_project.master_control.models import AdmissionApplication
 
-    prefix = timezone.now().strftime('PHD%Y%m%d')
+    today = timezone.now().strftime('%Y%m%d')
+    
+    if course_type == 'PGDRP':
+        prefix = f"PGDRP{today}"
+    elif course_type == 'Ph.D.' or course_type == 'PHD':
+        prefix = f"PHD{today}"
+    else:
+        # Default fallback
+        prefix = f"PHD{today}"
+    
     for seq in range(1, 10000):
-        candidate = f"{prefix}{seq:04d}"
+        candidate = f"{prefix}{seq:03d}"
         if not AdmissionApplication.objects.filter(application_no=candidate).exists():
             return candidate
     raise RuntimeError('Unable to generate unique application number')
@@ -294,8 +303,12 @@ def admission_form_single(request):
                 status='draft'
             ).first()
             
+            # Get current course type from form data
+            current_course = request.POST.get('apply_course', 'PHD')
+            
             if not draft_application:
-                app_no = _generate_application_no()
+                # Create new draft with course-specific number
+                app_no = _generate_application_no(current_course)
                 draft_application = AdmissionApplication.objects.create(
                     application_no=app_no,
                     student=request.user,
@@ -304,6 +317,18 @@ def admission_form_single(request):
                     department_name=getattr(course, 'department_name', '') or '',
                     status='draft'
                 )
+            else:
+                # Check if course type has changed and update application number if needed
+                old_course_type = 'PHD'  # Default
+                if draft_application.application_no.startswith('PGDRP'):
+                    old_course_type = 'PGDRP'
+                
+                # If course type changed, generate new application number
+                if (current_course == 'PGDRP' and old_course_type != 'PGDRP') or \
+                   (current_course == 'Ph.D.' and old_course_type != 'PHD'):
+                    new_app_no = _generate_application_no(current_course)
+                    draft_application.application_no = new_app_no
+                    messages.info(request, f'Application number updated to {new_app_no} due to course change.')
             
             # Update PersonalDetail
             personal_detail.first_name = request.POST.get('full_name') or personal_detail.first_name
@@ -436,10 +461,27 @@ def admission_form_single(request):
             # Handle file uploads
             if 'photo' in request.FILES:
                 draft_application.photo = request.FILES['photo']
+                # Also save to PersonalDetail for consistency
+                personal_detail.photo = request.FILES['photo']
             if 'signature' in request.FILES:
                 draft_application.signature = request.FILES['signature']
                 # Also store the file name separately
                 draft_application.signature_name = request.FILES['signature'].name
+                # Also save to PersonalDetail for consistency
+                personal_detail.signature = request.FILES['signature']
+                personal_detail.save()  # Save PersonalDetail after signature assignment
+
+            # Handle document uploads (SOP Certificates)
+            document_fields = [
+                'no_objection_certificate', 'father_guardian_certificate',
+                'parent_guardian_affidavit', 'character_certificate',
+                'category_certificate', 'haryana_domicile_certificate',
+                'nri_declaration', 'migration_certificate'
+            ]
+            
+            for field in document_fields:
+                if field in request.FILES:
+                    setattr(draft_application, field, request.FILES[field])
 
             # Handle academic qualifications data for draft
             draft_academic_qualifications = []
@@ -545,6 +587,8 @@ def admission_form_single(request):
         personal_detail.state = request.POST.get('state') or personal_detail.state
         personal_detail.city = request.POST.get('district') or personal_detail.city
         personal_detail.pincode = request.POST.get('pincode') or personal_detail.pincode
+        
+        personal_detail.date_of_birth = datetime.strptime(request.POST.get('dob'), '%Y-%m-%d').date() if request.POST.get('dob') else personal_detail.date_of_birth
 
         upload = request.FILES.get('photo')
         if upload:
@@ -579,8 +623,11 @@ def admission_form_single(request):
             status='draft'
         ).first()
         
+        # Get course type from form data
+        apply_course = request.POST.get('apply_course', '')
+        
         if draft_application:
-            # Upgrade existing draft to submitted
+            # Upgrade existing draft to submitted - keep same application number
             application = draft_application
             application.status = 'submitted'
             application.submitted_at = timezone.now()
@@ -588,7 +635,7 @@ def admission_form_single(request):
             application.save()
         else:
             # Create new submitted application (no draft exists)
-            app_no = _generate_application_no()
+            app_no = _generate_application_no(apply_course)
             application = AdmissionApplication.objects.create(
                 application_no=app_no,
                 student=request.user,
@@ -804,10 +851,23 @@ def admission_form_single(request):
         application.payment_date = datetime.strptime(request.POST.get('payment_date'), '%Y-%m-%d').date() if request.POST.get('payment_date') else None
         application.payment_id = request.POST.get('payment_id') or ''
 
+        # Handle document uploads (SOP Certificates) for submitted applications
+        document_fields = [
+            'no_objection_certificate', 'father_guardian_certificate',
+            'parent_guardian_affidavit', 'character_certificate',
+            'category_certificate', 'haryana_domicile_certificate',
+            'nri_declaration', 'migration_certificate'
+        ]
+        
+        for field in document_fields:
+            if field in request.FILES:
+                setattr(application, field, request.FILES[field])
+
         application.save()
 
-        # Also save to UnifiedApplicationData if available
-        if UnifiedApplicationData:
+        # 6) Save unified data to single table for database viewing
+        try:
+            from master_control_project.master_control.models import UnifiedApplicationData
             UnifiedApplicationData.objects.update_or_create(
                 application=application,
                 defaults={
@@ -861,7 +921,14 @@ def admission_form_single(request):
                     'signature': personal_detail.signature,
                 }
             )
+        except ImportError:
+            pass  # UnifiedApplicationData model not available, skip this step
 
+        # Check if redirect to preview is requested
+        redirect_to_preview = request.POST.get('redirect_to_preview') == 'true'
+        if redirect_to_preview:
+            return redirect('application_preview')
+        
         messages.success(request, f'Application submitted successfully! Application No: {application.application_no}')
         return redirect(f"/application_preview/?app={application.id}")
 
@@ -889,6 +956,12 @@ def admission_form_single(request):
     employment_history_data = []  # Initialize employment_history_data
     if draft_application:
         draft_data = {
+            # 1. Apply Course (moved to top to match form order)
+            'apply_course': draft_application.apply_course or '',
+            'department': draft_application.department or '',
+            'study_mode': draft_application.study_mode or '',
+            
+            # 2. Particulars to be filled in by the Candidate
             'full_name': draft_application.first_name or '',
             'father_name': draft_application.father_name or '',
             'mother_name': draft_application.mother_name or '',
@@ -896,14 +969,9 @@ def admission_form_single(request):
             'marital_status': draft_application.marital_status or '',
             'gender': draft_application.gender or '',
             'aadhar': draft_application.aadhar_number or '',
-            'category': draft_application.category or '',
-            'category_tick': draft_application.category_tick or '',
-            'category_other': draft_application.category_other or '',
-            'ugc_category': draft_application.ugc_category or '',
-            'ugc_validity_date': draft_application.ugc_validity_date.strftime('%Y-%m-%d') if draft_application.ugc_validity_date else '',
-            'apply_course': draft_application.apply_course or '',
-            'department': draft_application.department or '',
-            'study_mode': draft_application.study_mode or '',
+            'dob': draft_application.date_of_birth.strftime('%Y-%m-%d') if draft_application.date_of_birth else '',
+            
+            # 3. Contact Information
             'mobile': draft_application.mobile_number or '',
             'email': draft_application.email or '',
             'perm_address': draft_application.permanent_address or '',
@@ -914,10 +982,23 @@ def admission_form_single(request):
             'pincode': draft_application.pincode or '',
             'mobile_telephone': draft_application.mobile_telephone or '',
             'email_correspondence': draft_application.email_correspondence or '',
+            
+            # 4. Category Information
+            'category': draft_application.category or '',
+            'category_tick': draft_application.category_tick or '',
+            'category_other': draft_application.category_other or '',
+            'ugc_category': draft_application.ugc_category or '',
+            'ugc_validity_date': draft_application.ugc_validity_date.strftime('%Y-%m-%d') if draft_application.ugc_validity_date else '',
+            
+            # 5. Specialization and Academic Details
             'specialization_area': draft_application.specialization_area or '',
             'proposed_supervisor': draft_application.proposed_supervisor or '',
+            
+            # 6. Fellowship Details
             'fellowship_validity': draft_application.fellowship_validity.strftime('%Y-%m-%d') if draft_application.fellowship_validity else '',
             'fellowship_category': draft_application.fellowship_category or '',
+            
+            # 7. Employment Details
             'employed_status': draft_application.employed_status or '',
             'emp_post_current': draft_application.emp_post_current or '',
             'job_nature': draft_application.job_nature or '',
@@ -927,18 +1008,27 @@ def admission_form_single(request):
             'organization_address': draft_application.organization_address or '',
             'org_telephone': draft_application.org_telephone or '',
             'org_email': draft_application.org_email or '',
-            'employment_history': {'employments': employment_history_data},
+            
+            # 8. Research and Publications
             'research_experience': draft_application.research_experience or '',
             'publications': draft_application.publications or '',
+            
+            # 9. Other Course Information
             'pursuing_other_course': draft_application.pursuing_other_course or '',
-            'signature_name': getattr(draft_application, 'signature_name', '') or '',
             'other_institution': draft_application.other_institution or '',
             'other_class': draft_application.other_class or '',
             'other_session': draft_application.other_session or '',
             'other_result': draft_application.other_result or '',
-            'dob': draft_application.date_of_birth.strftime('%Y-%m-%d') if draft_application.date_of_birth else '',
+            
+            # 10. Signature Information
+            'signature_name': getattr(draft_application, 'signature_name', '') or '',
+            
+            # 11. Payment Information
             'payment_date': draft_application.payment_date.strftime('%Y-%m-%d') if draft_application.payment_date else '',
             'payment_id': draft_application.payment_id or '',
+            
+            # 12. Academic and Employment History (JSON fields)
+            'employment_history': {'employments': employment_history_data},
         }
         
         # Extract academic and employment data from JSON fields
@@ -1359,9 +1449,15 @@ def create_application(request):
                 messages.info(request, 'You already have a draft application for this course. Please complete it.')
                 return redirect('profile_personal_info')
         
-        # Create new draft application (AdmissionApplication requires application_no)
+        # Get course type from the selected course
+        course_type = 'PHD'  # Default, will be updated based on actual course
+        if ad_course.course.course_name == 'PGDRP':
+            course_type = 'PGDRP'
+        elif 'Ph.D.' in ad_course.course.course_name:
+            course_type = 'Ph.D.'
+        
         application = AdmissionApplication.objects.create(
-            application_no=_generate_application_no(),
+            application_no=_generate_application_no(course_type),
             student=request.user,
             advertisement=ad_course.advertisement,
             course=ad_course.course,
