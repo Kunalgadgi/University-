@@ -1,1449 +1,3219 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>{% block title %}Admission Form{% endblock %}</title>
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
   <style>
+
     :root {
+
       --ink: #0f1c30;
+
       --muted: #5a6a86;
+
       --line: #2b2b2b;
+
       --soft: #f4f6f8;
+
       --page: #ffffff;
+
       --bg: #eaeaea;
+
       --accent: #2c3e50;
+
     }
+
+
 
     body {
+
       margin: 0;
+
       font-family: "Segoe UI", Arial, sans-serif;
+
       background: var(--bg);
+
       color: var(--ink);
+
     }
+
+
 
     .page {
+
       width: 190mm;
+
       min-height: 277mm;
+
       margin: 18px auto;
+
       padding: 14mm;
+
       background: var(--page);
+
       border-radius: 6px;
+
       box-shadow: 0 0 8px rgba(0,0,0,0.15);
+
     }
+
+
 
     .hdr {
+
       display: flex;
+
       align-items: flex-start;
+
       justify-content: space-between;
+
       gap: 12px;
+
       border-bottom: 2px solid #000;
+
       padding-bottom: 10px;
+
       margin-bottom: 14px;
+
     }
+
+
 
     .hdr .title {
+
       text-align: center;
+
       flex: 1;
+
     }
+
+
 
     .hdr h2 {
+
       margin: 0;
+
       font-size: 18px;
+
       font-weight: 700;
+
       letter-spacing: 0.2px;
+
     }
+
+
 
     .hdr .sub {
+
       margin-top: 6px;
+
       font-size: 12px;
+
       color: var(--muted);
+
       line-height: 1.35;
+
     }
+
+
 
     .photo {
+
       width: 115px;
+
       height: 135px;
+
       border: 1px solid #000;
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
       font-size: 11px;
+
       color: var(--muted);
+
       overflow: hidden;
+
       background: #fff;
+
     }
+
+
 
     .photo img {
+
       width: 100%;
+
       height: 100%;
+
       object-fit: cover;
+
     }
+
+
 
     .sec {
+
       margin-top: 14px;
+
     }
+
+
 
     .sec-title {
+
       background: var(--soft);
+
       padding: 7px 10px;
+
       font-size: 13px;
+
       font-weight: 700;
+
       border-left: 4px solid var(--accent);
+
       text-align: center;
+
       margin: 16px 0 8px 0;
+
     }
+
+
 
     table {
+
       width: 100%;
+
       border-collapse: collapse;
+
       font-size: 12px;
+
       margin-top: 6px;
+
     }
+
+
 
     th, td {
+
       border: 1px solid #444;
+
       padding: 6px 7px;
+
       vertical-align: middle;
+
     }
 
+
+
     th {
+
       background: #f1f3f5;
+
       text-align: left;
+
       font-weight: 700;
+
     }
+
+
 
     td { text-align: left; }
 
+
+
     .grid {
+
       width: 100%;
+
       border-collapse: collapse;
+
     }
+
+
 
     .grid th {
+
       width: 25%;
+
     }
+
+
 
     .in {
+
       width: 100%;
+
       border: none;
+
       outline: none;
+
       background: transparent;
+
       font: inherit;
+
       padding: 0;
+
       margin: 0;
+
     }
+
+
 
     .in:focus {
+
       box-shadow: inset 0 -2px 0 rgba(44,62,80,0.25);
+
     }
+
+
 
     .btnbar {
+
       display: flex;
+
       gap: 10px;
+
       justify-content: center;
+
       margin-top: 16px;
+
       flex-wrap: wrap;
+
     }
+
+
 
     .btn {
+
       padding: 10px 16px;
+
       font-size: 14px;
+
       border: none;
+
       background: var(--accent);
+
       color: #fff;
+
       border-radius: 4px;
+
       cursor: pointer;
+
       text-decoration: none;
+
       display: inline-flex;
+
       align-items: center;
+
       gap: 8px;
+
     }
+
+
 
     .btn.secondary {
+
       background: #34495e;
+
     }
+
+
 
     .btn.primary {
+
       background: #27ae60;
+
       color: white;
+
     }
+
+
 
     .btn.primary:hover {
+
       background: #229954;
+
     }
+
+
 
     .btn.outline {
+
       background: transparent;
+
       color: var(--accent);
+
       border: 1px solid var(--accent);
+
     }
+
+
 
     .mini {
+
       padding: 6px 10px;
+
       font-size: 12px;
+
       border-radius: 4px;
+
     }
+
+
 
     .acts {
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
       gap: 8px;
+
     }
+
+
 
     .icon-btn {
+
       width: 30px;
+
       height: 30px;
+
       border-radius: 50%;
+
       border: none;
+
       cursor: pointer;
+
       display: inline-flex;
+
       align-items: center;
+
       justify-content: center;
+
       background: #dc2626;
+
       color: #fff;
+
     }
+
+
 
     .icon-btn.add {
+
       background: #0ea5e9;
+
     }
+
+
 
     .note {
+
       margin-top: 12px;
+
       font-size: 12px;
+
       line-height: 1.55;
+
       color: #111827;
+
     }
+
+
 
     .sign {
+
       width: 100%;
+
       border-collapse: collapse;
+
       margin-top: 18px;
+
     }
+
+
 
     .sign td {
+
       border: none;
+
       padding-top: 44px;
+
       font-size: 13px;
+
       text-align: center;
+
     }
+
+
 
     @page {
+
       size: A4;
+
       margin: 10mm;
+
     }
+
+
 
     @media print {
+
       body { background: none; }
+
       .page {
+
         margin: 0;
+
         box-shadow: none;
+
         border-radius: 0;
+
         width: 100%;
+
         padding: 0;
+
       }
+
       .btnbar { display: none; }
+
     }
+
   </style>
+
 </head>
+
 <body>
+
   <div class="page">
+
     <div class="hdr">
+
       <div style="width:115px"></div>
+
       <div class="title">
-        <h2>Application Form for Admission (Ph.D.)</h2>
+
+        <h2>Application Form for Admission</h2>
+
         <div class="sub">
+
           Chaudhary Bansi Lal University, Bhiwani
+
         </div>
+
       </div>
+
       <div class="photo">
+
         {% if personal_detail and personal_detail.photo %}
+
           <img src="{{ personal_detail.photo.url }}" alt="Photo" />
+
         {% else %}
+
           Affix passport size photo
+
         {% endif %}
+
       </div>
+
     </div>
 
+
+
     <form method="post" enctype="multipart/form-data" {% if is_read_only %}onsubmit="return false;"{% endif %}>
+
       {% csrf_token %}
 
+
+
       <!-- Quick Save Draft Section -->
+
       <div class="sec" style="background: #f8f9fa; border: 1px solid #dee2e6; margin-bottom: 20px;">
+
         <div style="text-align: center; padding: 15px;">
+
           {% if is_read_only %}
+
             <div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+
               <i class="fa-solid fa-lock"></i> 
+
               <strong>Application Submitted</strong><br>
+
               Your application has been submitted and is now in read-only mode. Application No: {{ submitted_application.application_no }}
+
             </div>
+
           {% else %}
+
             <p style="margin: 0 0 10px 0; color: #666; font-size: 14px;">
+
               <i class="fa-solid fa-info-circle"></i> 
+
               Save Draft: Data saved permanently in database | Submit: Final application submission
+
             </p>
+
           {% endif %}
+
           
+
           <span style="margin: 0 15px; color: #999;">|</span>
+
           <small style="color: #666;">
+
             {% if draft_application %}
+
               <i class="fa-solid fa-check-circle" style="color: #28a745;"></i> 
+
               Draft saved: Application No. {{ draft_application.application_no }} on {{ draft_application.updated_at|date:"d/m/Y H:i" }}
+
             {% elif personal_detail.first_name or personal_detail.email %}
+
               <i class="fa-solid fa-clock" style="color: #ffc107;"></i> 
+
               Old draft format: {{ personal_detail.updated_at|date:"d/m/Y H:i"|default:"Today" }}
+
             {% else %}
+
               <i class="fa-solid fa-clock" style="color: #ffc107;"></i> 
+
               No draft saved yet
+
             {% endif %}
+
           </small>
+
         </div>
+
       </div>
 
+
+
       <div class="sec">
+
         <div class="sec-title">Photo Upload</div>
+
         <table>
+
           <tr>
+
             <th style="width: 30%">Passport Size Photo</th>
+
             <td>
+
               <input type="file" name="photo" accept="image/*" {% if is_read_only %}disabled{% endif %} />
+
               {% if personal_detail and personal_detail.photo %}
+
                 <span style="margin-left: 10px; color: #666;">Current: {{ personal_detail.photo.name }}</span>
+
               {% endif %}
+
             </td>
+
           </tr>
+
         </table>
+
       </div>
 
+
+
       <div class="sec">
+
         <div class="sec-title">Signature Upload</div>
+
         <table>
+
           <tr>
+
             <th style="width: 30%">Signature</th>
+
             <td>
+
               <input type="file" name="signature" id="signature_input" accept="image/*" {% if is_read_only %}disabled{% endif %} onchange="updateFileName('signature_input', 'signature_name')" />
+
               <input type="hidden" name="signature_name" id="signature_name" value="{% if personal_detail and personal_detail.signature %}{{ personal_detail.signature.name }}{% endif %}" />
+
               {% if personal_detail and personal_detail.signature %}
+
                 <div style="margin-top: 10px;">
+
                   <span style="color: #666;">Current: {{ personal_detail.signature.name }}</span>
+
                   {% if not is_read_only %}
+
                     <button type="button" onclick="clearFile('signature_input', 'signature_name')" style="margin-left: 10px; padding: 2px 8px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">Clear</button>
+
                   {% endif %}
+
                 </div>
+
               {% endif %}
+
               <div id="signature_preview" style="margin-top: 10px;"></div>
+
             </td>
+
           </tr>
+
         </table>
+
       </div>
 
-      <div class="sec">
-        <div class="sec-title">1. Particulars to be filled in by the Candidate</div>
+
+
+         <div class="sec">
+
+        <div class="sec-title">1. Apply Course</div>
+
+          <table>
+
+              <tr>
+
+                <th style="width: 30%">Apply Course</th>
+
+                <td colspan="3">
+
+                  <select class="in" name="apply_course" id="apply_course" onchange="toggleDepartmentField()">
+
+                    <option value="">-- Select Course --</option>
+
+                    <option value="Ph.D."{% if draft_data.apply_course == 'Ph.D.' %} selected{% endif %}>Ph.D.</option>
+
+                    <option value="PGDRP"{% if draft_data.apply_course == 'PGDRP' %} selected{% endif %}>PGDRP</option>
+
+                  </select>
+
+                </td>
+
+              </tr>
+
+              <tr id="department_row" class="{% if draft_data.apply_course == 'Ph.D.' %}department-visible{% else %}department-hidden{% endif %}">
+
+                <th style="width: 30%">Department</th>
+
+                <td colspan="3">
+
+                  <select class="in" name="department" id="department">
+
+                    <option value="">-- Select Department --</option>
+
+                    <option value="Physical Education"{% if draft_data.department == 'Physical Education' %} selected{% endif %}>Physical Education</option>
+
+                    <option value="Zoology"{% if draft_data.department == 'Zoology' %} selected{% endif %}>Zoology</option>
+
+                    <option value="Commerce"{% if draft_data.department == 'Commerce' %} selected{% endif %}>Commerce</option>
+
+                    <option value="Biotechnology"{% if draft_data.department == 'Biotechnology' %} selected{% endif %}>Biotechnology</option>
+
+                    <option value="Physics"{% if draft_data.department == 'Physics' %} selected{% endif %}>Physics</option>
+
+                    <option value="Pharmaceutical"{% if draft_data.department == 'Pharmaceutical' %} selected{% endif %}>Pharmaceutical</option>
+
+                    <option value="Psychology"{% if draft_data.department == 'Psychology' %} selected{% endif %}>Psychology</option>
+
+                    <option value="History"{% if draft_data.department == 'History' %} selected{% endif %}>History</option>
+
+                    <option value="Chemistry"{% if draft_data.department == 'Chemistry' %} selected{% endif %}>Chemistry</option>
+
+                    <option value="Management"{% if draft_data.department == 'Management' %} selected{% endif %}>Management</option>
+
+                    <option value="Math"{% if draft_data.department == 'Math' %} selected{% endif %}>Math</option>
+
+                    <option value="English"{% if draft_data.department == 'English' %} selected{% endif %}>English</option>
+
+                  </select>
+
+                </td>
+
+              </tr>
+
+              <tr id="study_mode_row" class="{% if draft_data.apply_course == 'Ph.D.' %}department-visible{% else %}department-hidden{% endif %}">
+
+                <th style="width: 30%">Study Mode</th>
+
+                <td colspan="3">
+
+                  <select class="in" name="study_mode" id="study_mode">
+
+                    <option value="">-- Select Study Mode --</option>
+
+                    <option value="Full Time"{% if draft_data.study_mode == 'Full Time' %} selected{% endif %}>Full Time</option>
+
+                    <option value="Part Time"{% if draft_data.study_mode == 'Part Time' %} selected{% endif %}>Part Time</option>
+
+                  </select>
+
+                </td>
+
+              </tr>
+
+          </table>
+
+      </div>
+
+
+
+
+
+      <!-- <div class="sec">
+
+        <div class="sec-title">2. Correspondence Address (in block letters)</div>
+
+        <table>
+
+          <tr>
+
+            <th style="width: 30%">Correspondence Address</th>
+
+            <td colspan="3"><input class="in" type="text" name="corr_address_block" value="{{ personal_detail.current_address|default:'' }}" style="text-transform: uppercase;" /></td>
+
+          </tr>
+
+          <tr>
+
+            <th>Mobile/Telephone No.</th>
+
+            <td><input class="in" type="text" name="mobile_telephone" value="{{ personal_detail.mobile_number|default:'' }}" /></td>
+
+            <th>E-mail</th>
+
+            <td><input class="in" type="email" name="email_correspondence" value="{{ user.email|default:'' }}" /></td>
+
+          </tr>
+
+        </table>
+
+      </div> -->
+
+
+
+      <!-- <div class="sec">
+
+        <div class="sec-title">3. Category</div>
+
+        <table>
+
+          <tr>
+
+            <th>Tick appropriate category</th>
+
+            <td colspan="3">
+
+              <label style="margin-right: 15px;"><input type="radio" name="category_tick" value="GEN" {% if personal_detail.category == 'General' %}checked{% endif %}> GEN</label>
+
+              <label style="margin-right: 15px;"><input type="radio" name="category_tick" value="OBC" {% if personal_detail.category == 'OBC' %}checked{% endif %}> OBC</label>
+
+              <label style="margin-right: 15px;"><input type="radio" name="category_tick" value="SC" {% if personal_detail.category == 'SC' %}checked{% endif %}> SC</label>
+
+              <label style="margin-right: 15px;"><input type="radio" name="category_tick" value="ST" {% if personal_detail.category == 'ST' %}checked{% endif %}> ST</label>
+
+              <label style="margin-right: 15px;"><input type="radio" name="category_tick" value="EWS" {% if personal_detail.category == 'General-EWS' %}checked{% endif %}> EWS</label>
+
+              <label style="margin-right: 15px;"><input type="radio" name="category_tick" value="PwBD" {% if personal_detail.category == 'PwBD' %}checked{% endif %}> PwBD</label><br>
+
+              <label style="margin-right: 15px;"><input type="radio" name="category_tick" value="ESM" {% if personal_detail.category == 'ESM' %}checked{% endif %}> ESM</label>
+
+              <label style="margin-right: 15px;"><input type="radio" name="category_tick" value="DFF" {% if personal_detail.category == 'DFF' %}checked{% endif %}> DFF</label>
+
+              <label style="margin-right: 15px;"><input type="radio" name="category_tick" value="OTHER" {% if personal_detail.category and personal_detail.category not in 'General,OBC,SC,ST,General-EWS,PwBD,ESM,DFF' %}checked{% endif %}> Other</label>
+
+              {% if personal_detail.category and personal_detail.category not in 'General,OBC,SC,ST,General-EWS,PwBD,ESM,DFF' %}
+
+                <input type="text" name="category_other" value="{{ personal_detail.category }}" placeholder="Specify" />
+
+              {% else %}
+
+                <input type="text" name="category_other" placeholder="Specify" />
+
+              {% endif %}
+
+            </td>
+
+          </tr>
+
+        </table>
+
+      </div> -->
+
+            <div class="sec">
+
+        <div class="sec-title">2. Particulars to be filled in by the Candidate</div>
+
+
 
         <table class="grid">
+
           <tr>
+
             <th>Name (in block letters)</th>
+
             <td><input class="in" type="text" name="full_name" value="{{ draft_data.full_name|default:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
             <th>Father's Name</th>
+
             <td><input class="in" type="text" name="father_name" value="{{ draft_data.father_name|default:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
           </tr>
+
           <tr>
+
             <th>Mother's Name</th>
+
             <td><input class="in" type="text" name="mother_name" value="{{ draft_data.mother_name|default:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
             <th>Nationality</th>
+
             <td><input class="in" type="text" name="nationality" value="{{ draft_data.nationality|default:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
           </tr>
+
           <tr>
+
             <th>Marital Status</th>
+
             <td>
+
               <select class="in" name="marital_status" {% if is_read_only %}disabled{% endif %}>
+
                 <option value="">Select</option>
+
                 <option value="Single" {% if draft_data.marital_status == 'Single' %}selected{% endif %}>Single</option>
+
                 <option value="Married" {% if draft_data.marital_status == 'Married' %}selected{% endif %}>Married</option>
+
                 <option value="Divorced" {% if draft_data.marital_status == 'Divorced' %}selected{% endif %}>Divorced</option>
+
                 <option value="Widowed" {% if draft_data.marital_status == 'Widowed' %}selected{% endif %}>Widowed</option>
+
               </select>
+
             </td>
+
             <th>Gender</th>
+
             <td>
+
               <select class="in" name="gender" {% if is_read_only %}disabled{% endif %}>
+
                 <option value="">Select</option>
+
                 <option value="Male" {% if draft_data.gender == 'Male' %}selected{% endif %}>Male</option>
+
                 <option value="Female" {% if draft_data.gender == 'Female' %}selected{% endif %}>Female</option>
+
                 <option value="Other" {% if draft_data.gender == 'Other' %}selected{% endif %}>Other</option>
+
               </select>
+
             </td>
+
           </tr>
+
           <tr>
+
             <th>Date of Birth</th>
+
             <td><input class="in" type="date" name="dob" value="{{ draft_data.dob|default:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
             <th>Aadhar No.</th>
+
             <td><input class="in" type="text" name="aadhar" value="{{ draft_data.aadhar|default:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
           </tr>
+
           <tr>
+
             <th>Permanent Address</th>
+
             <td colspan="3"><input class="in" type="text" name="perm_address" value="{{ draft_data.perm_address|default:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
           </tr>
+
           <tr>
+
             <th>Correspondence Address</th>
+
             <td colspan="3"><input class="in" type="text" name="corr_address" value="{{ draft_data.corr_address|default:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
           </tr>
+
           <tr>
+
             <th>Mobile / Telephone</th>
+
             <td><input class="in" type="text" name="mobile" value="{{ draft_data.mobile|default:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
             <th>E-mail</th>
+
             <td><input class="in" type="email" name="email" value="{{ draft_data.email|default:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
           </tr>
+
           <tr>
+
             <th>State</th>
+
             <td>
+
               <select class="in" name="state" {% if is_read_only %}disabled{% endif %}>
+
                 <option value="">Select State</option>
+
                 <option value="Andhra Pradesh" {% if draft_data.state == 'Andhra Pradesh' %}selected{% endif %}>Andhra Pradesh</option>
+
                 <option value="Arunachal Pradesh" {% if draft_data.state == 'Arunachal Pradesh' %}selected{% endif %}>Arunachal Pradesh</option>
+
                 <option value="Assam" {% if draft_data.state == 'Assam' %}selected{% endif %}>Assam</option>
+
                 <option value="Bihar" {% if draft_data.state == 'Bihar' %}selected{% endif %}>Bihar</option>
+
                 <option value="Chhattisgarh" {% if draft_data.state == 'Chhattisgarh' %}selected{% endif %}>Chhattisgarh</option>
+
                 <option value="Goa" {% if draft_data.state == 'Goa' %}selected{% endif %}>Goa</option>
+
                 <option value="Gujarat" {% if draft_data.state == 'Gujarat' %}selected{% endif %}>Gujarat</option>
+
                 <option value="Haryana" {% if draft_data.state == 'Haryana' %}selected{% endif %}>Haryana</option>
+
                 <option value="Himachal Pradesh" {% if draft_data.state == 'Himachal Pradesh' %}selected{% endif %}>Himachal Pradesh</option>
+
                 <option value="Jharkhand" {% if draft_data.state == 'Jharkhand' %}selected{% endif %}>Jharkhand</option>
+
                 <option value="Karnataka" {% if draft_data.state == 'Karnataka' %}selected{% endif %}>Karnataka</option>
+
                 <option value="Kerala" {% if draft_data.state == 'Kerala' %}selected{% endif %}>Kerala</option>
+
                 <option value="Madhya Pradesh" {% if draft_data.state == 'Madhya Pradesh' %}selected{% endif %}>Madhya Pradesh</option>
+
                 <option value="Maharashtra" {% if draft_data.state == 'Maharashtra' %}selected{% endif %}>Maharashtra</option>
+
                 <option value="Manipur" {% if draft_data.state == 'Manipur' %}selected{% endif %}>Manipur</option>
+
                 <option value="Meghalaya" {% if draft_data.state == 'Meghalaya' %}selected{% endif %}>Meghalaya</option>
+
                 <option value="Mizoram" {% if draft_data.state == 'Mizoram' %}selected{% endif %}>Mizoram</option>
+
                 <option value="Nagaland" {% if draft_data.state == 'Nagaland' %}selected{% endif %}>Nagaland</option>
+
                 <option value="Odisha" {% if draft_data.state == 'Odisha' %}selected{% endif %}>Odisha</option>
+
                 <option value="Punjab" {% if draft_data.state == 'Punjab' %}selected{% endif %}>Punjab</option>
+
                 <option value="Rajasthan" {% if draft_data.state == 'Rajasthan' %}selected{% endif %}>Rajasthan</option>
+
                 <option value="Sikkim" {% if draft_data.state == 'Sikkim' %}selected{% endif %}>Sikkim</option>
+
                 <option value="Tamil Nadu" {% if draft_data.state == 'Tamil Nadu' %}selected{% endif %}>Tamil Nadu</option>
+
                 <option value="Telangana" {% if draft_data.state == 'Telangana' %}selected{% endif %}>Telangana</option>
+
                 <option value="Tripura" {% if draft_data.state == 'Tripura' %}selected{% endif %}>Tripura</option>
+
                 <option value="Uttar Pradesh" {% if draft_data.state == 'Uttar Pradesh' %}selected{% endif %}>Uttar Pradesh</option>
+
                 <option value="Uttarakhand" {% if draft_data.state == 'Uttarakhand' %}selected{% endif %}>Uttarakhand</option>
+
                 <option value="West Bengal" {% if draft_data.state == 'West Bengal' %}selected{% endif %}>West Bengal</option>
+
               </select>
+
             </td>
+
             <th>District</th>
+
             <td><input class="in" type="text" name="district" value="{{ draft_data.district|default:'' }}" placeholder="Enter District" {% if is_read_only %}disabled{% endif %} /></td>
+
           </tr>
+
           <tr>
+
             <th>Pincode</th>
+
             <td><input class="in" type="text" name="pincode" value="{{ draft_data.pincode|default:'' }}" placeholder="Enter Pincode" {% if is_read_only %}disabled{% endif %} /></td>
+
             <th>Category</th>
+
             <td>
+
               <select class="in" name="category" {% if is_read_only %}disabled{% endif %}>
+
                 <option value="">Select Category</option>
-                <option value="General" {% if draft_data.category == 'General' %}selected{% endif %}>General</option>
-                <option value="General-EWS" {% if draft_data.category == 'General-EWS' %}selected{% endif %}>General-EWS</option>
+
+                <option value="AIG" {% if draft_data.category == 'AIG' %}selected{% endif %}>AIG</option>
+
+                <option value="AIG (EWS)" {% if draft_data.category == 'AIG (EWS)' %}selected{% endif %}>AIG (EWS)</option>
+
+                <option value="HGC" {% if draft_data.category == 'HGC' %}selected{% endif %}>HGC</option>
+
+                <option value="HGC (EWS)" {% if draft_data.category == 'HGC (EWS)' %}selected{% endif %}>HGC (EWS)</option>
+
                 <option value="SC" {% if draft_data.category == 'SC' %}selected{% endif %}>SC</option>
-                <option value="ST" {% if draft_data.category == 'ST' %}selected{% endif %}>ST</option>
-                <option value="OBC" {% if draft_data.category == 'OBC' %}selected{% endif %}>OBC</option>
-                <option value="OBC-NCL" {% if draft_data.category == 'OBC-NCL' %}selected{% endif %}>OBC-NCL</option>
-                <option value="General-EWS" {% if personal_detail.category == 'General-EWS' %}selected{% endif %}>General-EWS</option>
-                <option value="SC" {% if personal_detail.category == 'SC' %}selected{% endif %}>SC</option>
-                <option value="ST" {% if personal_detail.category == 'ST' %}selected{% endif %}>ST</option>
-                <option value="OBC" {% if personal_detail.category == 'OBC' %}selected{% endif %}>OBC</option>
-                <option value="OBC-NCL" {% if personal_detail.category == 'OBC-NCL' %}selected{% endif %}>OBC-NCL</option>
+
+                <option value="DSC" {% if draft_data.category == 'DSC' %}selected{% endif %}>DSC</option>
+
+                <option value="BC-A" {% if draft_data.category == 'BC-A' %}selected{% endif %}>BC-A</option>
+
+                <option value="BC-B" {% if draft_data.category == 'BC-B' %}selected{% endif %}>BC-B</option>
+
+                <option value="PH/ESM" {% if draft_data.category == 'PH/ESM' %}selected{% endif %}>PH/ESM</option>
+
               </select>
+
             </td>
+
           </tr>
+
         </table>
+
       </div>
 
-      <!-- <div class="sec">
-        <div class="sec-title">2. Correspondence Address (in block letters)</div>
-        <table>
-          <tr>
-            <th style="width: 30%">Correspondence Address</th>
-            <td colspan="3"><input class="in" type="text" name="corr_address_block" value="{{ personal_detail.current_address|default:'' }}" style="text-transform: uppercase;" /></td>
-          </tr>
-          <tr>
-            <th>Mobile/Telephone No.</th>
-            <td><input class="in" type="text" name="mobile_telephone" value="{{ personal_detail.mobile_number|default:'' }}" /></td>
-            <th>E-mail</th>
-            <td><input class="in" type="email" name="email_correspondence" value="{{ user.email|default:'' }}" /></td>
-          </tr>
-        </table>
-      </div> -->
+      <div class="sec">
 
-      <!-- <div class="sec">
-        <div class="sec-title">3. Category</div>
-        <table>
-          <tr>
-            <th>Tick appropriate category</th>
-            <td colspan="3">
-              <label style="margin-right: 15px;"><input type="radio" name="category_tick" value="GEN" {% if personal_detail.category == 'General' %}checked{% endif %}> GEN</label>
-              <label style="margin-right: 15px;"><input type="radio" name="category_tick" value="OBC" {% if personal_detail.category == 'OBC' %}checked{% endif %}> OBC</label>
-              <label style="margin-right: 15px;"><input type="radio" name="category_tick" value="SC" {% if personal_detail.category == 'SC' %}checked{% endif %}> SC</label>
-              <label style="margin-right: 15px;"><input type="radio" name="category_tick" value="ST" {% if personal_detail.category == 'ST' %}checked{% endif %}> ST</label>
-              <label style="margin-right: 15px;"><input type="radio" name="category_tick" value="EWS" {% if personal_detail.category == 'General-EWS' %}checked{% endif %}> EWS</label>
-              <label style="margin-right: 15px;"><input type="radio" name="category_tick" value="PwBD" {% if personal_detail.category == 'PwBD' %}checked{% endif %}> PwBD</label><br>
-              <label style="margin-right: 15px;"><input type="radio" name="category_tick" value="ESM" {% if personal_detail.category == 'ESM' %}checked{% endif %}> ESM</label>
-              <label style="margin-right: 15px;"><input type="radio" name="category_tick" value="DFF" {% if personal_detail.category == 'DFF' %}checked{% endif %}> DFF</label>
-              <label style="margin-right: 15px;"><input type="radio" name="category_tick" value="OTHER" {% if personal_detail.category and personal_detail.category not in 'General,OBC,SC,ST,General-EWS,PwBD,ESM,DFF' %}checked{% endif %}> Other</label>
-              {% if personal_detail.category and personal_detail.category not in 'General,OBC,SC,ST,General-EWS,PwBD,ESM,DFF' %}
-                <input type="text" name="category_other" value="{{ personal_detail.category }}" placeholder="Specify" />
-              {% else %}
-                <input type="text" name="category_other" placeholder="Specify" />
-              {% endif %}
-            </td>
-          </tr>
-        </table>
-      </div> -->
-      <div class="sec">
-        <div class="sec-title">2. Apply Course</div>
-          <table>
-              <tr>
-                <th style="width: 30%">Apply Course</th>
-                <td colspan="3">
-                  <select class="in" name="apply_course" id="apply_course" onchange="toggleDepartmentField()">
-                    <option value="">-- Select Course --</option>
-                    <option value="Ph.D."{% if draft_data.apply_course == 'Ph.D.' %} selected{% endif %}>Ph.D.</option>
-                    <option value="PGDRP"{% if draft_data.apply_course == 'PGDRP' %} selected{% endif %}>PGDRP</option>
-                  </select>
-                </td>
-              </tr>
-              <tr id="department_row" class="{% if draft_data.apply_course == 'Ph.D.' %}department-visible{% else %}department-hidden{% endif %}">
-                <th style="width: 30%">Department</th>
-                <td colspan="3">
-                  <select class="in" name="department" id="department">
-                    <option value="">-- Select Department --</option>
-                    <option value="Physical Education"{% if draft_data.department == 'Physical Education' %} selected{% endif %}>Physical Education</option>
-                    <option value="Zoology"{% if draft_data.department == 'Zoology' %} selected{% endif %}>Zoology</option>
-                    <option value="Commerce"{% if draft_data.department == 'Commerce' %} selected{% endif %}>Commerce</option>
-                    <option value="Biotechnology"{% if draft_data.department == 'Biotechnology' %} selected{% endif %}>Biotechnology</option>
-                    <option value="Physics"{% if draft_data.department == 'Physics' %} selected{% endif %}>Physics</option>
-                    <option value="Pharmaceutical"{% if draft_data.department == 'Pharmaceutical' %} selected{% endif %}>Pharmaceutical</option>
-                    <option value="Psychology"{% if draft_data.department == 'Psychology' %} selected{% endif %}>Psychology</option>
-                    <option value="History"{% if draft_data.department == 'History' %} selected{% endif %}>History</option>
-                    <option value="Chemistry"{% if draft_data.department == 'Chemistry' %} selected{% endif %}>Chemistry</option>
-                    <option value="Management"{% if draft_data.department == 'Management' %} selected{% endif %}>Management</option>
-                    <option value="Math"{% if draft_data.department == 'Math' %} selected{% endif %}>Math</option>
-                    <option value="English"{% if draft_data.department == 'English' %} selected{% endif %}>English</option>
-                  </select>
-                </td>
-              </tr>
-              <tr id="study_mode_row" class="{% if draft_data.apply_course == 'Ph.D.' %}department-visible{% else %}department-hidden{% endif %}">
-                <th style="width: 30%">Study Mode</th>
-                <td colspan="3">
-                  <select class="in" name="study_mode" id="study_mode">
-                    <option value="">-- Select Study Mode --</option>
-                    <option value="Full Time"{% if draft_data.study_mode == 'Full Time' %} selected{% endif %}>Full Time</option>
-                    <option value="Part Time"{% if draft_data.study_mode == 'Part Time' %} selected{% endif %}>Part Time</option>
-                  </select>
-                </td>
-              </tr>
-          </table>
-      </div>
-      <div class="sec">
         <div class="sec-title">3. Broad area of Specialization in Ph.D. course</div>
+
         <table>
+
           <tr>
+
             <th style="width: 30%">Area of Specialization</th>
+
             <td colspan="3"><input class="in" type="text" name="specialization_area" value="{{ draft_data.specialization_area|default:'' }}" placeholder="Enter your broad area of specialization" /></td>
+
           </tr>
+
           <tr>
+
             <th style="width: 30%">Name of Proposed Supervisor(s)</th>
+
             <td colspan="3"><input class="in" type="text" name="proposed_supervisor" value="{{ draft_data.proposed_supervisor|default:'' }}" placeholder="Enter name(s) of proposed supervisor(s)" /></td>
+
           </tr>
+
         </table>
+
       </div>
 
+
+
       <div class="sec">
+
         <div class="sec-title">4. Select your category, as per UGC notification regarding NET as entrance test 27.03.2024</div>
+
         <table>
+
           <tr>
+
             <th style="width: 30%">UGC Category</th>
+
             <td colspan="3">
+
               <select class="in" name="ugc_category" id="ugc_category" onchange="toggleUgcDateField()">
+
                 <option value="">-- Select Category --</option>
+
                 <option value="Category I (JRF)" {% if draft_data.ugc_category == 'Category I (JRF)' %}selected{% endif %}>Category I (JRF)</option>
+
                 <option value="Category II (NET)" {% if draft_data.ugc_category == 'Category II (NET)' %}selected{% endif %}>Category II (NET)</option>
+
                 <option value="Category III (Ph.D. Only)" {% if draft_data.ugc_category == 'Category III (Ph.D. Only)' %}selected{% endif %}>Category III (Ph.D. Only)</option>
+
                 <option value="Not Applicable" {% if draft_data.ugc_category == 'Not Applicable' %}selected{% endif %}>Not Applicable</option>
+
               </select>
+
             </td>
+
           </tr>
+
           <tr id="ugc_date_row" style="display: {% if draft_data.ugc_category and 'Not Applicable' not in draft_data.ugc_category %}table-row{% else %}none{% endif %};">
+
             <th style="width: 30%">UGC Validity Date</th>
+
             <td colspan="3">
+
               <input class="in" type="date" name="ugc_validity_date" value="{{ draft_data.ugc_validity_date|default:'' }}" />
+
             </td>
+
           </tr>
+
         </table>
+
       </div>
 
+
+
       <div class="sec">
+
         <div class="sec-title">5. Fellowship Details</div>
+
         <table>
+
           <tr>
+
             <th colspan="4">(i) Mention date of validity for entitlement of fellowship as per award letter of UGC/CSIR-NET-JRF as per the phd ordinanc and also enclose docmentry proof in dublicate in support thereof addmission in phd course.</th>
+
           </tr>
+
           <tr>
+
             <th style="width: 30%">Date of Validity</th>
+
             <td colspan="3"><input class="in" type="date" name="fellowship_validity" value="{{ draft_data.fellowship_validity|default:'' }}" /></td>
+
           </tr>
+
           <tr>
+
             <th colspan="4">(ii) Category of candidate in which he/she appeared for UGC-NET/JRF/Any Other Equivalent Fellowship</th>
+
           </tr>
+
           <tr>
+
             <th>Fellowship Category</th>
+
             <td colspan="3">
+
               <select class="in" name="fellowship_category">
+
                 <option value="">Select</option>
+
                 <option value="UGC-NET-JRF" {% if draft_data.fellowship_category == 'UGC-NET-JRF' %}selected{% endif %}>UGC-NET-JRF</option>
+
                 <option value="CSIR-NET-JRF" {% if draft_data.fellowship_category == 'CSIR-NET-JRF' %}selected{% endif %}>CSIR-NET-JRF</option>
+
                 <option value="Other" {% if draft_data.fellowship_category == 'Other' %}selected{% endif %}>Other</option>
+
               </select>
+
             </td>
+
           </tr>
+
         </table>
+
       </div>
 
+
+
       <div class="sec">
+
         <div class="sec-title">6. Employment Details</div>
+
         <table>
+
           <tr>
+
             <th colspan="4">(i) Whether employed</th>
+
           </tr>
+
           <tr>
+
             <th style="width: 30%">Employment Status</th>
+
             <td colspan="3">
+
               <label style="margin-right: 15px;"><input type="radio" name="employed_status" value="Yes" {% if draft_data.employed_status == 'Yes' %}checked{% endif %}> Yes</label>
+
               <label style="margin-right: 15px;"><input type="radio" name="employed_status" value="No" {% if draft_data.employed_status == 'No' %}checked{% endif %}> No</label>
+
             </td>
+
           </tr>
+
         </table>
+
         
+
         <table style="margin-top: 10px;">
+
           <tr>
+
             <th colspan="4">If employed, mention:</th>
+
           </tr>
+
           <tr>
+
             <th style="width: 30%">a) Name of Post/Designation</th>
+
             <td colspan="3"><input class="in" type="text" name="emp_post_current" value="{{ draft_data.emp_post_current|default:'' }}" /></td>
+
           </tr>
+
           <tr>
+
             <th>b) Nature of Job</th>
+
             <td colspan="3">
+
               <select class="in" name="job_nature">
+
                 <option value="">Select</option>
+
                 <option value="Regular" {% if draft_data.job_nature == 'Regular' %}selected{% endif %}>Regular</option>
+
                 <option value="Contractual" {% if draft_data.job_nature == 'Contractual' %}selected{% endif %}>Contractual</option>
+
                 <option value="Hired" {% if draft_data.job_nature == 'Hired' %}selected{% endif %}>Hired</option>
+
               </select>
+
             </td>
+
           </tr>
+
           <tr>
+
             <th>c) Date of Joining the Service</th>
+
             <td colspan="3"><input class="in" type="date" name="date_of_joining" value="{{ draft_data.date_of_joining|default:'' }}" /></td>
+
           </tr>
+
           <tr>
+
             <th>d) Total period of Service</th>
+
             <td colspan="3"><input class="in" type="text" name="service_period" value="{{ draft_data.service_period|default:'' }}" placeholder="e.g., 2 years 3 months" /></td>
+
           </tr>
+
           <tr>
+
             <th>e) Name of the Organization</th>
+
             <td colspan="3"><input class="in" type="text" name="organization_name_current" value="{{ draft_data.organization_name_current|default:'' }}" /></td>
+
           </tr>
+
           <tr>
+
             <th>f) Address of the Organization</th>
+
             <td colspan="3"><input class="in" type="text" name="organization_address" value="{{ draft_data.organization_address|default:'' }}" /></td>
+
           </tr>
+
           <tr>
+
             <th>Telephone/Mobile</th>
+
             <td><input class="in" type="text" name="org_telephone" value="{{ draft_data.org_telephone|default:'' }}" /></td>
+
             <th>Email</th>
+
             <td><input class="in" type="email" name="org_email" value="{{ draft_data.org_email|default:'' }}" /></td>
+
           </tr>
+
         </table>
+
       </div>
 
+
+
       <div class="sec">
+
         <div class="sec-title">7. Details of previous research experience</div>
+
         <table>
+
           <tr>
+
             <th>Research Experience</th>
+
             <td colspan="3"><textarea class="in" name="research_experience" rows="4" style="width: 100%; border: none; outline: none; resize: vertical;" placeholder="Describe your previous research experience, if any">{{ draft_data.research_experience|default:'' }}</textarea></td>
+
           </tr>
+
         </table>
+
       </div>
 
+
+
       <div class="sec">
+
         <div class="sec-title">8. Details of publications, if any</div>
+
         <table>
+
           <tr>
+
             <th>Publications</th>
+
             <td colspan="3"><textarea class="in" name="publications" rows="4" style="width: 100%; border: none; outline: none; resize: vertical;" placeholder="List your publications, if any">{{ draft_data.publications|default:'' }}</textarea></td>
+
           </tr>
+
         </table>
+
       </div>
 
+
+
       <div class="sec">
+
         <div class="sec-title">9. Whether pursuing any other course of study</div>
+
         <table>
+
           <tr>
+
             <th style="width: 30%">Currently pursuing other course?</th>
+
             <td>
+
               <label style="margin-right: 15px;"><input type="radio" name="pursuing_other_course" value="Yes" {% if draft_data.pursuing_other_course == 'Yes' %}checked{% endif %}> Yes</label>
+
               <label style="margin-right: 15px;"><input type="radio" name="pursuing_other_course" value="No" {% if draft_data.pursuing_other_course == 'No' %}checked{% endif %}> No</label>
+
             </td>
+
           </tr>
+
           <tr>
+
             <th>If yes, mention:</th>
+
             <th style="width: 25%">Institution</th>
+
             <th style="width: 25%">Class</th>
+
             <th style="width: 20%">Session/Year</th>
+
             <th style="width: 20%">Result</th>
+
           </tr>
+
           <tr>
+
             <td></td>
+
             <td><input class="in" type="text" name="other_institution" value="{{ draft_data.other_institution|default:'' }}" /></td>
+
             <td><input class="in" type="text" name="other_class" value="{{ draft_data.other_class|default:'' }}" /></td>
+
             <td><input class="in" type="text" name="other_session" value="{{ draft_data.other_session|default:'' }}" /></td>
+
             <td><input class="in" type="text" name="other_result" value="{{ draft_data.other_result|default:'' }}" /></td>
+
           </tr>
+
         </table>
+
       </div>
 
+
+
       <div class="sec">
+
         <div class="sec-title">10. Academic Qualifications</div>
 
+
+
         <table id="aqTable">
+
           <thead>
+
             <tr>
+
               <th style="width: 15%">Examination Passed</th>
+
               <th style="width: 18%">Name of University / Board</th>
+
               <th style="width: 8%">Year of Passing</th>
+
               <th style="width: 8%">Roll No.</th>
+
               <th style="width: 8%">Marks Obtained</th>
+
               <th style="width: 8%">Total Marks</th>
+
               <th style="width: 10%">Subjects</th>
+
               <th style="width: 15%">Upload Certificate</th>
+
               <th style="width: 80px; text-align:center;">Action</th>
+
             </tr>
+
           </thead>
+
           <tbody id="aqBody">
+
             {% if draft_data.academic_qualifications %}
+
               {% for qual in draft_data.academic_qualifications %}
+
               <tr class="aqRow">
+
                 <td>
+
                   <select class="in" name="aq_exam[]" {% if is_read_only %}disabled{% endif %}>
+
                     <option value="">Select</option>
+
                     <option value="10th" {% if qual.qualification == '10th' %}selected{% endif %}>10th</option>
+
                     <option value="12th" {% if qual.qualification == '12th' %}selected{% endif %}>12th</option>
+
                     <option value="Graduation" {% if qual.qualification == 'Graduation' %}selected{% endif %}>Graduation</option>
+
                     <option value="Post Graduation" {% if qual.qualification == 'Post Graduation' %}selected{% endif %}>Post Graduation</option>
+
                     <option value="UGC/CSIR JRF" {% if qual.qualification == 'UGC/CSIR JRF' %}selected{% endif %}>UGC/CSIR JRF</option>
+
                     <option value="Other" {% if qual.qualification == 'Other' %}selected{% endif %}>Other</option>
+
                   </select>
+
                 </td>
+
                 <td><input class="in" name="aq_board[]" type="text" value="{{ qual.board_university|default_if_none:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
                 <td><input class="in" name="aq_year[]" type="text" value="{{ qual.passing_year|default_if_none:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
                 <td><input class="in" name="aq_roll[]" type="text" value="{{ qual.roll_number|default_if_none:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
                 <td><input class="in" name="aq_marks_obtained[]" type="number" min="0" value="{{ qual.marks_obtained|default_if_none:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
                 <td><input class="in" name="aq_total_marks[]" type="number" min="0" value="{{ qual.total_marks|default_if_none:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
                 <td><input class="in" name="aq_subjects[]" type="text" value="{{ qual.subjects|default_if_none:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
                 <td>
+
                   <input class="in" type="file" name="aq_certificate[]" accept=".pdf,.jpg,.jpeg,.png" {% if is_read_only %}disabled{% endif %} />
+
                   {% if qual.certificate_file_name %}
+
                     <br><small>File: {{ qual.certificate_file_name }} ({{ qual.certificate_file_size|filesizeformat }})</small>
+
                   {% endif %}
+
                 </td>
+
                 <td style="text-align:center;">
+
                   <div class="acts">
+
                     {% if not is_read_only %}
+
                     <button type="button" class="icon-btn add" onclick="addAqRow()" title="Add"><i class="fa-solid fa-plus"></i></button>
+
                     <button type="button" class="icon-btn" onclick="delAqRow(this)" title="Delete"><i class="fa-solid fa-trash"></i></button>
+
                     {% endif %}
+
                   </div>
+
                 </td>
+
               </tr>
+
               {% endfor %}
+
             {% else %}
+
             <tr class="aqRow">
+
               <td>
+
                 <select class="in" name="aq_exam[]" {% if is_read_only %}disabled{% endif %}>
+
                   <option value="">Select</option>
+
                   <option value="10th">10th</option>
+
                   <option value="12th">12th</option>
+
                   <option value="Graduation">Graduation</option>
+
                   <option value="Post Graduation">Post Graduation</option>
+
                   <option value="UGC/CSIR JRF">UGC/CSIR JRF</option>
+
                   <option value="Other">Other</option>
+
                 </select>
+
               </td>
+
               <td><input class="in" name="aq_board[]" type="text" {% if is_read_only %}disabled{% endif %} /></td>
+
               <td><input class="in" name="aq_year[]" type="text" {% if is_read_only %}disabled{% endif %} /></td>
+
               <td><input class="in" name="aq_roll[]" type="text" {% if is_read_only %}disabled{% endif %} /></td>
+
               <td><input class="in" name="aq_marks_obtained[]" type="number" min="0" {% if is_read_only %}disabled{% endif %} /></td>
+
               <td><input class="in" name="aq_total_marks[]" type="number" min="0" {% if is_read_only %}disabled{% endif %} /></td>
+
               <td><input class="in" name="aq_subjects[]" type="text" {% if is_read_only %}disabled{% endif %} /></td>
+
               <td>
+
                 <input class="in" type="file" name="aq_certificate[]" accept=".pdf,.jpg,.jpeg,.png" {% if is_read_only %}disabled{% endif %} />
+
               </td>
+
               <td style="text-align:center;">
+
                 <div class="acts">
+
                   {% if not is_read_only %}
+
                   <button type="button" class="icon-btn add" onclick="addAqRow()" title="Add"><i class="fa-solid fa-plus"></i></button>
+
                   <button type="button" class="icon-btn" onclick="delAqRow(this)" title="Delete"><i class="fa-solid fa-trash"></i></button>
+
                   {% endif %}
+
                 </div>
+
               </td>
+
             </tr>
+
             {% endif %}
+
           </tbody>
+
         </table>
+
       </div>
 
+
+
       <div class="sec">
+
         <div class="sec-title">11. Employment History</div>
 
+
+
         <table id="empTable">
+
           <thead>
+
             <tr>
+
               <th style="width: 7%">Sr.</th>
+
               <th style="width: 20%">Name of Post Held</th>
+
               <th style="width: 20%">Name of Organization</th>
+
               <th style="width: 10%">From</th>
+
               <th style="width: 10%">To</th>
+
               <th style="width: 18%">Type / Nature of Job</th>
+
               <th style="width: 15%">Remarks</th>
+
               <th style="width: 80px; text-align:center;">Action</th>
+
             </tr>
+
           </thead>
+
           <tbody id="empBody">
+
             {% if draft_data.employment_history_data %}
+
               {% for emp in draft_data.employment_history_data %}
+
               <tr class="empRow">
+
                 <td style="text-align:center;"><input class="in" name="emp_sr[]" type="text" value="{{ forloop.counter }}" {% if is_read_only %}disabled{% endif %} /></td>
+
                 <td><input class="in" name="emp_post[]" type="text" value="{{ emp.designation|default_if_none:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
                 <td><input class="in" name="emp_org[]" type="text" value="{{ emp.organization_name|default_if_none:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
                 <td><input class="in" name="emp_from[]" type="date" value="{{ emp.from_date|default_if_none:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
                 <td><input class="in" name="emp_to[]" type="date" value="{{ emp.to_date|default_if_none:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
                 <td><input class="in" name="emp_type[]" type="text" value="{{ emp.experience_type|default_if_none:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
                 <td><input class="in" name="emp_remarks[]" type="text" value="{{ emp.remarks|default_if_none:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
                 <td style="text-align:center;">
+
                   <div class="acts">
+
                     {% if not is_read_only %}
+
                     <button type="button" class="icon-btn add" onclick="addEmpRow()" title="Add"><i class="fa-solid fa-plus"></i></button>
+
                     <button type="button" class="icon-btn" onclick="delEmpRow(this)" title="Delete"><i class="fa-solid fa-trash"></i></button>
+
                     {% endif %}
+
                   </div>
+
                 </td>
+
               </tr>
+
               {% endfor %}
+
             {% else %}
+
             <tr class="empRow">
+
               <td style="text-align:center;"><input class="in" name="emp_sr[]" type="text" value="1" {% if is_read_only %}disabled{% endif %} /></td>
+
               <td><input class="in" name="emp_post[]" type="text" {% if is_read_only %}disabled{% endif %} /></td>
+
               <td><input class="in" name="emp_org[]" type="text" {% if is_read_only %}disabled{% endif %} /></td>
+
               <td><input class="in" name="emp_from[]" type="date" {% if is_read_only %}disabled{% endif %} /></td>
+
               <td><input class="in" name="emp_to[]" type="date" {% if is_read_only %}disabled{% endif %} /></td>
+
               <td><input class="in" name="emp_type[]" type="text" {% if is_read_only %}disabled{% endif %} /></td>
+
               <td><input class="in" name="emp_remarks[]" type="text" {% if is_read_only %}disabled{% endif %} /></td>
+
               <td style="text-align:center;">
+
                 <div class="acts">
+
                   {% if not is_read_only %}
+
                   <button type="button" class="icon-btn add" onclick="addEmpRow()" title="Add"><i class="fa-solid fa-plus"></i></button>
+
                   <button type="button" class="icon-btn" onclick="delEmpRow(this)" title="Delete"><i class="fa-solid fa-trash"></i></button>
+
                   {% endif %}
+
                 </div>
+
               </td>
+
             </tr>
+
             {% endif %}
+
           </tbody>
+
         </table>
+
       </div>
 
+
+
+            <!-- Document Uploads Section -->
+
       <div class="sec">
-        <div class="sec-title">12. Declaration</div>
+
+        <div class="sec-title">12. Document Uploads (SOP Certificates)</div>
+
+        
+
+        <table>
+
+          <tr>
+
+            <th style="width: 40%">No Objection cum Service Certificate (SOP-II)</th>
+
+            <td>
+
+              <input class="in" type="file" name="no_objection_certificate" accept=".pdf,.jpg,.jpeg,.png" {% if is_read_only %}disabled{% endif %} />
+
+              {% if draft_application.no_objection_certificate %}
+
+                <br><small>Current: <a href="{{ draft_application.no_objection_certificate.url }}" target="_blank">View File</a></small>
+
+              {% endif %}
+
+            </td>
+
+            <th style="width: 5%">Required for employed candidates</th>
+
+          </tr>
+
+          <tr>
+
+            <th>Certificate from Father/Guardian (SOP-III)</th>
+
+            <td>
+
+              <input class="in" type="file" name="father_guardian_certificate" accept=".pdf,.jpg,.jpeg,.png" {% if is_read_only %}disabled{% endif %} />
+
+              {% if draft_application.father_guardian_certificate %}
+
+                <br><small>Current: <a href="{{ draft_application.father_guardian_certificate.url }}" target="_blank">View File</a></small>
+
+              {% endif %}
+
+            </td>
+
+            <td></td>
+
+          </tr>
+
+          <tr>
+
+            <th>Affidavit of Parent/Guardian (SOP-IV)</th>
+
+            <td>
+
+              <input class="in" type="file" name="parent_guardian_affidavit" accept=".pdf,.jpg,.jpeg,.png" {% if is_read_only %}disabled{% endif %} />
+
+              {% if draft_application.parent_guardian_affidavit %}
+
+                <br><small>Current: <a href="{{ draft_application.parent_guardian_affidavit.url }}" target="_blank">View File</a></small>
+
+              {% endif %}
+
+            </td>
+
+            <td>Attested by executive magistrate/oath commissioner/notary public</td>
+
+          </tr>
+
+          <tr>
+
+            <th>Character Certificate (SOP-V)</th>
+
+            <td>
+
+              <input class="in" type="file" name="character_certificate" accept=".pdf,.jpg,.jpeg,.png" {% if is_read_only %}disabled{% endif %} />
+
+              {% if draft_application.character_certificate %}
+
+                <br><small>Current: <a href="{{ draft_application.character_certificate.url }}" target="_blank">View File</a></small>
+
+              {% endif %}
+
+            </td>
+
+            <td>Required if there is gap in study</td>
+
+          </tr>
+
+          <tr>
+
+            <th>Category Certificate (SOP-VI to SOP-XI)</th>
+
+            <td>
+
+              <input class="in" type="file" name="category_certificate" accept=".pdf,.jpg,.jpeg,.png" {% if is_read_only %}disabled{% endif %} />
+
+              {% if draft_application.category_certificate %}
+
+                <br><small>Current: <a href="{{ draft_application.category_certificate.url }}" target="_blank">View File</a></small>
+
+              {% endif %}
+
+            </td>
+
+            <td>SC/ST/BC/EWS/SBC/PwD/ESM/Others certificate in Govt. format</td>
+
+          </tr>
+
+          <tr>
+
+            <th>Haryana Domicile Certificate</th>
+
+            <td>
+
+              <input class="in" type="file" name="haryana_domicile_certificate" accept=".pdf,.jpg,.jpeg,.png" {% if is_read_only %}disabled{% endif %} />
+
+              {% if draft_application.haryana_domicile_certificate %}
+
+                <br><small>Current: <a href="{{ draft_application.haryana_domicile_certificate.url }}" target="_blank">View File</a></small>
+
+              {% endif %}
+
+            </td>
+
+            <td>If applicable</td>
+
+          </tr>
+
+          <tr>
+
+            <th>NRI/Foreign Citizen Declaration (SOP-XII)</th>
+
+            <td>
+
+              <input class="in" type="file" name="nri_declaration" accept=".pdf,.jpg,.jpeg,.png" {% if is_read_only %}disabled{% endif %} />
+
+              {% if draft_application.nri_declaration %}
+
+                <br><small>Current: <a href="{{ draft_application.nri_declaration.url }}" target="_blank">View File</a></small>
+
+              {% endif %}
+
+            </td>
+
+            <td>If applicable</td>
+
+          </tr>
+
+          <tr>
+
+            <th>Migration Certificate</th>
+
+            <td>
+
+              <input class="in" type="file" name="migration_certificate" accept=".pdf,.jpg,.jpeg,.png" {% if is_read_only %}disabled{% endif %} />
+
+              {% if draft_application.migration_certificate %}
+
+                <br><small>Current: <a href="{{ draft_application.migration_certificate.url }}" target="_blank">View File</a></small>
+
+              {% endif %}
+
+            </td>
+
+            <td></td>
+
+          </tr>
+
+        </table>
+
+      </div>
+
+
+
+
+
+      <div class="sec">
+
+        <div class="sec-title">13. Declaration</div>
+
         <div class="note">
+
           I hereby declare that all the information provided above is true and correct. If any information is found incorrect, my application may be rejected.
+
         </div>
 
+        
 
+      
+
+        
+
+        
+
+        {% if not has_submitted_application %}
+
+        {% if not has_draft_application %}
+
+        {% endif %}
+
+        {% if has_draft_application %}
+
+        <div class="sec">
+
+          <div class="sec-title">14. Payment Details</div>
+
+          
+
+          <table>
+
+            <tr>
+
+              <th style="width: 30%">Payment Date</th>
+
+              <td><input class="in" type="date" name="payment_date" value="{{ draft_data.payment_date|default:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
+              <th style="width: 30%">Payment ID</th>
+
+              <td><input class="in" type="text" name="payment_id" value="{{ draft_data.payment_id|default:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
+
+              <h5 style="color: red;">Please make payment first then fill the payment details and submit the form</h5>
+
+            </tr>
+
+          </table>
+
+          {% endif %}
+
+        </div>
 
         <table class="sign">
-          <tr>
-            <td>Date: __________</td>
-            <td>Place: __________</td>
-            <td style="text-align:right;">Signature: __________</td>
-          </tr>
-        </table>
-      </div>
 
+            <tr>
 
-      {% if not has_submitted_application %}
-          {% if not has_draft_application %}
-           {% endif %}
-          {% if has_draft_application %}
-      <div class="sec">
-        <div class="sec-title">13. Payment Details</div>
-        
-        <table>
-          <tr>
-            <th style="width: 30%">Payment Date</th>
-            <td><input class="in" type="date" name="payment_date" value="{{ draft_data.payment_date|default:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
-            <th style="width: 30%">Payment ID</th>
-            <td><input class="in" type="text" name="payment_id" value="{{ draft_data.payment_id|default:'' }}" {% if is_read_only %}disabled{% endif %} /></td>
-          </tr>
-        </table>
-{% endif %}
-          {% endif %}
+              <td>Date: __________</td>
 
+              <td>Place: __________</td>
+
+              <td style="text-align:right;">Signature: __________</td>
+
+            </tr>
+
+          </table>
+
+      {% endif %}
 
       <div class="btnbar">
+
         <a class="btn outline" href="{% url 'dashboard' %}"><i class="fa-solid fa-arrow-left"></i> Back</a>
+
        {% if not has_submitted_application %}
+
           {% if not has_draft_application %}
+
           <button type="submit" name="action" value="save" class="btn secondary" style="background: #6c757d; color: white;">
+
             <i class="fa-solid fa-floppy-disk"></i> Save to Draft
+
           </button>
+
           {% else %}
+
           <!-- User has draft - show update draft and submit options -->
+
           <button type="submit" name="action" value="save" class="btn secondary" style="background: #6c757d; color: white;">
+
             <i class="fa-solid fa-save"></i> Update Draft
+
           </button>
+
           <a href="https://form.qfixonline.com/focblubof" class="btn back-btn" target="_blank">
+
             <i class="fa-solid fa-credit-card"></i> Make Payment
+
           </a>
+
           <button class="btn primary" type="submit" name="action" value="submit" onclick="return confirm('Are you sure you want to submit your application? This action cannot be undone.')" disabled style="opacity: 0.6; cursor: not-allowed;">
+
             <i class="fa-solid fa-check"></i> Submit Application
+
           </button>
+
           {% endif %}
+
           {% else %}
+
           <!-- Application already submitted -->
+
           <button class="btn" type="button" disabled style="background: #28a745; color: white;">
+
             <i class="fa-solid fa-check-circle"></i> Application Submitted
+
           </button>
+
           {% endif %}
+
         <!-- <button class="btn" type="button" onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button> -->
+
       </div>
+
     </form>
+
   </div>
 
+
+
   <style>
+
     .field-error {
+
       color: #dc3545;
+
       font-size: 0.875rem;
+
       margin-top: 0.25rem;
+
       font-weight: 500;
+
       display: block;
+
     }
+
     
+
     .input-error {
+
       border-color: #dc3545 !important;
+
       box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25) !important;
+
     }
+
     
+
     .department-visible {
+
       display: table-row !important;
+
     }
+
     
+
     .department-hidden {
+
       display: none !important;
+
     }
+
   </style>
 
+
+
   <script>
+
     // Store field errors
+
     const fieldErrors = {};
+
     
+
     function showFieldError(fieldName, message) {
+
       fieldErrors[fieldName] = message;
+
       const field = document.querySelector(`[name="${fieldName}"]`);
+
       if (field) {
+
         field.classList.add('input-error');
+
         
+
         // Remove existing error message
+
         const existingError = field.parentNode.querySelector('.field-error');
+
         if (existingError) {
+
           existingError.remove();
+
         }
+
         
+
         // Add new error message
+
         const errorDiv = document.createElement('div');
+
         errorDiv.className = 'field-error';
+
         errorDiv.textContent = message;
+
         field.parentNode.appendChild(errorDiv);
+
       }
+
     }
+
     
+
     function clearFieldError(fieldName) {
+
       const field = document.querySelector(`[name="${fieldName}"]`);
+
       if (field) {
+
         field.classList.remove('input-error');
+
         const existingError = field.parentNode.querySelector('.field-error');
+
         if (existingError) {
+
           existingError.remove();
+
         }
+
       }
+
       delete fieldErrors[fieldName];
+
     }
+
     
+
     function clearAllFieldErrors() {
+
       Object.keys(fieldErrors).forEach(fieldName => {
+
         clearFieldError(fieldName);
+
       });
+
     }
+
     
+
     // Real-time form validation function
+
     function validateFormForSubmit() {
+
       const applyCourseSelect = document.getElementById('apply_course');
+
       const selectedCourse = applyCourseSelect ? applyCourseSelect.value : '';
+
+      console.log('Validating form for course:', selectedCourse);
       
-      // Base required fields for all courses
-      let requiredFields = [
+      // Base required fields for all courses (Particulars to be filled in by the Candidate)
+
+      const baseFields = [
         'full_name', 'father_name', 'mother_name', 'gender', 'nationality', 
         'marital_status', 'category', 'mobile', 'email', 'perm_address', 
-        'state', 'district', 'pincode'
+        'state', 'district', 'pincode', 'dob'
       ];
       
-      // Add Ph.D. specific fields only if Ph.D. is selected
-      if (selectedCourse === 'Ph.D.') {
-        requiredFields = requiredFields.concat([
-          'department', 'study_mode', 'specialization_area', 'proposed_supervisor'
-        ]);
-      }
-      
-      // Check all required fields
-      for (const fieldName of requiredFields) {
+      // Check base fields for all courses
+
+      for (const fieldName of baseFields) {
+
         const field = document.querySelector(`[name="${fieldName}"]`);
+
         if (!field || !field.value.trim()) {
+          console.log('Missing base field:', fieldName);
           return false;
+
         }
+
       }
       
-      // Check date of birth
-      const dob = document.querySelector('[name="dob"]');
-      if (!dob || !dob.value) {
-        return false;
-      }
-      
-      // Check at least one academic qualification
-      const aqExam = document.querySelector('[name="aq_exam[]"]');
-      if (!aqExam || !aqExam.value.trim()) {
-        return false;
-      }
-      
-      // Payment fields are not required for submit button to be enabled
-      // User can submit without payment and payment can be handled separately
-      
-      return true;
-    }
-    
-    // Update submit button state
-    function updateSubmitButtonState() {
-      const submitBtn = document.querySelector('button[type="submit"][value="submit"]');
-      if (!submitBtn) return;
-      
-      const isValid = validateFormForSubmit();
-      
-      if (isValid) {
-        submitBtn.disabled = false;
-        submitBtn.style.opacity = '1';
-        submitBtn.style.cursor = 'pointer';
-        submitBtn.title = 'Click to submit your application';
-      } else {
-        submitBtn.disabled = true;
-        submitBtn.style.opacity = '0.6';
-        submitBtn.style.cursor = 'not-allowed';
-        submitBtn.title = 'Please fill all required fields before submitting';
-      }
-    }
-    
-    // Add event listeners for real-time validation
-    document.addEventListener('DOMContentLoaded', function() {
-      // Monitor all input fields
-      const inputs = document.querySelectorAll('input, select, textarea');
-      inputs.forEach(input => {
-        input.addEventListener('input', updateSubmitButtonState);
-        input.addEventListener('change', updateSubmitButtonState);
-      });
-      
-      // Initial state
-      updateSubmitButtonState();
-    });
-    
-    function addAqRow() {
-      const body = document.getElementById('aqBody');
-      const first = body.querySelector('.aqRow');
-      if (!first) return;
-      const row = first.cloneNode(true);
-      row.querySelectorAll('input').forEach(i => { i.value = ''; });
-      body.appendChild(row);
-    }
+      if (selectedCourse === 'Ph.D.') {
 
-    function toggleDepartmentField() {
-      const applyCourseSelect = document.getElementById('apply_course');
-      const departmentRow = document.getElementById('department_row');
-      const studyModeRow = document.getElementById('study_mode_row');
-      
-      if (applyCourseSelect && departmentRow && studyModeRow) {
-        const selectedValue = applyCourseSelect.value;
-        
-        if (selectedValue === 'Ph.D.') {
-          // Show Ph.D. specific fields and sections
-          departmentRow.className = 'department-visible';
-          studyModeRow.className = 'department-visible';
-          
-          // Show all Ph.D. specific sections
-          document.querySelectorAll('.sec').forEach(section => {
-            const title = section.querySelector('.sec-title');
-            if (title) {
-              const titleText = title.textContent;
-              if (titleText.includes('Broad area of Specialization') ||
-                  titleText.includes('Select your category') ||
-                  titleText.includes('Fellowship Details') ||
-                  titleText.includes('Employment Details') ||
-                  titleText.includes('Details of previous research experience') ||
-                  titleText.includes('Details of publications') ||
-                  titleText.includes('Employment History')) {
-                section.style.display = 'block';
-              }
-            }
-          });
-          
-          // Renumber sections for Ph.D.
-          renumberSections('Ph.D.');
-          
-        } else {
-          // Hide Ph.D. specific fields and sections
-          departmentRow.className = 'department-hidden';
-          studyModeRow.className = 'department-hidden';
-          
-          // Clear the fields when hidden
-          const departmentSelect = departmentRow.querySelector('select[name="department"]');
-          const studyModeSelect = studyModeRow.querySelector('select[name="study_mode"]');
-          if (departmentSelect) {
-            departmentSelect.value = '';
-          }
-          if (studyModeSelect) {
-            studyModeSelect.value = '';
-          }
-          
-          // Hide all Ph.D. specific sections
-          document.querySelectorAll('.sec').forEach(section => {
-            const title = section.querySelector('.sec-title');
-            if (title) {
-              const titleText = title.textContent;
-              if (titleText.includes('Broad area of Specialization') ||
-                  titleText.includes('Select your category') ||
-                  titleText.includes('Fellowship Details') ||
-                  titleText.includes('Employment Details') ||
-                  titleText.includes('Details of previous research experience') ||
-                  titleText.includes('Details of publications') ||
-                  titleText.includes('Employment History')) {
-                section.style.display = 'none';
-              }
-            }
-          });
-          
-          // Renumber sections for PGDRP
-          renumberSections('PGDRP');
-        }
-      }
-    }
-    
-    function renumberSections(courseType) {
-      const sectionMapping = {
-        'Ph.D.': [
-          'Particulars to be filled in by the Candidate',
-          'Apply Course',
-          'Broad area of Specialization',
-          'Select your category',
-          'Fellowship Details',
-          'Employment Details',
-          'Details of previous research experience',
-          'Details of publications',
-          'Whether pursuing any other course',
-          'Academic Qualifications',
-          'Employment History',
-          'Declaration',
-          'Payment Details'
-        ],
-        'PGDRP': [
-          'Particulars to be filled in by the Candidate',
-          'Apply Course',
-          'Whether pursuing any other course',
-          'Academic Qualifications',
-          'Declaration',
-          'Payment Details'
-        ]
-      };
-      
-      const sections = sectionMapping[courseType] || [];
-      let sectionIndex = 1;
-      
-      document.querySelectorAll('.sec').forEach(section => {
-        const title = section.querySelector('.sec-title');
-        if (title) {
-          const titleText = title.textContent;
-          const isPaymentSection = titleText.includes('Payment Details');
-          const isDeclarationSection = titleText.includes('Declaration');
-          
-          // Check if this section should be numbered for current course
-          const shouldNumber = sections.some(sectionTitle => {
-            if (isPaymentSection) return sectionTitle === 'Payment Details';
-            if (isDeclarationSection) return sectionTitle === 'Declaration';
-            return titleText.includes(sectionTitle);
-          });
-          
-          if (shouldNumber && !titleText.includes('13.')) { // Don't renumber if already has 13.
-            // Remove existing number and add new one
-            const cleanTitle = titleText.replace(/^\d+\.\s*/, '');
-            title.textContent = `${sectionIndex}. ${cleanTitle}`;
-            sectionIndex++;
-          } else if (titleText.includes('13.') && courseType === 'PGDRP') {
-            // Hide section 13 for PGDRP
-            section.style.display = 'none';
-          }
-        }
-      });
-    }
+        console.log('Checking PHD specific fields...');
+        // Ph.D. specific required fields
 
-    function toggleUgcDateField() {
-      const ugcCategorySelect = document.getElementById('ugc_category');
-      const ugcDateRow = document.getElementById('ugc_date_row');
-      
-      if (ugcCategorySelect && ugcDateRow) {
-        const selectedValue = ugcCategorySelect.value;
-        
-        // Show date field for Category I, II, III
-        if (selectedValue && selectedValue !== 'Not Applicable') {
-          ugcDateRow.style.display = 'table-row';
-        } else {
-          ugcDateRow.style.display = 'none';
-          // Clear the date field when hidden
-          const dateInput = ugcDateRow.querySelector('input[name="ugc_validity_date"]');
-          if (dateInput) {
-            dateInput.value = '';
-          }
-        }
-      }
-    }
-
-    function delAqRow(btn) {
-      const body = document.getElementById('aqBody');
-      if (body.querySelectorAll('tr').length <= 1) return;
-      btn.closest('tr').remove();
-    }
-
-    function renumberEmp() {
-      document.querySelectorAll('#empBody tr').forEach((tr, idx) => {
-        const sr = tr.querySelector('input[name="emp_sr[]"]');
-        if (sr) sr.value = String(idx + 1);
-      });
-    }
-
-    function addEmpRow() {
-      const body = document.getElementById('empBody');
-      const first = body.querySelector('.empRow');
-      if (!first) return;
-      const row = first.cloneNode(true);
-      row.querySelectorAll('input').forEach(i => { i.value = ''; });
-      body.appendChild(row);
-      renumberEmp();
-    }
-
-    function delEmpRow(btn) {
-      const body = document.getElementById('empBody');
-      if (body.querySelectorAll('tr').length <= 1) return;
-      btn.closest('tr').remove();
-      renumberEmp();
-    }
-
-    // Validate marks before form submission
-    document.querySelector('form').addEventListener('submit', function(e) {
-      const action = e.submitter?.value || 'save';
-      
-      // Only validate on submit, not on save
-      if (action === 'submit') {
-        const applyCourseSelect = document.getElementById('apply_course');
-        const selectedCourse = applyCourseSelect ? applyCourseSelect.value : '';
-        
-        // Base required fields for all courses
-        let requiredFields = [
-          { name: 'full_name', label: 'Full Name' },
-          { name: 'father_name', label: 'Father Name' },
-          { name: 'mother_name', label: 'Mother Name' },
-          { name: 'gender', label: 'Gender' },
-          { name: 'nationality', label: 'Nationality' },
-          { name: 'marital_status', label: 'Marital Status' },
-          { name: 'category', label: 'Category' },
-          { name: 'mobile', label: 'Mobile Number' },
-          { name: 'email', label: 'Email' },
-          { name: 'perm_address', label: 'Permanent Address' },
-          { name: 'state', label: 'State' },
-          { name: 'district', label: 'District' },
-          { name: 'pincode', label: 'Pincode' }
+        const phdFields = [
+          'department', 'study_mode', 'specialization_area', 'proposed_supervisor',  // Broad area of Specialization
+          'ugc_category', 'ugc_validity_date',  // Select your category UGC
+          'fellowship_validity', 'fellowship_category',  // Fellowship Details
+          'employed_status', 'emp_post_current', 'job_nature', 'date_of_joining', 'service_period', 
+          'organization_name_current', 'organization_address', 'org_telephone', 'org_email',  // Employment Details
+          'research_experience',  // Details of previous research experience
+          'publications',  // Details of publications
+          'pursuing_other_course', 'other_institution', 'other_class', 'other_session', 'other_result',  // Whether pursuing any other course
+          'payment_date', 'payment_id'  // Payment Details
         ];
         
-        // Add Ph.D. specific fields only if Ph.D. is selected
-        if (selectedCourse === 'Ph.D.') {
-          requiredFields = requiredFields.concat([
-            { name: 'department', label: 'Department' },
-            { name: 'study_mode', label: 'Study Mode' },
-            { name: 'specialization_area', label: 'Area of Specialization' },
-            { name: 'proposed_supervisor', label: 'Proposed Supervisor' }
-          ]);
+        for (const fieldName of phdFields) {
+
+          const field = document.querySelector(`[name="${fieldName}"]`);
+
+          if (field && (!field.value || !field.value.trim())) {
+            console.log('Missing PHD field:', fieldName, 'value:', field.value);
+            return false;
+
+          }
+
         }
         
-        const missingFields = [];
+      } else if (selectedCourse === 'PGDRP') {
+
+        // PGDRP specific required fields
+
+        const pgdrpFields = [
+          'pursuing_other_course', 'other_institution', 'other_class', 'other_session', 'other_result',  // Whether pursuing any other course
+          'payment_date', 'payment_id'  // Payment Details
+        ];
         
-        requiredFields.forEach(field => {
-          const input = document.querySelector(`[name="${field.name}"]`);
-          if (!input || !input.value.trim()) {
-            missingFields.push(field.label);
+        for (const fieldName of pgdrpFields) {
+
+          const field = document.querySelector(`[name="${fieldName}"]`);
+
+          if (field && (!field.value || !field.value.trim())) {
+            console.log('Missing PGDRP field:', fieldName);
+            return false;
+
           }
-        });
-        
-        // Check if at least one academic qualification is filled
-        const aqExam = document.querySelector('[name="aq_exam[]"]');
-        if (!aqExam || !aqExam.value.trim()) {
-          missingFields.push('Academic Qualification (at least one)');
+
         }
-        
-        // Check date of birth
-        const dob = document.querySelector('[name="dob"]');
-        if (!dob || !dob.value) {
-          missingFields.push({ name: 'dob', label: 'Date of Birth' });
-        }
-        
-        // Check payment fields if they exist (only for draft applications)
-        const paymentDate = document.querySelector('[name="payment_date"]');
-        const paymentId = document.querySelector('[name="payment_id"]');
-        if (paymentDate && paymentId) {
-          if (!paymentDate.value.trim()) {
-            missingFields.push({ name: 'payment_date', label: 'Payment Date' });
-          }
-          if (!paymentId.value.trim()) {
-            missingFields.push({ name: 'payment_id', label: 'Payment ID' });
-          }
-        }
-        
-        if (missingFields.length > 0) {
-          e.preventDefault();
-          missingFields.forEach(field => {
-            if (typeof field === 'object') {
-              showFieldError(field.name, field.label + ' is required');
-            } else {
-              showFieldError('', field + ' is required');
-            }
-          });
-          // Scroll to first error field
-          const firstErrorField = document.querySelector('.input-error');
-          if (firstErrorField) {
-            firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            firstErrorField.focus();
-          }
+
+      }
+      
+      // Check academic qualifications (required for both courses)
+
+      const aqExam = document.querySelector('[name="aq_exam[]"]');
+
+      if (!aqExam || !aqExam.value.trim()) {
+        console.log('Missing academic qualification exam');
+        return false;
+
+      }
+      
+      // Check employment history for Ph.D. (section 13)
+
+      if (selectedCourse === 'Ph.D.') {
+
+        const empPost = document.querySelector('[name="emp_post[]"]');
+
+        if (!empPost || !empPost.value.trim()) {
+          console.log('Missing employment history (emp_post[])');
           return false;
         }
+
       }
       
-      const marksObtained = document.querySelectorAll('input[name="aq_marks_obtained[]"]');
-      const totalMarks = document.querySelectorAll('input[name="aq_total_marks[]"]');
-      
-      for (let i = 0; i < marksObtained.length; i++) {
-        const obtained = parseFloat(marksObtained[i].value) || 0;
-        const total = parseFloat(totalMarks[i].value) || 0;
-        
-        if (obtained > 0 && total > 0 && obtained > total) {
-          e.preventDefault();
-          alert(`Error in row ${i + 1}: Marks obtained (${obtained}) cannot be greater than total marks (${total})`);
-          marksObtained[i].focus();
-          return false;
-        }
-      }
-    });
-    
-    // Clear field error when user starts typing
-    document.addEventListener('input', function(e) {
-      if (e.target.matches('input, textarea, select')) {
-        const fieldName = e.target.name;
-        if (fieldName && fieldErrors[fieldName]) {
-          clearFieldError(fieldName);
-        }
-      }
-    });
-    
-    // File upload functions
-    function updateFileName(inputId, hiddenFieldId) {
-      const fileInput = document.getElementById(inputId);
-      const hiddenField = document.getElementById(hiddenFieldId);
-      const previewDiv = document.getElementById(inputId.replace('_input', '_preview'));
-      
-      if (fileInput.files && fileInput.files[0]) {
-        const file = fileInput.files[0];
-        hiddenField.value = file.name;
-        
-        // Show file preview
-        if (previewDiv) {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            previewDiv.innerHTML = `
-              <div style="border: 1px solid #ddd; padding: 10px; border-radius: 4px; background: #f9f9f9;">
-                <strong>Selected File:</strong> ${file.name}<br>
-                <strong>Size:</strong> ${(file.size / 1024).toFixed(2)} KB<br>
-                <strong>Type:</strong> ${file.type}<br>
-                <img src="${e.target.result}" style="max-width: 200px; max-height: 100px; margin-top: 10px; border: 1px solid #ccc;" />
-              </div>
-            `;
-          };
-          reader.readAsDataURL(file);
-        }
-      }
+      console.log('Form validation passed!');
+      return true;
+
     }
+
     
-    function clearFile(inputId, hiddenFieldId) {
-      const fileInput = document.getElementById(inputId);
-      const hiddenField = document.getElementById(hiddenFieldId);
-      const previewDiv = document.getElementById(inputId.replace('_input', '_preview'));
+
+    // Update submit button state
+
+    function updateSubmitButtonState() {
+
+      const submitBtn = document.querySelector('button[type="submit"][value="submit"]');
+
+      if (!submitBtn) return;
+
       
-      fileInput.value = '';
-      hiddenField.value = '';
+
+      const isValid = validateFormForSubmit();
+
       
-      if (previewDiv) {
-        previewDiv.innerHTML = '';
+
+      if (isValid) {
+
+        submitBtn.disabled = false;
+
+        submitBtn.style.opacity = '1';
+
+        submitBtn.style.cursor = 'pointer';
+
+        submitBtn.title = 'Click to submit your application';
+
+      } else {
+
+        submitBtn.disabled = true;
+
+        submitBtn.style.opacity = '0.6';
+
+        submitBtn.style.cursor = 'not-allowed';
+
+        submitBtn.title = 'Please fill all field first';
+
       }
-    }
-    
-    // Initialize file preview on page load
-    document.addEventListener('DOMContentLoaded', function() {
-      // Monitor all input fields
-      const inputs = document.querySelectorAll('input, select, textarea');
-      inputs.forEach(input => {
-        input.addEventListener('input', updateSubmitButtonState);
-        input.addEventListener('change', updateSubmitButtonState);
+
+      
+
+      // Always ensure Save to Draft button is visible
+
+      const saveBtn = document.querySelector('button[type="submit"][value="save"]');
+
+      if (saveBtn) {
+
+        saveBtn.style.display = 'inline-block';
+
+        saveBtn.style.visibility = 'visible';
+
+        saveBtn.style.opacity = '1';
+
+      }
+
+      
+
+      // Ensure Submit Application button is visible if it exists
+
+      if (submitBtn) {
+
+        submitBtn.style.display = 'inline-block';
+
+        submitBtn.style.visibility = 'visible';
+
+      }
+
+      
+
+      // Ensure Make Payment button is visible if it exists
+
+      const paymentBtn = document.querySelector('a[href*="form.qfixonline.com"]');
+
+      if (paymentBtn) {
+
+        paymentBtn.style.display = 'inline-block';
+
+        paymentBtn.style.visibility = 'visible';
+
+        paymentBtn.style.opacity = '1';
+
+      }
+
+      
+
+      // Ensure all buttons in button bar are visible
+
+      const allButtons = document.querySelectorAll('.btnbar button, .btnbar a');
+
+      allButtons.forEach(button => {
+
+        button.style.display = 'inline-block';
+
+        button.style.visibility = 'visible';
+
       });
+
+    }
+
+    
+
+    // Add event listeners for real-time validation
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+      // Monitor all input fields
+
+      const inputs = document.querySelectorAll('input, select, textarea');
+
+      inputs.forEach(input => {
+
+        input.addEventListener('input', updateSubmitButtonState);
+
+        input.addEventListener('change', updateSubmitButtonState);
+
+      });
+
       
+
+      // Initialize form state based on selected course
+
+      const applyCourseSelect = document.getElementById('apply_course');
+
+      if (applyCourseSelect && applyCourseSelect.value) {
+
+        // Trigger the toggleDepartmentField function to set correct visibility
+
+        toggleDepartmentField();
+
+      }
+
+      
+
       // Initial state
+
       updateSubmitButtonState();
-      
-      // Initialize file previews for existing files
-      {% if personal_detail and personal_detail.signature %}
-      (function() {
-        const signaturePreview = document.getElementById('signature_preview');
-        if (signaturePreview) {
-          signaturePreview.innerHTML = `
-            <div style="border: 1px solid #ddd; padding: 10px; border-radius: 4px; background: #f9f9f9;">
-              <strong>Current File:</strong> {{ personal_detail.signature.name|escapejs }}<br>
-              <img src="{{ personal_detail.signature.url|escapejs }}" style="max-width: 200px; max-height: 100px; margin-top: 10px; border: 1px solid #ccc;" />
-            </div>
-          `;
-        }
-      })();
-      {% endif %}
+
     });
+
+    
+
+    function addAqRow() {
+
+      const body = document.getElementById('aqBody');
+
+      const first = body.querySelector('.aqRow');
+
+      if (!first) return;
+
+      const row = first.cloneNode(true);
+
+      row.querySelectorAll('input').forEach(i => { i.value = ''; });
+
+      body.appendChild(row);
+
+    }
+
+
+
+    function toggleDepartmentField() {
+
+      const applyCourseSelect = document.getElementById('apply_course');
+
+      const departmentRow = document.getElementById('department_row');
+
+      const studyModeRow = document.getElementById('study_mode_row');
+
+      
+
+      if (applyCourseSelect && departmentRow && studyModeRow) {
+
+        const selectedValue = applyCourseSelect.value;
+
+        
+
+        if (selectedValue === 'Ph.D.') {
+
+          // Show Ph.D. specific fields and sections
+
+          departmentRow.className = 'department-visible';
+
+          studyModeRow.className = 'department-visible';
+
+          
+
+          // Show all Ph.D. specific sections
+
+          document.querySelectorAll('.sec').forEach(section => {
+
+            const title = section.querySelector('.sec-title');
+
+            if (title) {
+
+              const titleText = title.textContent;
+
+              if (titleText.includes('Broad area of Specialization') ||
+
+                  titleText.includes('Select your category') ||
+
+                  titleText.includes('Fellowship Details') ||
+
+                  titleText.includes('Employment Details') ||
+
+                  titleText.includes('Details of previous research experience') ||
+
+                  titleText.includes('Details of publications') ||
+
+                  titleText.includes('Employment History')) {
+
+                section.style.display = 'block';
+
+              }
+
+            }
+
+          });
+
+          
+
+          // Renumber sections for Ph.D.
+
+          renumberSections('Ph.D.');
+
+          
+
+        } else {
+
+          // Hide Ph.D. specific fields and sections
+
+          departmentRow.className = 'department-hidden';
+
+          studyModeRow.className = 'department-hidden';
+
+          
+
+          // Clear the fields when hidden
+
+          const departmentSelect = departmentRow.querySelector('select[name="department"]');
+
+          const studyModeSelect = studyModeRow.querySelector('select[name="study_mode"]');
+
+          if (departmentSelect) {
+
+            departmentSelect.value = '';
+
+          }
+
+          if (studyModeSelect) {
+
+            studyModeSelect.value = '';
+
+          }
+
+          
+
+          // Hide all Ph.D. specific sections and show only PGDRP sections
+
+          document.querySelectorAll('.sec').forEach(section => {
+
+            const title = section.querySelector('.sec-title');
+
+            if (title) {
+
+              const titleText = title.textContent;
+
+              
+
+              // PGDRP sections that should be visible
+
+              const pgdrpSections = [
+
+                'Photo Upload',
+
+                'Signature Upload',
+
+                'Particulars to be filled in by the Candidate',
+
+                'Apply Course',
+
+                'Whether pursuing any other course',
+
+                'Academic Qualifications',
+
+                'Declaration',
+
+                'Document Uploads (SOP Certificates)',
+
+                'Payment Details'
+
+              ];
+
+              
+
+              // Check if current section should be visible for PGDRP
+
+              const shouldBeVisible = pgdrpSections.some(sectionName => 
+
+                titleText.includes(sectionName)
+
+              );
+
+              
+
+              if (shouldBeVisible) {
+
+                section.style.display = 'block';
+
+              } else {
+
+                section.style.display = 'none';
+
+              }
+
+            }
+
+          });
+
+          
+
+          // Renumber sections for PGDRP
+
+          renumberSections('PGDRP');
+
+        }
+
+      }
+
+    }
+
+    
+
+    function renumberSections(courseType) {
+
+      const sectionMapping = {
+
+        'Ph.D.': [
+
+          'Photo Upload',
+
+          'Signature Upload',
+
+          'Apply Course',
+
+          'Particulars to be filled in by the Candidate',
+
+          'Broad area of Specialization',
+
+          'Select your category',
+
+          'Fellowship Details',
+
+          'Employment Details',
+
+          'Details of previous research experience',
+
+          'Details of publications',
+
+          'Whether pursuing any other course',
+
+          'Academic Qualifications',
+
+          'Employment History',
+
+          'Document Uploads (SOP Certificates)',
+
+          'Payment Details',
+
+          'Declaration'
+
+        ],
+
+        'PGDRP': [
+
+          'Photo Upload',
+
+          'Signature Upload',
+
+          'Apply Course',
+
+          'Particulars to be filled in by the Candidate',
+
+          'Whether pursuing any other course',
+
+          'Academic Qualifications',
+
+          'Document Uploads (SOP Certificates)',
+
+          'Declaration',
+
+          'Payment Details'
+
+        ]
+
+      };
+
+      
+
+      const sections = sectionMapping[courseType] || [];
+
+      let sectionIndex = 1;
+
+      
+
+      document.querySelectorAll('.sec').forEach(section => {
+
+        const title = section.querySelector('.sec-title');
+
+        if (title) {
+
+          const titleText = title.textContent;
+
+          
+
+          // Check if this section should be numbered for current course
+
+          const shouldNumber = sections.some(sectionTitle => {
+
+            return titleText.includes(sectionTitle);
+
+          });
+
+          
+
+          if (shouldNumber) {
+
+            // Remove existing number and add new one
+
+            const cleanTitle = titleText.replace(/^\d+\.\s*/, '');
+
+            title.textContent = `${sectionIndex}. ${cleanTitle}`;
+
+            sectionIndex++;
+
+          }
+
+        }
+
+      });
+
+    }
+
+
+
+    function toggleUgcDateField() {
+
+      const ugcCategorySelect = document.getElementById('ugc_category');
+
+      const ugcDateRow = document.getElementById('ugc_date_row');
+
+      
+
+      if (ugcCategorySelect && ugcDateRow) {
+
+        const selectedValue = ugcCategorySelect.value;
+
+        
+
+        // Show date field for Category I, II, III
+
+        if (selectedValue && selectedValue !== 'Not Applicable') {
+
+          ugcDateRow.style.display = 'table-row';
+
+        } else {
+
+          ugcDateRow.style.display = 'none';
+
+          // Clear the date field when hidden
+
+          const dateInput = ugcDateRow.querySelector('input[name="ugc_validity_date"]');
+
+          if (dateInput) {
+
+            dateInput.value = '';
+
+          }
+
+        }
+
+      }
+
+    }
+
+
+
+    function delAqRow(btn) {
+
+      const body = document.getElementById('aqBody');
+
+      if (body.querySelectorAll('tr').length <= 1) return;
+
+      btn.closest('tr').remove();
+
+    }
+
+
+
+    function renumberEmp() {
+
+      document.querySelectorAll('#empBody tr').forEach((tr, idx) => {
+
+        const sr = tr.querySelector('input[name="emp_sr[]"]');
+
+        if (sr) sr.value = String(idx + 1);
+
+      });
+
+    }
+
+
+
+    function addEmpRow() {
+
+      const body = document.getElementById('empBody');
+
+      const first = body.querySelector('.empRow');
+
+      if (!first) return;
+
+      const row = first.cloneNode(true);
+
+      row.querySelectorAll('input').forEach(i => { i.value = ''; });
+
+      body.appendChild(row);
+
+      renumberEmp();
+
+    }
+
+
+
+    function delEmpRow(btn) {
+
+      const body = document.getElementById('empBody');
+
+      if (body.querySelectorAll('tr').length <= 1) return;
+
+      btn.closest('tr').remove();
+
+      renumberEmp();
+
+    }
+
+
+
+    // Validate marks before form submission
+
+    document.querySelector('form').addEventListener('submit', function(e) {
+
+      const action = e.submitter?.value || 'save';
+
+      
+
+      // Don't disable save buttons during save operation
+
+      if (action === 'save') {
+
+        // Let the save proceed without disabling the button
+
+        return;
+
+      }
+
+      
+
+      // Only validate on submit, not on save
+
+      if (action === 'submit') {
+
+        const applyCourseSelect = document.getElementById('apply_course');
+
+        const selectedCourse = applyCourseSelect ? applyCourseSelect.value : '';
+
+        
+
+        // Base required fields for all courses
+
+        let requiredFields = [
+
+          { name: 'full_name', label: 'Full Name' },
+
+          { name: 'father_name', label: 'Father Name' },
+
+          { name: 'mother_name', label: 'Mother Name' },
+
+          { name: 'gender', label: 'Gender' },
+
+          { name: 'nationality', label: 'Nationality' },
+
+          { name: 'marital_status', label: 'Marital Status' },
+
+          { name: 'category', label: 'Category' },
+
+          { name: 'mobile', label: 'Mobile Number' },
+
+          { name: 'email', label: 'Email' },
+
+          { name: 'perm_address', label: 'Permanent Address' },
+
+          { name: 'state', label: 'State' },
+
+          { name: 'district', label: 'District' },
+
+          { name: 'pincode', label: 'Pincode' }
+
+        ];
+
+        
+
+        // Add Ph.D. specific fields only if Ph.D. is selected
+
+        if (selectedCourse === 'Ph.D.') {
+
+          requiredFields = requiredFields.concat([
+
+            { name: 'department', label: 'Department' },
+
+            { name: 'study_mode', label: 'Study Mode' },
+
+            { name: 'specialization_area', label: 'Area of Specialization' },
+
+            { name: 'proposed_supervisor', label: 'Proposed Supervisor' }
+
+          ]);
+
+        }
+
+        
+
+        const missingFields = [];
+
+        
+
+        requiredFields.forEach(field => {
+
+          const input = document.querySelector(`[name="${field.name}"]`);
+
+          if (!input || !input.value.trim()) {
+
+            missingFields.push(field.label);
+
+          }
+
+        });
+
+        
+
+        // Check if at least one academic qualification is filled
+
+        const aqExam = document.querySelector('[name="aq_exam[]"]');
+
+        if (!aqExam || !aqExam.value.trim()) {
+
+          missingFields.push('Academic Qualification (at least one)');
+
+        }
+
+        
+
+        // Check date of birth
+
+        const dob = document.querySelector('[name="dob"]');
+
+        if (!dob || !dob.value) {
+
+          missingFields.push({ name: 'dob', label: 'Date of Birth' });
+
+        }
+
+        
+
+        // Check payment fields if they exist (only for draft applications)
+
+        const paymentDate = document.querySelector('[name="payment_date"]');
+
+        const paymentId = document.querySelector('[name="payment_id"]');
+
+        if (paymentDate && paymentId) {
+
+          if (!paymentDate.value.trim()) {
+
+            missingFields.push({ name: 'payment_date', label: 'Payment Date' });
+
+          }
+
+          if (!paymentId.value.trim()) {
+
+            missingFields.push({ name: 'payment_id', label: 'Payment ID' });
+
+          }
+
+        }
+
+        
+
+        if (missingFields.length > 0) {
+
+          e.preventDefault();
+
+          missingFields.forEach(field => {
+
+            if (typeof field === 'object') {
+
+              showFieldError(field.name, field.label + ' is required');
+
+            } else {
+
+              showFieldError('', field + ' is required');
+
+            }
+
+          });
+
+          // Scroll to first error field
+
+          const firstErrorField = document.querySelector('.input-error');
+
+          if (firstErrorField) {
+
+            firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            firstErrorField.focus();
+
+          }
+
+          return false;
+
+        }
+
+      }
+
+      
+
+      const marksObtained = document.querySelectorAll('input[name="aq_marks_obtained[]"]');
+
+      const totalMarks = document.querySelectorAll('input[name="aq_total_marks[]"]');
+
+      
+
+      for (let i = 0; i < marksObtained.length; i++) {
+
+        const obtained = parseFloat(marksObtained[i].value) || 0;
+
+        const total = parseFloat(totalMarks[i].value) || 0;
+
+        
+
+        if (obtained > 0 && total > 0 && obtained > total) {
+
+          e.preventDefault();
+
+          alert(`Error in row ${i + 1}: Marks obtained (${obtained}) cannot be greater than total marks (${total})`);
+
+          marksObtained[i].focus();
+
+          return false;
+
+        }
+
+      }
+
+    });
+
+    
+
+    // Clear field error when user starts typing
+
+    document.addEventListener('input', function(e) {
+
+      if (e.target.matches('input, textarea, select')) {
+
+        const fieldName = e.target.name;
+
+        if (fieldName && fieldErrors[fieldName]) {
+
+          clearFieldError(fieldName);
+
+        }
+
+      }
+
+    });
+
+    
+
+    // File upload functions
+
+    function updateFileName(inputId, hiddenFieldId) {
+
+      const fileInput = document.getElementById(inputId);
+
+      const hiddenField = document.getElementById(hiddenFieldId);
+
+      const previewDiv = document.getElementById(inputId.replace('_input', '_preview'));
+
+      
+
+      if (fileInput.files && fileInput.files[0]) {
+
+        const file = fileInput.files[0];
+
+        hiddenField.value = file.name;
+
+        
+
+        // Show file preview
+
+        if (previewDiv) {
+
+          const reader = new FileReader();
+
+          reader.onload = function(e) {
+
+            previewDiv.innerHTML = `
+
+              <div style="border: 1px solid #ddd; padding: 10px; border-radius: 4px; background: #f9f9f9;">
+
+                <strong>Selected File:</strong> ${file.name}<br>
+
+                <strong>Size:</strong> ${(file.size / 1024).toFixed(2)} KB<br>
+
+                <strong>Type:</strong> ${file.type}<br>
+
+                <img src="${e.target.result}" style="max-width: 200px; max-height: 100px; margin-top: 10px; border: 1px solid #ccc;" />
+
+              </div>
+
+            `;
+
+          };
+
+          reader.readAsDataURL(file);
+
+        }
+
+      }
+
+    }
+
+    
+
+    function clearFile(inputId, hiddenFieldId) {
+
+      const fileInput = document.getElementById(inputId);
+
+      const hiddenField = document.getElementById(hiddenFieldId);
+
+      const previewDiv = document.getElementById(inputId.replace('_input', '_preview'));
+
+      
+
+      fileInput.value = '';
+
+      hiddenField.value = '';
+
+      
+
+      if (previewDiv) {
+
+        previewDiv.innerHTML = '';
+
+      }
+
+    }
+
+    
+
+    // Initialize file preview on page load
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+      // Initialize form state based on selected course
+
+      const applyCourseSelect = document.getElementById('apply_course');
+
+      if (applyCourseSelect && applyCourseSelect.value) {
+
+        // Trigger the toggleDepartmentField function to set correct visibility
+
+        toggleDepartmentField();
+
+      }
+
+      
+
+      // Monitor all input fields
+
+      const inputs = document.querySelectorAll('input, select, textarea');
+
+      inputs.forEach(input => {
+
+        input.addEventListener('input', updateSubmitButtonState);
+
+        input.addEventListener('change', updateSubmitButtonState);
+
+      });
+
+      
+
+      // Initial state
+
+      updateSubmitButtonState();
+
+      
+
+      // Initialize file previews for existing files
+
+      {% if personal_detail and personal_detail.signature %}
+
+      (function() {
+
+        const signaturePreview = document.getElementById('signature_preview');
+
+        if (signaturePreview) {
+
+          signaturePreview.innerHTML = `
+
+            <div style="border: 1px solid #ddd; padding: 10px; border-radius: 4px; background: #f9f9f9;">
+
+              <strong>Current File:</strong> {{ personal_detail.signature.name|escapejs }}<br>
+
+              <img src="{{ personal_detail.signature.url|escapejs }}" style="max-width: 200px; max-height: 100px; margin-top: 10px; border: 1px solid #ccc;" />
+
+            </div>
+
+          `;
+
+        }
+
+      })();
+
+      {% endif %}
+
+    });
+
       </script>
+
     </body>
+
     </html>

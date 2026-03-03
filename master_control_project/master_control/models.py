@@ -1961,225 +1961,7 @@ class AdmissionApplication(TimeStampedModel):
     submitted_at = models.DateTimeField(null=True, blank=True)
 
 
-
-    
-
-
-
-    # PERSONAL INFORMATION
-
-
-
-    first_name = models.CharField(max_length=100, blank=True)
-
-
-
-    last_name = models.CharField(max_length=100, blank=True)
-
-
-
-    full_name = models.CharField(max_length=200, blank=True)
-
-
-
-    date_of_birth = models.DateField(null=True, blank=True)
-
-
-
-    gender = models.CharField(max_length=10, blank=True)
-
-
-
-    father_name = models.CharField(max_length=100, blank=True)
-
-
-
-    mother_name = models.CharField(max_length=100, blank=True)
-
-
-
-    marital_status = models.CharField(max_length=20, blank=True)
-
-
-
-    nationality = models.CharField(max_length=50, blank=True)
-
-
-
-    aadhar_number = models.CharField(max_length=20, blank=True)
-
-
-
-    category = models.CharField(max_length=50, blank=True)
-
-
-
-    category_tick = models.CharField(max_length=50, blank=True)
-
-
-
-    category_other = models.CharField(max_length=100, blank=True)
-
-
-
-    
-
-
-
-    # CONTACT INFORMATION
-
-
-
-    mobile_number = models.CharField(max_length=20, blank=True)
-
-
-
-    email = models.EmailField(blank=True)
-
-
-
-    
-
-
-
-    # ADDRESS INFORMATION
-
-
-
-    permanent_address = models.TextField(blank=True)
-
-
-
-    current_address = models.TextField(blank=True)
-
-
-
-    corr_address_block = models.TextField(blank=True)
-
-
-
-    district = models.CharField(max_length=100, blank=True)
-
-
-
-    state = models.CharField(max_length=100, blank=True)
-
-
-
-    pincode = models.CharField(max_length=10, blank=True)
-
-
-
-    mobile_telephone = models.CharField(max_length=20, blank=True)
-
-
-
-    email_correspondence = models.EmailField(blank=True)
-
-
-
-    
-
-
-
-    # ACADEMIC QUALIFICATIONS (JSON)
-
-
-
-    academic_data = models.JSONField(default=dict, blank=True, help_text="Stores all academic qualifications as JSON")
-
-
-
-    
-
-
-
-    # SPECIALIZATION
-
-
-
-    specialization_area = models.TextField(blank=True)
-
-
-
-    proposed_supervisor = models.TextField(blank=True)
-
-
-
-    
-
-
-
-    # FELLOWSHIP
-
-
-
-    fellowship_validity = models.DateField(null=True, blank=True)
-
-
-
-    fellowship_category = models.CharField(max_length=100, blank=True)
-
-
-
-    
-
-
-
-    # UGC CATEGORY (as per UGC notification regarding NET as entrance test 27.03.2024)
-
-
-
-    # Will be enabled after first application submission creates the database table
-
-
-
-    ugc_category = models.CharField(
-
-
-
-        max_length=50, 
-
-
-
-        blank=True,
-
-
-
-        choices=[
-
-
-
-            ('Category I (JRF)', 'Category I (JRF)'),
-
-
-
-            ('Category II (NET)', 'Category II (NET)'),
-
-
-
-            ('Category III (Ph.D. Only)', 'Category III (Ph.D. Only)'),
-
-
-
-            ('Not Applicable', 'Not Applicable'),
-
-
-
-        ],
-
-
-
-        help_text="UGC category as per NET entrance test notification"
-    )
-
-    ugc_validity_date = models.DateField(
-        null=True, 
-        blank=True,
-        help_text="UGC validity date for NET/JRF certificate"
-    )
-
-    # APPLY COURSE (13th Field)
+    # 1. APPLY COURSE (moved to top to match form order)
     apply_course = models.CharField(
         max_length=50,
         blank=True,
@@ -2222,142 +2004,207 @@ class AdmissionApplication(TimeStampedModel):
         help_text="Select study mode for Ph.D. program"
     )
 
+    # 2. PERSONAL INFORMATION
 
-    
+    first_name = models.CharField(max_length=100, blank=True)
 
+    last_name = models.CharField(max_length=100, blank=True)
 
+    full_name = models.CharField(max_length=200, blank=True)
 
-    # EMPLOYMENT DETAILS
+    date_of_birth = models.DateField(null=True, blank=True)
 
+    gender = models.CharField(max_length=10, blank=True)
 
+    father_name = models.CharField(max_length=100, blank=True)
 
+    mother_name = models.CharField(max_length=100, blank=True)
+
+    marital_status = models.CharField(max_length=20, blank=True)
+
+    nationality = models.CharField(max_length=50, blank=True)
+
+    aadhar_number = models.CharField(max_length=20, blank=True)
+
+    # 3. CONTACT INFORMATION
+    mobile_number = models.CharField(max_length=20, blank=True)
+
+    email = models.EmailField(blank=True)
+
+    mobile_telephone = models.CharField(max_length=20, blank=True)
+
+    email_correspondence = models.EmailField(blank=True)
+
+    # 4. ADDRESS INFORMATION
+    permanent_address = models.TextField(blank=True)
+
+    current_address = models.TextField(blank=True)
+
+    corr_address_block = models.TextField(blank=True)
+
+    district = models.CharField(max_length=100, blank=True)
+
+    state = models.CharField(max_length=100, blank=True)
+
+    pincode = models.CharField(max_length=10, blank=True)
+
+    # 5. CATEGORY INFORMATION
+    category = models.CharField(max_length=50, blank=True)
+
+    category_tick = models.CharField(max_length=50, blank=True)
+
+    category_other = models.CharField(max_length=100, blank=True)
+
+    # UGC CATEGORY (as per UGC notification regarding NET as entrance test 27.03.2024)
+    ugc_category = models.CharField(
+        max_length=50, 
+        blank=True,
+        choices=[
+            ('Category I (JRF)', 'Category I (JRF)'),
+            ('Category II (NET)', 'Category II (NET)'),
+            ('Category III (Ph.D. Only)', 'Category III (Ph.D. Only)'),
+            ('Not Applicable', 'Not Applicable'),
+        ],
+        help_text="UGC category as per NET entrance test notification"
+    )
+    ugc_validity_date = models.DateField(
+        null=True, 
+        blank=True,
+        help_text="UGC validity date for NET/JRF certificate"
+    )
+
+    # 6. SPECIALIZATION AND ACADEMIC DETAILS
+    specialization_area = models.TextField(blank=True)
+
+    proposed_supervisor = models.TextField(blank=True)
+
+    # 7. FELLOWSHIP DETAILS
+    fellowship_validity = models.DateField(null=True, blank=True)
+
+    fellowship_category = models.CharField(max_length=100, blank=True)
+
+    # 8. EMPLOYMENT DETAILS
     employed_status = models.CharField(max_length=10, blank=True)
-
-
 
     emp_post_current = models.CharField(max_length=200, blank=True)
 
-
-
     job_nature = models.CharField(max_length=100, blank=True)
-
-
 
     date_of_joining = models.DateField(null=True, blank=True)
 
-
-
     service_period = models.CharField(max_length=100, blank=True)
-
-
 
     organization_name_current = models.CharField(max_length=200, blank=True)
 
-
-
     organization_address = models.TextField(blank=True)
-
-
 
     org_telephone = models.CharField(max_length=20, blank=True)
 
-
-
     org_email = models.EmailField(blank=True)
 
-
-
-    
-
-
-
-    # EMPLOYMENT HISTORY (JSON)
-
-
-
-    employment_history = models.JSONField(default=dict, blank=True, help_text="Stores all employment history as JSON")
-
-
-
-    
-
-
-
-    # PAYMENT INFORMATION
-
-
-
-    payment_date = models.DateField(null=True, blank=True, verbose_name="Payment Date", help_text="Date when payment was made")
-
-
-
-    payment_id = models.CharField(max_length=100, blank=True, verbose_name="Payment ID", help_text="Payment transaction ID")
-
-
-
-    
-
-
-
-    # RESEARCH AND PUBLICATIONS
-
-
-
+    # 9. RESEARCH AND PUBLICATIONS
     research_experience = models.TextField(blank=True)
-
-
 
     publications = models.TextField(blank=True)
 
-
-
-    
-
-
-
-    # OTHER COURSE
-
-
-
+    # 10. OTHER COURSE INFORMATION
     pursuing_other_course = models.CharField(max_length=10, blank=True)
-
-
 
     other_institution = models.CharField(max_length=200, blank=True)
 
-
-
     other_class = models.CharField(max_length=100, blank=True)
-
-
 
     other_session = models.CharField(max_length=50, blank=True)
 
-
-
     other_result = models.CharField(max_length=50, blank=True)
 
-
-
+    # 11. SIGNATURE INFORMATION
+    # signature_name field handled via property/method
     
+    # 12. PAYMENT INFORMATION
+    payment_date = models.DateField(null=True, blank=True, verbose_name="Payment Date", help_text="Date when payment was made")
 
+    payment_id = models.CharField(max_length=100, blank=True, verbose_name="Payment ID", help_text="Payment transaction ID")
 
+    # 13. DOCUMENT UPLOADS (SOP Certificates)
+    # No Objection cum Service Certificate from employer (SOP-II)
+    no_objection_certificate = models.FileField(
+        upload_to='applications/documents/no_objection/', 
+        null=True, 
+        blank=True, 
+        verbose_name="No Objection cum Service Certificate (SOP-II)",
+        help_text="Required for employed candidates"
+    )
+
+    # Certificate from Father/Guardian (SOP-III)
+    father_guardian_certificate = models.FileField(
+        upload_to='applications/documents/father_guardian/', 
+        null=True, 
+        blank=True, 
+        verbose_name="Certificate from Father/Guardian (SOP-III)"
+    )
+
+    # Affidavit of parent/guardian (SOP-IV)
+    parent_guardian_affidavit = models.FileField(
+        upload_to='applications/documents/affidavit/', 
+        null=True, 
+        blank=True, 
+        verbose_name="Affidavit of Parent/Guardian (SOP-IV)",
+        help_text="Attested by executive magistrate/oath commissioner/notary public"
+    )
+
+    # Character Certificate (SOP-V)
+    character_certificate = models.FileField(
+        upload_to='applications/documents/character/', 
+        null=True, 
+        blank=True, 
+        verbose_name="Character Certificate (SOP-V)",
+        help_text="Required if there is gap in study"
+    )
+
+    # Category Certificate (SOP-VI to SOP-XI)
+    category_certificate = models.FileField(
+        upload_to='applications/documents/category/', 
+        null=True, 
+        blank=True, 
+        verbose_name="Category Certificate (SOP-VI to SOP-XI)",
+        help_text="SC/ST/BC/EWS/SBC/PwD/ESM/Others certificate in Govt. format"
+    )
+
+    # Haryana Domicile Certificate
+    haryana_domicile_certificate = models.FileField(
+        upload_to='applications/documents/domicile/', 
+        null=True, 
+        blank=True, 
+        verbose_name="Haryana Domicile Certificate"
+    )
+
+    # NRI/Foreign Citizen Declaration (SOP-XII)
+    nri_declaration = models.FileField(
+        upload_to='applications/documents/nri/', 
+        null=True, 
+        blank=True, 
+        verbose_name="NRI/Foreign Citizen Declaration (SOP-XII)"
+    )
+
+    # Migration Certificate
+    migration_certificate = models.FileField(
+        upload_to='applications/documents/migration/', 
+        null=True, 
+        blank=True, 
+        verbose_name="Migration Certificate"
+    )
+
+    # ACADEMIC QUALIFICATIONS (JSON)
+    academic_data = models.JSONField(default=dict, blank=True, help_text="Stores all academic qualifications as JSON")
+
+    # EMPLOYMENT HISTORY (JSON)
+    employment_history = models.JSONField(default=dict, blank=True, help_text="Stores all employment history as JSON")
 
     # FILES
-
-
-
     photo = models.ImageField(upload_to='applications/photos/', null=True, blank=True)
 
-
-
     signature = models.ImageField(upload_to='applications/signatures/', null=True, blank=True)
-
-
-
-    
-
-
 
     # PRINT STATUS
 

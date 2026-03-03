@@ -63,44 +63,44 @@ class BaseAdmin(admin.ModelAdmin):
 # PORTAL SETTINGS ADMIN
 # ──────────────────────────────────────────────────────────────────────────────
 
-@admin.register(PortalSettings)
-class PortalSettingsAdmin(admin.ModelAdmin):
-    """
-    Singleton configuration admin.
-    Prevents multiple entries and provides full portal control.
-    """
-    list_display = (
-        "portal_name", "current_academic_year", "is_portal_active",
-        "maintenance_mode", "application_start_date", "application_end_date"
-    )
-    list_filter = ("is_portal_active", "maintenance_mode")
-    fieldsets = (
-        ("Portal Identity", {
-            "fields": ("portal_name", "current_academic_year"),
-            "description": "Main portal identification settings"
-        }),
-        ("Portal Status", {
-            "fields": ("is_portal_active", "maintenance_mode"),
-            "description": "Control portal accessibility and maintenance mode",
-            "classes": ("wide",)
-        }),
-        ("Application Period", {
-            "fields": ("application_start_date", "application_end_date"),
-            "description": "Define when applications are accepted"
-        }),
-        ("Contact Information", {
-            "fields": ("contact_email", "support_phone"),
-            "description": "Public contact details displayed on portal"
-        }),
-    )
+# @admin.register(PortalSettings)
+# class PortalSettingsAdmin(admin.ModelAdmin):
+#     """
+#     Singleton configuration admin.
+#     Prevents multiple entries and provides full portal control.
+#     """
+#     list_display = (
+#         "portal_name", "current_academic_year", "is_portal_active",
+#         "maintenance_mode", "application_start_date", "application_end_date"
+#     )
+#     list_filter = ("is_portal_active", "maintenance_mode")
+#     fieldsets = (
+#         ("Portal Identity", {
+#             "fields": ("portal_name", "current_academic_year"),
+#             "description": "Main portal identification settings"
+#         }),
+#         ("Portal Status", {
+#             "fields": ("is_portal_active", "maintenance_mode"),
+#             "description": "Control portal accessibility and maintenance mode",
+#             "classes": ("wide",)
+#         }),
+#         ("Application Period", {
+#             "fields": ("application_start_date", "application_end_date"),
+#             "description": "Define when applications are accepted"
+#         }),
+#         ("Contact Information", {
+#             "fields": ("contact_email", "support_phone"),
+#             "description": "Public contact details displayed on portal"
+#         }),
+#     )
     
-    def has_add_permission(self, request):
-        """Prevent creating multiple PortalSettings instances."""
-        return not PortalSettings.objects.exists()
+#     def has_add_permission(self, request):
+#         """Prevent creating multiple PortalSettings instances."""
+#         return not PortalSettings.objects.exists()
     
-    def has_delete_permission(self, request, obj=None):
-        """Prevent deletion of portal settings."""
-        return False
+#     def has_delete_permission(self, request, obj=None):
+#         """Prevent deletion of portal settings."""
+#         return False
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -143,128 +143,128 @@ class CourseAdmin(BaseAdmin):
 # FORM CONFIGURATION ADMIN
 # ──────────────────────────────────────────────────────────────────────────────
 
-@admin.register(FormConfiguration)
-class FormConfigurationAdmin(BaseAdmin):
-    """
-    Form availability and payment configuration per course.
-    """
-    list_display = (
-        "course", "is_form_open", "is_payment_required",
-        "application_fee", "max_applications_allowed", "date_range"
-    )
-    list_filter = ("is_form_open", "is_payment_required", "is_active")
-    search_fields = ("course__course_name", "course__department_name")
-    ordering = ("-created_at",)
+# @admin.register(FormConfiguration)
+# class FormConfigurationAdmin(BaseAdmin):
+#     """
+#     Form availability and payment configuration per course.
+#     """
+#     list_display = (
+#         "course", "is_form_open", "is_payment_required",
+#         "application_fee", "max_applications_allowed", "date_range"
+#     )
+#     list_filter = ("is_form_open", "is_payment_required", "is_active")
+#     search_fields = ("course__course_name", "course__department_name")
+#     ordering = ("-created_at",)
     
-    def date_range(self, obj):
-        """Display form date range."""
-        if obj.form_start_date and obj.form_end_date:
-            return f"{obj.form_start_date} to {obj.form_end_date}"
-        return "No dates set"
-    date_range.short_description = "Form Period"
+#     def date_range(self, obj):
+#         """Display form date range."""
+#         if obj.form_start_date and obj.form_end_date:
+#             return f"{obj.form_start_date} to {obj.form_end_date}"
+#         return "No dates set"
+#     date_range.short_description = "Form Period"
     
-    fieldsets = (
-        ("Course Selection", {
-            "fields": ("course",)
-        }),
-        ("Form Availability", {
-            "fields": ("is_form_open", "form_start_date", "form_end_date")
-        }),
-        ("Payment Configuration", {
-            "fields": ("is_payment_required", "application_fee")
-        }),
-        ("Application Limits", {
-            "fields": ("max_applications_allowed",)
-        }),
-        ("Status", {
-            "fields": ("is_active",),
-            "classes": ("collapse",)
-        }),
-    )
+#     fieldsets = (
+#         ("Course Selection", {
+#             "fields": ("course",)
+#         }),
+#         ("Form Availability", {
+#             "fields": ("is_form_open", "form_start_date", "form_end_date")
+#         }),
+#         ("Payment Configuration", {
+#             "fields": ("is_payment_required", "application_fee")
+#         }),
+#         ("Application Limits", {
+#             "fields": ("max_applications_allowed",)
+#         }),
+#         ("Status", {
+#             "fields": ("is_active",),
+#             "classes": ("collapse",)
+#         }),
+#     )
 
 
 # ──────────────────────────────────────────────────────────────────────────────
 # ADVERTISEMENT ADMIN
 # ──────────────────────────────────────────────────────────────────────────────
 
-@admin.register(Advertisement)
-class AdvertisementAdmin(BaseAdmin):
-    """
-    Advertisement/Banner management with priority handling.
-    """
-    list_display = (
-        "title", "display_type", "priority", "campaign_period",
-        "redirect_url", "is_currently_active"
-    )
-    list_filter = ("is_active", "display_type", "start_date")
-    search_fields = ("title", "description")
-    ordering = ("priority", "-created_at")
-    date_hierarchy = "start_date"
+# @admin.register(Advertisement)
+# class AdvertisementAdmin(BaseAdmin):
+#     """
+#     Advertisement/Banner management with priority handling.
+#     """
+#     list_display = (
+#         "title", "display_type", "priority", "campaign_period",
+#         "redirect_url", "is_currently_active"
+#     )
+#     list_filter = ("is_active", "display_type", "start_date")
+#     search_fields = ("title", "description")
+#     ordering = ("priority", "-created_at")
+#     date_hierarchy = "start_date"
     
-    def campaign_period(self, obj):
-        """Display campaign duration."""
-        return f"{obj.start_date} to {obj.end_date}"
-    campaign_period.short_description = "Campaign Period"
+#     def campaign_period(self, obj):
+#         """Display campaign duration."""
+#         return f"{obj.start_date} to {obj.end_date}"
+#     campaign_period.short_description = "Campaign Period"
     
-    def is_currently_active(self, obj):
-        """Check if advertisement is currently active based on dates."""
-        active = obj.is_currently_active()
-        color = "#22c55e" if active else "#94a3b8"
-        status = "Running" if active else "Not Running"
-        return format_html(
-            '<span style="color: {}; font-weight: 600;">{}</span>',
-            color, status
-        )
-    is_currently_active.short_description = "Currently Active"
+#     def is_currently_active(self, obj):
+#         """Check if advertisement is currently active based on dates."""
+#         active = obj.is_currently_active()
+#         color = "#22c55e" if active else "#94a3b8"
+#         status = "Running" if active else "Not Running"
+#         return format_html(
+#             '<span style="color: {}; font-weight: 600;">{}</span>',
+#             color, status
+#         )
+#     is_currently_active.short_description = "Currently Active"
     
-    fieldsets = (
-        ("Advertisement Content", {
-            "fields": ("title", "description", "file")
-        }),
-        ("Display Configuration", {
-            "fields": ("display_type", "priority", "redirect_url")
-        }),
-        ("Campaign Period", {
-            "fields": ("start_date", "end_date"),
-            "description": "Advertisement will only display between these dates"
-        }),
-        ("Status", {
-            "fields": ("is_active",),
-            "classes": ("collapse",)
-        }),
-    )
+#     fieldsets = (
+#         ("Advertisement Content", {
+#             "fields": ("title", "description", "file")
+#         }),
+#         ("Display Configuration", {
+#             "fields": ("display_type", "priority", "redirect_url")
+#         }),
+#         ("Campaign Period", {
+#             "fields": ("start_date", "end_date"),
+#             "description": "Advertisement will only display between these dates"
+#         }),
+#         ("Status", {
+#             "fields": ("is_active",),
+#             "classes": ("collapse",)
+#         }),
+#     )
 
 
-class AdvertisementFieldOptionInline(admin.TabularInline):
-    model = AdvertisementFieldOption
-    extra = 0
-    fields = ("value", "label", "display_order", "is_active")
-    ordering = ("display_order", "id")
+# class AdvertisementFieldOptionInline(admin.TabularInline):
+#     model = AdvertisementFieldOption
+#     extra = 0
+#     fields = ("value", "label", "display_order", "is_active")
+#     ordering = ("display_order", "id")
 
 
-@admin.register(AdvertisementCourse)
-class AdvertisementCourseAdmin(BaseAdmin):
-    list_display = ("advertisement", "course", "total_seats", "application_fee")
-    search_fields = ("advertisement__title", "course__course_name")
-    list_filter = ("is_active",)
-    ordering = ("-created_at",)
+# @admin.register(AdvertisementCourse)
+# class AdvertisementCourseAdmin(BaseAdmin):
+#     list_display = ("advertisement", "course", "total_seats", "application_fee")
+#     search_fields = ("advertisement__title", "course__course_name")
+#     list_filter = ("is_active",)
+#     ordering = ("-created_at",)
 
 
-@admin.register(AdvertisementField)
-class AdvertisementFieldAdmin(BaseAdmin):
-    list_display = (
-        "advertisement",
-        "course",
-        "label",
-        "name",
-        "field_type",
-        "is_required",
-        "display_order",
-    )
-    search_fields = ("advertisement__title", "label", "name")
-    list_filter = ("field_type", "is_required", "is_active")
-    ordering = ("advertisement", "course", "display_order", "id")
-    inlines = [AdvertisementFieldOptionInline]
+# @admin.register(AdvertisementField)
+# class AdvertisementFieldAdmin(BaseAdmin):
+#     list_display = (
+#         "advertisement",
+#         "course",
+#         "label",
+#         "name",
+#         "field_type",
+#         "is_required",
+#         "display_order",
+#     )
+#     search_fields = ("advertisement__title", "label", "name")
+#     list_filter = ("field_type", "is_required", "is_active")
+#     ordering = ("advertisement", "course", "display_order", "id")
+#     inlines = [AdvertisementFieldOptionInline]
 
 
 @admin.action(description="Print selected applications")
@@ -306,12 +306,16 @@ class AdmissionApplicationAdmin(BaseAdmin):
                 "status", "is_data_locked", "is_active"
             )
         }),
+        ("Apply Course", {
+            "fields": (
+                "apply_course", "department", "study_mode"
+            )
+        }),
         ("Personal Details", {
             "fields": (
                 "first_name", "last_name", "full_name", "date_of_birth", 
                 "gender", "father_name", "mother_name", "marital_status", 
-                "nationality", "aadhar_number", "category", "category_tick", 
-                "category_other"
+                "nationality", "aadhar_number"
             )
         }),
         ("Contact Information", {
@@ -326,16 +330,16 @@ class AdmissionApplicationAdmin(BaseAdmin):
                 "district", "state", "pincode"
             )
         }),
-        ("Academic Information", {
+        ("Category Information", {
             "fields": (
-                "specialization_area", "proposed_supervisor", 
-                "fellowship_validity", "fellowship_category", 
+                "category", "category_tick", "category_other", 
                 "ugc_category", "ugc_validity_date"
             )
         }),
-        ("Course Details", {
+        ("Academic Information", {
             "fields": (
-                "apply_course", "department", "study_mode"
+                "specialization_area", "proposed_supervisor", 
+                "fellowship_validity", "fellowship_category"
             )
         }),
         ("Employment Details", {
@@ -346,9 +350,13 @@ class AdmissionApplicationAdmin(BaseAdmin):
                 "org_telephone", "org_email"
             )
         }),
-        ("Other Information", {
+        ("Research and Publications", {
             "fields": (
-                "research_experience", "publications", 
+                "research_experience", "publications"
+            )
+        }),
+        ("Other Course Information", {
+            "fields": (
                 "pursuing_other_course", "other_institution", 
                 "other_class", "other_session", "other_result"
             )
@@ -357,6 +365,15 @@ class AdmissionApplicationAdmin(BaseAdmin):
             "fields": (
                 "payment_date", "payment_id"
             )
+        }),
+        ("Document Uploads (SOP Certificates)", {
+            "fields": (
+                "no_objection_certificate", "father_guardian_certificate",
+                "parent_guardian_affidavit", "character_certificate",
+                "category_certificate", "haryana_domicile_certificate",
+                "nri_declaration", "migration_certificate"
+            ),
+            "classes": ("wide",)
         }),
         ("Files", {
             "fields": (
@@ -401,114 +418,114 @@ class AdmissionApplicationAdmin(BaseAdmin):
     print_button.allow_tags = True
 
 
-@admin.register(ApplicationFieldValue)
-class ApplicationFieldValueAdmin(BaseAdmin):
-    list_display = ("application", "field", "created_at")
-    search_fields = ("application__application_no", "field__name", "field__label")
-    list_filter = ("is_active",)
-    ordering = ("-created_at",)
+# @admin.register(ApplicationFieldValue)
+# class ApplicationFieldValueAdmin(BaseAdmin):
+#     list_display = ("application", "field", "created_at")
+#     search_fields = ("application__application_no", "field__name", "field__label")
+#     list_filter = ("is_active",)
+#     ordering = ("-created_at",)
 
 
-@admin.register(ApplicationProfileSnapshot)
-class ApplicationProfileSnapshotAdmin(BaseAdmin):
-    list_display = ("application", "first_name", "last_name", "snapshot_created_at")
-    search_fields = ("application__application_no", "first_name", "last_name")
-    ordering = ("-snapshot_created_at",)
+# @admin.register(ApplicationProfileSnapshot)
+# class ApplicationProfileSnapshotAdmin(BaseAdmin):
+#     list_display = ("application", "first_name", "last_name", "snapshot_created_at")
+#     search_fields = ("application__application_no", "first_name", "last_name")
+#     ordering = ("-snapshot_created_at",)
 
 
-@admin.register(ApplicationEducationSnapshot)
-class ApplicationEducationSnapshotAdmin(BaseAdmin):
-    list_display = ("application", "qualification", "passing_year", "snapshot_created_at")
-    search_fields = ("application__application_no", "qualification", "institution_name")
-    ordering = ("-snapshot_created_at",)
+# @admin.register(ApplicationEducationSnapshot)
+# class ApplicationEducationSnapshotAdmin(BaseAdmin):
+#     list_display = ("application", "qualification", "passing_year", "snapshot_created_at")
+#     search_fields = ("application__application_no", "qualification", "institution_name")
+#     ordering = ("-snapshot_created_at",)
 
 
-@admin.register(ApplicationExperienceSnapshot)
-class ApplicationExperienceSnapshotAdmin(BaseAdmin):
-    list_display = ("application", "organization_name", "designation", "snapshot_created_at")
-    search_fields = ("application__application_no", "organization_name", "designation")
-    ordering = ("-snapshot_created_at",)
+# @admin.register(ApplicationExperienceSnapshot)
+# class ApplicationExperienceSnapshotAdmin(BaseAdmin):
+#     list_display = ("application", "organization_name", "designation", "snapshot_created_at")
+#     search_fields = ("application__application_no", "organization_name", "designation")
+#     ordering = ("-snapshot_created_at",)
 
 
 # ──────────────────────────────────────────────────────────────────────────────
 # NOTICE ADMIN
 # ──────────────────────────────────────────────────────────────────────────────
 
-@admin.register(Notice)
-class NoticeAdmin(BaseAdmin):
-    """
-    Notice/Announcement management.
-    """
-    list_display = (
-        "title", "priority", "has_attachment", "created_at_display"
-    )
-    list_filter = ("is_active",)
-    search_fields = ("title", "content")
-    ordering = ("priority", "-created_at")
+# @admin.register(Notice)
+# class NoticeAdmin(BaseAdmin):
+#     """
+#     Notice/Announcement management.
+#     """
+#     list_display = (
+#         "title", "priority", "has_attachment", "created_at_display"
+#     )
+#     list_filter = ("is_active",)
+#     search_fields = ("title", "content")
+#     ordering = ("priority", "-created_at")
     
-    def has_attachment(self, obj):
-        """Indicate if notice has an attachment."""
-        if obj.attachment:
-            return format_html(
-                '<span style="color: #3b82f6;"><i class="fas fa-paperclip"></i> Yes</span>',
-                ''  # Empty argument since no placeholder needed
-            )
-        return format_html('<span style="color: #94a3b8;">No</span>', '')
-    has_attachment.short_description = "Attachment"
+#     def has_attachment(self, obj):
+#         """Indicate if notice has an attachment."""
+#         if obj.attachment:
+#             return format_html(
+#                 '<span style="color: #3b82f6;"><i class="fas fa-paperclip"></i> Yes</span>',
+#                 ''  # Empty argument since no placeholder needed
+#             )
+#         return format_html('<span style="color: #94a3b8;">No</span>', '')
+#     has_attachment.short_description = "Attachment"
     
-    def created_at_display(self, obj):
-        """Formatted creation date."""
-        return obj.created_at.strftime("%d %b %Y, %I:%M %p")
-    created_at_display.short_description = "Created"
+#     def created_at_display(self, obj):
+#         """Formatted creation date."""
+#         return obj.created_at.strftime("%d %b %Y, %I:%M %p")
+#     created_at_display.short_description = "Created"
     
-    fieldsets = (
-        ("Notice Content", {
-            "fields": ("title", "content")
-        }),
-        ("Attachment (Optional)", {
-            "fields": ("attachment",),
-            "classes": ("collapse",)
-        }),
-        ("Display Settings", {
-            "fields": ("priority", "is_active")
-        }),
-    )
+#     fieldsets = (
+#         ("Notice Content", {
+#             "fields": ("title", "content")
+#         }),
+#         ("Attachment (Optional)", {
+#             "fields": ("attachment",),
+#             "classes": ("collapse",)
+#         }),
+#         ("Display Settings", {
+#             "fields": ("priority", "is_active")
+#         }),
+#     )
 
 
 # ──────────────────────────────────────────────────────────────────────────────
 # HOMEPAGE SLIDER ADMIN
 # ──────────────────────────────────────────────────────────────────────────────
 
-@admin.register(HomepageSlider)
-class HomepageSliderAdmin(BaseAdmin):
-    """
-    Homepage carousel/slider management.
-    """
-    list_display = (
-        "title", "subtitle", "priority", "preview_image"
-    )
-    list_filter = ("is_active",)
-    search_fields = ("title", "subtitle")
-    ordering = ("priority", "-created_at")
+# @admin.register(HomepageSlider)
+# class HomepageSliderAdmin(BaseAdmin):
+#     """
+#     Homepage carousel/slider management.
+#     """
+#     list_display = (
+#         "title", "subtitle", "priority", "preview_image"
+#     )
+#     list_filter = ("is_active",)
+#     search_fields = ("title", "subtitle")
+#     ordering = ("priority", "-created_at")
     
-    def preview_image(self, obj):
-        """Show thumbnail preview in admin list."""
-        if obj.image:
-            return format_html(
-                '<img src="{}" style="max-height: 50px; border-radius: 4px;" />',
-                obj.image.url
-            )
-        return format_html('<span style="color: #94a3b8;">No Image</span>', '')
-    preview_image.short_description = "Preview"
+#     def preview_image(self, obj):
+#         """Show thumbnail preview in admin list."""
+#         if obj.image:
+#             return format_html(
+#                 '<img src="{}" style="max-height: 50px; border-radius: 4px;" />',
+#                 obj.image.url
+#             )
+#         return format_html('<span style="color: #94a3b8;">No Image</span>', '')
+#     preview_image.short_description = "Preview"
     
-    fieldsets = (
-        ("Slider Content", {
-            "fields": ("title", "subtitle", "image")
-        }),
-        ("Display Settings", {
-            "fields": ("priority", "is_active")
-        }),
-    )
+#     fieldsets = (
+#         ("Slider Content", {
+#             "fields": ("title", "subtitle", "image")
+#         }),
+#         ("Display Settings", {
+#             "fields": ("priority", "is_active")
+#         }),
+#     )
 
 
 # ──────────────────────────────────────────────────────────────────────────────
