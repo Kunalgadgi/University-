@@ -1,4 +1,4 @@
-#!/var/www/admission/portal/venv/bin/python3
+#!/var/www/cblu/University-/venv/bin/python3.12
 # -*- coding: utf-8 -*-
 import re
 import sys

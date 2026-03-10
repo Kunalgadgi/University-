@@ -494,7 +494,7 @@ def admission_form_single(request):
             aq_subjects = request.POST.getlist('aq_subjects[]')
             aq_certificates = request.FILES.getlist('aq_certificate[]')
 
-            row_count = max(len(aq_exam), len(aq_board), len(aq_year), len(aq_roll), len(aq_marks_obtained), len(aq_total_marks), len(aq_subjects))
+            row_count = max(len(aq_exam), len(aq_board), len(aq_year), len(aq_roll), len(aq_marks_obtained), len(aq_total_marks), len(aq_subjects), len(aq_certificates))
             for i in range(row_count):
                 qualification = (aq_exam[i] if i < len(aq_exam) else '').strip()
                 board_university = (aq_board[i] if i < len(aq_board) else '').strip()
@@ -518,12 +518,26 @@ def admission_form_single(request):
                     'subjects': subjects,
                 }
                 
-                # Handle certificate file - store file info instead of file object
+                # Handle certificate file - store file info in JSON and also save to appropriate field
                 if certificate_file:
                     qual_data['certificate_file_name'] = certificate_file.name
                     qual_data['certificate_file_size'] = certificate_file.size
                     qual_data['certificate_file_content_type'] = certificate_file.content_type
-                    # Note: The actual file needs to be saved separately to a FileField
+                    
+                    # Save certificate to appropriate field based on examination type (6 fields as requested)
+                    if qualification.lower() in ['matric', '10th', 'tenth']:
+                        draft_application.tenth_certificate = certificate_file
+                    elif qualification.lower() in ['10+2', '12th', 'twelfth', 'intermediate']:
+                        draft_application.twelfth_certificate = certificate_file
+                    elif qualification.lower() in ['bachelor', 'bachelor degree', 'graduation', 'graduate']:
+                        draft_application.graduation_certificate = certificate_file
+                    elif qualification.lower() in ['master', 'master degree', 'post graduation', 'post_graduation', 'mphil', 'm.phil']:
+                        draft_application.post_graduation_certificate = certificate_file
+                    elif qualification.lower() in ['ugc', 'csir', 'jrf', 'net', 'gate', 'gpat', 'ugc/csir jrf']:
+                        draft_application.ugc_csir_jrf_certificate = certificate_file
+                    else:
+                        # For any other examination, save to other_certificate
+                        draft_application.other_certificate = certificate_file
                     
                 draft_academic_qualifications.append(qual_data)
 
@@ -661,8 +675,9 @@ def admission_form_single(request):
         aq_marks_obtained = request.POST.getlist('aq_marks_obtained[]')
         aq_total_marks = request.POST.getlist('aq_total_marks[]')
         aq_subjects = request.POST.getlist('aq_subjects[]')
+        aq_certificates = request.FILES.getlist('aq_certificate[]')
 
-        row_count = max(len(aq_exam), len(aq_board), len(aq_year), len(aq_roll), len(aq_marks_obtained), len(aq_total_marks), len(aq_subjects))
+        row_count = max(len(aq_exam), len(aq_board), len(aq_year), len(aq_roll), len(aq_marks_obtained), len(aq_total_marks), len(aq_subjects), len(aq_certificates))
         for i in range(row_count):
             qualification = (aq_exam[i] if i < len(aq_exam) else '').strip()
             board_university = (aq_board[i] if i < len(aq_board) else '').strip()
@@ -671,8 +686,9 @@ def admission_form_single(request):
             marks_obtained = (aq_marks_obtained[i] if i < len(aq_marks_obtained) else '').strip()
             total_marks = (aq_total_marks[i] if i < len(aq_total_marks) else '').strip()
             subjects = (aq_subjects[i] if i < len(aq_subjects) else '').strip()
+            certificate_file = (aq_certificates[i] if i < len(aq_certificates) else None)
 
-            if not (qualification or board_university or passing_year or roll_number or marks_obtained or total_marks or subjects):
+            if not (qualification or board_university or passing_year or roll_number or marks_obtained or total_marks or subjects or certificate_file):
                 continue
 
             # Validation: marks obtained should not be greater than total marks
@@ -698,6 +714,23 @@ def admission_form_single(request):
                     percentage = f"{marks_obtained}/{total_marks}"
             elif marks_obtained or total_marks:
                 percentage = f"{marks_obtained or '-'}/{total_marks or '-'}"
+
+            # Handle certificate file - save to appropriate field based on examination type (6 fields as requested)
+            if certificate_file:
+                # Save certificate to appropriate field based on examination type
+                if qualification.lower() in ['matric', '10th', 'tenth']:
+                    application.tenth_certificate = certificate_file
+                elif qualification.lower() in ['10+2', '12th', 'twelfth', 'intermediate']:
+                    application.twelfth_certificate = certificate_file
+                elif qualification.lower() in ['bachelor', 'bachelor degree', 'graduation', 'graduate']:
+                    application.graduation_certificate = certificate_file
+                elif qualification.lower() in ['master', 'master degree', 'post graduation', 'post_graduation', 'mphil', 'm.phil']:
+                    application.post_graduation_certificate = certificate_file
+                elif qualification.lower() in ['ugc', 'csir', 'jrf', 'net', 'gate', 'gpat', 'ugc/csir jrf']:
+                    application.ugc_csir_jrf_certificate = certificate_file
+                else:
+                    # For any other examination, save to other_certificate
+                    application.other_certificate = certificate_file
 
             # Add to academic qualifications list for JSON storage
             academic_qualifications.append({

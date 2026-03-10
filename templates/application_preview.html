@@ -846,6 +846,7 @@
 
     </table>
 
+
     <!-- EMPLOYMENT HISTORY - Only for PHD -->
     {% if application and application.apply_course == 'Ph.D.' %}
     <h4>11. Employment History</h4>
@@ -1050,11 +1051,50 @@
 
     </table>
 
+        <!-- ACADEMIC CERTIFICATES -->
+    <h4>14.Academic Certificates</h4>
+    <table>
+        <tr>
+            <th>Certificate Type</th>
+            {% comment %} <th>File Name</th> {% endcomment %}
+            <th>Status</th>
+        </tr>
+        <tr>
+            <td>10th Certificate</td>
+            {% comment %} <td>{% if application.tenth_certificate %}{{ application.tenth_certificate.name }}{% else %}-{% endif %}</td> {% endcomment %}
+            <td>{% if application.tenth_certificate %}<span style="color: green;">✓ Uploaded</span>{% else %}<span style="color: red;">✗ Not Uploaded</span>{% endif %}</td>
+        </tr>
+        <tr>
+            <td>12th Certificate</td>
+            {% comment %} <td>{% if application.twelfth_certificate %}{{ application.twelfth_certificate.name }}{% else %}-{% endif %}</td> {% endcomment %}
+            <td>{% if application.twelfth_certificate %}<span style="color: green;">✓ Uploaded</span>{% else %}<span style="color: red;">✗ Not Uploaded</span>{% endif %}</td>
+        </tr>
+        <tr>
+            <td>Graduation Certificate</td>
+            {% comment %} <td>{% if application.graduation_certificate %}{{ application.graduation_certificate.name }}{% else %}-{% endif %}</td> {% endcomment %}
+            <td>{% if application.graduation_certificate %}<span style="color: green;">✓ Uploaded</span>{% else %}<span style="color: red;">✗ Not Uploaded</span>{% endif %}</td>
+        </tr>
+        <tr>
+            <td>Post Graduation Certificate</td>
+            {% comment %} <td>{% if application.post_graduation_certificate %}{{ application.post_graduation_certificate.name }}{% else %}-{% endif %}</td> {% endcomment %}
+            <td>{% if application.post_graduation_certificate %}<span style="color: green;">✓ Uploaded</span>{% else %}<span style="color: red;">✗ Not Uploaded</span>{% endif %}</td>
+        </tr>
+        <tr>
+            <td>UGC/CSIR JRF Certificate</td>
+            {% comment %} <td>{% if application.ugc_csir_jrf_certificate %}{{ application.ugc_csir_jrf_certificate.name }}{% else %}-{% endif %}</td> {% endcomment %}
+            <td>{% if application.ugc_csir_jrf_certificate %}<span style="color: green;">✓ Uploaded</span>{% else %}<span style="color: red;">✗ Not Uploaded</span>{% endif %}</td>
+        </tr>
+        <tr>
+            <td>Other Certificate</td>
+            {% comment %} <td>{% if application.other_certificate %}{{ application.other_certificate.name }}{% else %}-{% endif %}</td> {% endcomment %}
+            <td>{% if application.other_certificate %}<span style="color: green;">✓ Uploaded</span>{% else %}<span style="color: red;">✗ Not Uploaded</span>{% endif %}</td>
+        </tr>
+    </table>
 
 
     <!-- DECLARATION -->
 
-    <h4>14. Declaration</h4>
+    <h4>15. Declaration</h4>
 
 
 

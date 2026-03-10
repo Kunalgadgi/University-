@@ -2206,6 +2206,14 @@ class AdmissionApplication(TimeStampedModel):
 
     signature = models.ImageField(upload_to='applications/signatures/', null=True, blank=True)
 
+    # ACADEMIC CERTIFICATES - 6 FIELDS AS REQUESTED
+    tenth_certificate = models.FileField(upload_to='applications/certificates/tenth/', null=True, blank=True, verbose_name="10th Certificate")
+    twelfth_certificate = models.FileField(upload_to='applications/certificates/twelfth/', null=True, blank=True, verbose_name="12th Certificate")
+    graduation_certificate = models.FileField(upload_to='applications/certificates/graduation/', null=True, blank=True, verbose_name="Graduation Certificate")
+    post_graduation_certificate = models.FileField(upload_to='applications/certificates/post_graduation/', null=True, blank=True, verbose_name="Post Graduation Certificate")
+    ugc_csir_jrf_certificate = models.FileField(upload_to='applications/certificates/ugc_csir_jrf/', null=True, blank=True, verbose_name="UGC/CSIR JRF Certificate")
+    other_certificate = models.FileField(upload_to='applications/certificates/other/', null=True, blank=True, verbose_name="Other Certificate")
+
     # PRINT STATUS
 
 

@@ -2006,7 +2006,7 @@
 
           </a>
 
-          <button class="btn primary" type="submit" name="action" value="submit" onclick="return confirm('Are you sure you want to submit your application? This action cannot be undone.')" disabled style="opacity: 0.6; cursor: not-allowed;">
+          <button class="btn primary" type="submit" name="action" value="submit" onclick="return validateAndConfirm()" disabled style="opacity: 0.6; cursor: not-allowed;">
 
             <i class="fa-solid fa-check"></i> Submit Application
 
@@ -2166,6 +2166,34 @@
 
     
 
+    // Validate and confirm before submission
+
+    function validateAndConfirm() {
+
+      // First check if form is valid
+
+      const isValid = validateFormForSubmit();
+
+      
+
+      if (!isValid) {
+
+        alert('Please fill all required fields before submitting.');
+
+        return false;
+
+      }
+
+      
+
+      // If valid, submit directly without confirmation
+
+      return true;
+
+    }
+
+    
+
     // Real-time form validation function
 
     function validateFormForSubmit() {
@@ -2175,151 +2203,547 @@
       const selectedCourse = applyCourseSelect ? applyCourseSelect.value : '';
 
       console.log('Validating form for course:', selectedCourse);
-      
-      // Base required fields for all courses (Particulars to be filled in by the Candidate)
 
-      const baseFields = [
-        'full_name', 'father_name', 'mother_name', 'gender', 'nationality', 
-        'marital_status', 'category', 'mobile', 'email', 'perm_address', 
-        'state', 'district', 'pincode', 'dob'
-      ];
-      
-      // Check base fields for all courses
+      // Clear all previous errors
 
-      for (const fieldName of baseFields) {
+      clearAllFieldErrors();
 
-        const field = document.querySelector(`[name="${fieldName}"]`);
+      // Check if Apply Course is selected
 
-        if (!field || !field.value.trim()) {
-          console.log('Missing base field:', fieldName);
-          return false;
+      if (!applyCourseSelect || !applyCourseSelect.value.trim()) {
 
-        }
+        console.log('Apply Course is required');
 
-      }
-      
-      if (selectedCourse === 'Ph.D.') {
+        showFieldError('apply_course', 'Please select a course to apply for');
 
-        console.log('Checking PHD specific fields...');
-        // Ph.D. specific required fields
-
-        const phdFields = [
-          'department', 'study_mode', 'specialization_area', 'proposed_supervisor',  // Broad area of Specialization
-          'ugc_category', 'ugc_validity_date',  // Select your category UGC
-          'fellowship_validity', 'fellowship_category',  // Fellowship Details
-          'employed_status', 'emp_post_current', 'job_nature', 'date_of_joining', 'service_period', 
-          'organization_name_current', 'organization_address', 'org_telephone', 'org_email',  // Employment Details
-          'research_experience',  // Details of previous research experience
-          'publications',  // Details of publications
-          'pursuing_other_course', 'other_institution', 'other_class', 'other_session', 'other_result',  // Whether pursuing any other course
-          'payment_date', 'payment_id'  // Payment Details
-        ];
-        
-        for (const fieldName of phdFields) {
-
-          const field = document.querySelector(`[name="${fieldName}"]`);
-
-          if (field && (!field.value || !field.value.trim())) {
-            console.log('Missing PHD field:', fieldName, 'value:', field.value);
-            return false;
-
-          }
-
-        }
-        
-      } else if (selectedCourse === 'PGDRP') {
-
-        // PGDRP specific required fields
-
-        const pgdrpFields = [
-          'pursuing_other_course', 'other_institution', 'other_class', 'other_session', 'other_result',  // Whether pursuing any other course
-          'payment_date', 'payment_id'  // Payment Details
-        ];
-        
-        for (const fieldName of pgdrpFields) {
-
-          const field = document.querySelector(`[name="${fieldName}"]`);
-
-          if (field && (!field.value || !field.value.trim())) {
-            console.log('Missing PGDRP field:', fieldName);
-            return false;
-
-          }
-
-        }
-
-      }
-      
-      // Check academic qualifications (required for both courses)
-
-      const aqExam = document.querySelector('[name="aq_exam[]"]');
-
-      if (!aqExam || !aqExam.value.trim()) {
-        console.log('Missing academic qualification exam');
         return false;
 
       }
-      
-      // Check employment history for Ph.D. (section 13)
 
-      if (selectedCourse === 'Ph.D.') {
+      // Base required fields for all courses (Particulars to be filled in by the Candidate)
 
-        const empPost = document.querySelector('[name="emp_post[]"]');
+      const baseFields = [
 
-        if (!empPost || !empPost.value.trim()) {
-          console.log('Missing employment history (emp_post[])');
+        { name: 'full_name', label: 'Full Name', validation: validateName },
+
+        { name: 'father_name', label: 'Father Name', validation: validateName },
+
+        { name: 'mother_name', label: 'Mother Name', validation: validateName },
+
+        { name: 'gender', label: 'Gender', validation: validateRequired },
+
+        { name: 'nationality', label: 'Nationality', validation: validateRequired },
+
+        { name: 'marital_status', label: 'Marital Status', validation: validateRequired },
+
+        { name: 'category', label: 'Category', validation: validateRequired },
+
+        { name: 'mobile', label: 'Mobile Number', validation: validateMobile },
+
+        { name: 'email', label: 'Email', validation: validateEmail },
+
+        { name: 'perm_address', label: 'Permanent Address', validation: validateRequired },
+
+        { name: 'state', label: 'State', validation: validateRequired },
+
+        { name: 'district', label: 'District', validation: validateRequired },
+
+        { name: 'pincode', label: 'Pincode', validation: validatePincode },
+
+        { name: 'dob', label: 'Date of Birth', validation: validateDOB }
+
+      ];
+
+      // Check base fields for all courses
+
+      for (const field of baseFields) {
+
+        const fieldElement = document.querySelector(`[name="${field.name}"]`);
+
+        if (!fieldElement) {
+
+          console.log('Field not found:', field.name);
+
+          showFieldError(field.name, `${field.label} field is missing`);
+
           return false;
+
+        }
+
+        const validationResult = field.validation(fieldElement);
+
+        if (!validationResult.valid) {
+
+          console.log('Validation failed for:', field.name, validationResult.message);
+
+          showFieldError(field.name, validationResult.message);
+
+          return false;
+
         }
 
       }
-      
+
+      // Add Ph.D. specific validations
+
+      if (selectedCourse === 'Ph.D.') {
+
+        const phdFields = [
+
+          { name: 'department', label: 'Department', validation: validateRequired },
+
+          { name: 'study_mode', label: 'Study Mode', validation: validateRequired },
+
+          //{ name: 'specialization_area', label: 'Area of Specialization', validation: validateRequired },
+
+         // { name: 'proposed_supervisor', label: 'Proposed Supervisor', validation: validateName }
+
+        ];
+
+      //  for (const field of phdFields) {
+//
+      //    const fieldElement = document.querySelector(`[name="${field.name}"]`);
+//
+      //    if (!fieldElement || !field.validation(fieldElement).valid) {
+//
+      //      showFieldError(field.name, `${field.label} is required for Ph.D. admission`);
+//
+      //      return false;
+//
+      //    }
+//
+      //  }
+
+      }
+
+      // Check academic qualifications (required for both courses)
+
+      //  if (!validateAcademicQualifications()) {
+
+       /// return false;
+
+      //}
+
+      // Check payment details (required for both courses)
+
+      if (!validatePaymentDetails()) {
+
+        return false;
+
+      }
+
       console.log('Form validation passed!');
+
       return true;
 
     }
 
-    
+    // Individual validation functions
 
-    // Update submit button state
+    function validateRequired(field) {
 
-    function updateSubmitButtonState() {
+      const value = field.value ? field.value.trim() : '';
 
-      const submitBtn = document.querySelector('button[type="submit"][value="submit"]');
+      return {
 
-      if (!submitBtn) return;
+        valid: value.length > 0,
 
-      
+        message: 'This field is required'
 
-      const isValid = validateFormForSubmit();
+      };
 
-      
+    }
 
-      if (isValid) {
+    function validateName(field) {
 
-        submitBtn.disabled = false;
+      const value = field.value ? field.value.trim() : '';
 
-        submitBtn.style.opacity = '1';
+      if (value.length === 0) {
 
-        submitBtn.style.cursor = 'pointer';
-
-        submitBtn.title = 'Click to submit your application';
-
-      } else {
-
-        submitBtn.disabled = true;
-
-        submitBtn.style.opacity = '0.6';
-
-        submitBtn.style.cursor = 'not-allowed';
-
-        submitBtn.title = 'Please fill all field first';
+        return { valid: false, message: 'This field is required' };
 
       }
 
+      if (value.length < 2) {
+
+        return { valid: false, message: 'Name must be at least 2 characters long' };
+
+      }
+
+      if (!/^[a-zA-Z\s\.]+$/.test(value)) {
+
+        return { valid: false, message: 'Name can only contain letters, spaces, and dots' };
+
+      }
+
+      return { valid: true, message: '' };
+
+    }
+
+    function validateEmail(field) {
+
+      const value = field.value ? field.value.trim() : '';
+
+      if (value.length === 0) {
+
+        return { valid: false, message: 'Email is required' };
+
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailRegex.test(value)) {
+
+        return { valid: false, message: 'Please enter a valid email address' };
+
+      }
+
+      return { valid: true, message: '' };
+
+    }
+
+    function validateMobile(field) {
+
+      const value = field.value ? field.value.trim() : '';
+
+      if (value.length === 0) {
+
+        return { valid: false, message: 'Mobile number is required' };
+
+      }
+
+      if (!/^[6-9]\d{9}$/.test(value)) {
+
+        return { valid: false, message: 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9' };
+
+      }
+
+      return { valid: true, message: '' };
+
+    }
+
+    function validatePincode(field) {
+
+      const value = field.value ? field.value.trim() : '';
+
+      if (value.length === 0) {
+
+        return { valid: false, message: 'Pincode is required' };
+
+      }
+
+      if (!/^\d{6}$/.test(value)) {
+
+        return { valid: false, message: 'Pincode must be exactly 6 digits' };
+
+      }
+
+      return { valid: true, message: '' };
+
+    }
+
+    function validateDOB(field) {
+
+      const value = field.value;
+
+      if (!value) {
+
+        return { valid: false, message: 'Date of Birth is required' };
+
+      }
+
+      const dob = new Date(value);
+
+      const today = new Date();
+
+      const minDate = new Date(today.getFullYear() - 70, today.getMonth(), today.getDate());
+
+      const maxDate = new Date(today.getFullYear() - 15, today.getMonth(), today.getDate());
+
+      if (dob < minDate) {
+
+        return { valid: false, message: 'Date of Birth cannot be more than 70 years ago' };
+
+      }
+
+      if (dob > maxDate) {
+
+        return { valid: false, message: 'You must be at least 15 years old to apply' };
+
+      }
+
+      return { valid: true, message: '' };
+
+    }
+
+    {% comment %} function validateAcademicQualifications() {
+
+      const aqExams = document.querySelectorAll('[name="aq_exam[]"]');
+
+      const aqBoards = document.querySelectorAll('[name="aq_board[]"]');
+
+      const aqYears = document.querySelectorAll('[name="aq_year[]"]');
+
+      const aqMarksObtained = document.querySelectorAll('[name="aq_marks_obtained[]"]');
+
+      const aqTotalMarks = document.querySelectorAll('[name="aq_total_marks[]"]');
+
+      let hasAtLeastOneCompleteQual = false;
+
+      for (let i = 0; i < aqExams.length; i++) {
+
+        const exam = aqExams[i].value.trim();
+
+        const board = aqBoards[i].value.trim();
+
+        const year = aqYears[i].value.trim();
+
+        const marksObtained = aqMarksObtained[i].value.trim();
+
+        const totalMarks = aqTotalMarks[i].value.trim();
+
+        // If this row is filled, validate it
+
+        if (exam || board || year || marksObtained || totalMarks) {
+
+          if (!exam) {
+
+            showFieldError('aq_exam[]', 'Please select examination');
+
+            return false;
+
+          }
+
+          if (!board) {
+
+            showFieldError('aq_board[]', 'Please enter university/board name');
+
+            return false;
+
+          }
+
+          if (!year) {
+
+            showFieldError('aq_year[]', 'Please enter passing year');
+
+            return false;
+
+          }
+
+          if (!/^\d{4}$/.test(year)) {
+
+            showFieldError('aq_year[]', 'Please enter a valid year (4 digits)');
+
+            return false;
+
+          }
+
+          // Validate marks if provided
+
+          if (marksObtained || totalMarks) {
+
+            const obtained = parseFloat(marksObtained) || 0;
+
+            const total = parseFloat(totalMarks) || 0;
+
+            if (total <= 0) {
+
+              showFieldError('aq_total_marks[]', 'Total marks must be greater than 0');
+
+              return false;
+
+            }
+
+            if (obtained < 0) {
+
+              showFieldError('aq_marks_obtained[]', 'Marks obtained cannot be negative');
+
+              return false;
+
+            }
+
+            if (obtained > total) {
+
+              showFieldError('aq_marks_obtained[]', 'Marks obtained cannot be greater than total marks');
+
+              return false;
+
+            }
+
+          }
+
+          hasAtLeastOneCompleteQual = true;
+
+        }
+
+      }
+
+      if (!hasAtLeastOneCompleteQual) {
+
+        showFieldError('aq_exam[]', 'Please add at least one complete academic qualification');
+
+        return false;
+
+      }
+
+      return true;
+
+    } {% endcomment %}
+
+    function validatePaymentDetails() {
+
+      const paymentDate = document.querySelector('[name="payment_date"]');
+
+      const paymentId = document.querySelector('[name="payment_id"]');
+
+      // Only validate if payment fields exist (for draft applications)
+
+      if (!paymentDate || !paymentId) {
+
+        return true; // Payment fields not present, skip validation
+
+      }
+
+      if (!paymentDate.value.trim()) {
+
+        showFieldError('payment_date', 'Payment date is required');
+
+        return false;
+
+      }
+
+      if (!paymentId.value.trim()) {
+
+        showFieldError('payment_id', 'Payment ID is required');
+
+        return false;
+
+      }
+
+      if (paymentId.value.trim().length < 5) {
+
+        showFieldError('payment_id', 'Payment ID seems too short');
+
+        return false;
+
+      }
+
+      return true;
+
+    }
+
+    // Update submit button state
+    function updateSubmitButtonState() {
+      const submitBtn = document.querySelector('button[type="submit"][value="submit"]');
+      if (!submitBtn) return;
       
+      // Check specific sections for submit button
+      let allRequiredFilled = true;
+      let missingSections = [];
+      
+      // 1. Check Apply Course
+      const applyCourse = document.querySelector('[name="apply_course"]');
+      if (!applyCourse || !applyCourse.value.trim()) {
+        allRequiredFilled = false;
+        missingSections.push('Apply Course');
+      }
+      
+      // 2. Check Particulars to be filled in by the Candidate
+      const requiredFields = ['full_name', 'father_name', 'mother_name', 'gender', 'nationality', 
+                             'marital_status', 'category', 'mobile', 'email', 'perm_address', 
+                             'state', 'district', 'pincode', 'dob'];
+      
+      for (const fieldName of requiredFields) {
+        const field = document.querySelector(`[name="${fieldName}"]`);
+        if (!field || !field.value.trim()) {
+          allRequiredFilled = false;
+          missingSections.push('Particulars to be filled in by the Candidate');
+          break;
+        }
+      }
+      
+      // 3. Check Academic Qualifications
+    //  const aqExams = document.querySelectorAll('[name="aq_exam[]"]');
+    //  let hasAcademicQual = false;
+    //  for (let i = 0; i < aqExams.length; i++) {
+    //    const exam = aqExams[i].value.trim();
+    //    const board = document.querySelectorAll('[name="aq_board[]"]')[i]?.value.trim();
+    //    if (exam && board) {
+    //      hasAcademicQual = true;
+    //      break;
+    //    }
+    //  }
+    //  if (!hasAcademicQual) {
+    //    allRequiredFilled = false;
+    //    missingSections.push('Academic Qualifications');
+    //  }
+      
+      // 3. Check Payment Details
+      const paymentDate = document.querySelector('[name="payment_date"]');
+      const paymentId = document.querySelector('[name="payment_id"]');
+      
+      let paymentFilled = false;
+      if (paymentDate && paymentId) {
+        if (paymentDate.value.trim() && paymentId.value.trim()) {
+          paymentFilled = true;
+        }
+      } else {
+        // If payment fields don't exist, consider as filled
+        paymentFilled = true;
+      }
+      
+      if (!paymentFilled) {
+        allRequiredFilled = false;
+        missingSections.push('Payment Details');
+      }
+      
+      // 4. Check Photo Upload
+      const photoInput = document.querySelector('[name="photo"]');
+      let hasPhoto = false;
+      if (photoInput && photoInput.files && photoInput.files.length > 0) {
+        hasPhoto = true;
+      } else {
+        // Check if photo is already uploaded (from existing data)
+        const photoPreview = document.querySelector('.photo img');
+        if (photoPreview && photoPreview.src && photoPreview.src !== '') {
+          hasPhoto = true;
+        }
+      }
+      if (!hasPhoto) {
+        allRequiredFilled = false;
+        missingSections.push('Photo Upload');
+      }
+      
+      // 5. Check Signature Upload
+      const signatureInput = document.querySelector('[name="signature"]');
+      let hasSignature = false;
+      if (signatureInput && signatureInput.files && signatureInput.files.length > 0) {
+        hasSignature = true;
+      } else {
+        // Check if signature is already uploaded (from existing data)
+        const signatureName = document.querySelector('[name="signature_name"]');
+        if (signatureName && signatureName.value.trim()) {
+          hasSignature = true;
+        }
+      }
+      if (!hasSignature) {
+        allRequiredFilled = false;
+        missingSections.push('Signature Upload');
+      }
+      
+      if (allRequiredFilled) {
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+        submitBtn.style.cursor = 'pointer';
+        submitBtn.title = 'Click to submit your application';
+      } else {
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.6';
+        submitBtn.style.cursor = 'not-allowed';
+        submitBtn.title = 'Please fill: ' + missingSections.join(', ');
+      }
 
       // Always ensure Save to Draft button is visible
-
       const saveBtn = document.querySelector('button[type="submit"][value="save"]');
 
       if (saveBtn) {
@@ -2896,9 +3320,9 @@
 
             { name: 'study_mode', label: 'Study Mode' },
 
-            { name: 'specialization_area', label: 'Area of Specialization' },
-
-            { name: 'proposed_supervisor', label: 'Proposed Supervisor' }
+           // { name: 'specialization_area', label: 'Area of Specialization' },
+//
+           // { name: 'proposed_supervisor', label: 'Proposed Supervisor' }
 
           ]);
 
@@ -2926,13 +3350,13 @@
 
         // Check if at least one academic qualification is filled
 
-        const aqExam = document.querySelector('[name="aq_exam[]"]');
+        //const aqExam = document.querySelector('[name="aq_exam[]"]');
 
-        if (!aqExam || !aqExam.value.trim()) {
+        //if (!aqExam || !aqExam.value.trim()) {
 
-          missingFields.push('Academic Qualification (at least one)');
+          //missingFields.push('Academic Qualification (at least one)');
 
-        }
+          //}
 
         
 

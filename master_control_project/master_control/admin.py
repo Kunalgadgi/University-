@@ -3,6 +3,9 @@ Master Control Admin Configuration
 Production-grade Django Admin customization with full features.
 """
 
+import csv
+import datetime
+from django.http import HttpResponse
 from django.contrib import admin
 from django.db.models import Count, Sum
 from django.utils.html import format_html
@@ -281,6 +284,72 @@ def print_applications(modeladmin, request, queryset):
         modeladmin.message_user(request, "Please select only one application to print.", level='warning')
 
 
+@admin.action(description="Export selected applications to Excel")
+def export_to_excel(modeladmin, request, queryset):
+    """
+    Export selected admission applications to Excel/CSV format
+    """
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="admission_applications_{datetime.datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
+    
+    writer = csv.writer(response)
+    
+    # Write header
+    headers = [
+        'Application No', 'Student Name', 'Email', 'Mobile', 'Advertisement', 
+        'Course', 'Apply Course', 'Department', 'Study Mode', 'Status', 'Applied Date', 'Father Name', 'Mother Name',
+        'Date of Birth', 'Gender', 'Nationality', 'Aadhar Number',
+        'Permanent Address', 'Current Address', 'District', 'State', 'Pincode',
+        '10th Certificate', '12th Certificate', 'Graduation Certificate', 
+        'Post Graduation Certificate', 'UGC/CSIR JRF Certificate', 'Other Certificate',
+        'Photo', 'Signature', 'Payment Status', 'Print Status'
+    ]
+    writer.writerow(headers)
+    
+    # Write data rows
+    for app in queryset:
+        # Get academic qualifications from JSON data
+        academic_data = app.get_academic_qualifications() if hasattr(app, 'get_academic_qualifications') else []
+        
+        row = [
+            app.application_no or '',
+            app.full_name or f"{app.first_name or ''} {app.last_name or ''}".strip(),
+            app.email or '',
+            app.mobile_number or '',
+            app.advertisement.title if app.advertisement else '',
+            app.course.course_name if app.course else '',
+            app.apply_course or '',
+            app.department or '',
+            app.study_mode or '',
+            app.status or '',
+            app.created_at.strftime('%Y-%m-%d %H:%M:%S') if app.created_at else '',
+            app.father_name or '',
+            app.mother_name or '',
+            app.date_of_birth.strftime('%Y-%m-%d') if app.date_of_birth else '',
+            app.gender or '',
+            app.nationality or '',
+            app.aadhar_number or '',
+            app.permanent_address or '',
+            app.current_address or '',
+            app.district or '',
+            app.state or '',
+            app.pincode or '',
+            'Yes' if app.tenth_certificate else 'No',
+            'Yes' if app.twelfth_certificate else 'No',
+            'Yes' if app.graduation_certificate else 'No',
+            'Yes' if app.post_graduation_certificate else 'No',
+            'Yes' if app.ugc_csir_jrf_certificate else 'No',
+            'Yes' if app.other_certificate else 'No',
+            'Yes' if app.photo else 'No',
+            'Yes' if app.signature else 'No',
+            'Success' if app.status == 'payment_success' else app.status,
+            'Yes' if app.is_printed else 'No'
+        ]
+        writer.writerow(row)
+    
+    return response
+
+
 @admin.register(AdmissionApplication)
 class AdmissionApplicationAdmin(BaseAdmin):
     list_display = (
@@ -297,7 +366,7 @@ class AdmissionApplicationAdmin(BaseAdmin):
     search_fields = ("application_no", "student__username", "student__email")
     list_filter = ("status", "is_data_locked", "is_active", "is_printed")
     ordering = ("-created_at",)
-    actions = [activate_selected, deactivate_selected, print_applications]
+    actions = [activate_selected, deactivate_selected, print_applications, export_to_excel]
     
     fieldsets = (
         ("Basic Information", {
@@ -379,6 +448,13 @@ class AdmissionApplicationAdmin(BaseAdmin):
             "fields": (
                 "photo", "signature"
             )
+        }),
+        ("Academic Certificates", {
+            "fields": (
+                "tenth_certificate", "twelfth_certificate", "graduation_certificate",
+                "post_graduation_certificate", "ugc_csir_jrf_certificate", "other_certificate"
+            ),
+            "classes": ("wide",)
         }),
         ("System Information", {
             "fields": (

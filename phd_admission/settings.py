@@ -31,6 +31,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+# DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600
+# FILE_UPLOAD_MAX_MEMORY_SIZE = 104857600
+
 
 # Application definition
 
@@ -130,11 +133,11 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 import os
 
 STATIC_URL = '/static/'
+STATIC_ROOT = '/var/www/cblu/University-/staticfiles'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = '/var/www/cblu/University-/media'
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
